@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Study Planner App</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React & ReactDOM -->
+  <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+  <!-- Babel for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Lucide Icons UMD -->
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body class="bg-gray-100">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    function StudyPlannerApp() {
+      const [currentView, setCurrentView] = useState('schedule'); // 'schedule' or 'ai'
+      const [userPlans, setUserPlans] = useState([
+        { id: 1, title: '영어 단어 암기', memo: '새 단어 20개', start: '16:00', end: '17:00', emoji: '📚' },
+        { id: 2, title: '수학 문제 풀이', memo: '기출문제 5개', start: '18:00', end: '19:30', emoji: '📐' }
+      ]);
+      const [aiPlans, setAiPlans] = useState([]);
+      const [draggedItem, setDraggedItem] = useState(null);
+      const [showModal, setShowModal] = useState(false);
+      const [editingPlan, setEditingPlan] = useState(null);
+      const [newPlan, setNewPlan] = useState({
+        title:'', memo:'', start:'21:00', end:'22:00', emoji:'📚'
+      });
+
+      // Lucide 렌더
+      useEffect(() => { lucide.createIcons() }, []);
+
+      // 30분 단위 슬롯
+      const timeSlots = Array.from({length: (24-8)*2 + 3*2}, (_, i) => {
+        const total = 8*60 + i*30;
+        const h = Math.floor(total/60)%24, m = total%60;
+        return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+      });
+
+      // Drag & Drop 핸들러
+      const handleDragStart = (e,p) => {
+        setDraggedItem(p);
+        e.dataTransfer.effectAllowed='move';
+      };
+      const handleDragOver = e => e.preventDefault();
+      const handleDrop = (e, targetStart) => {
+        e.preventDefault();
+        if(!draggedItem) return;
+        const [sh,sm] = draggedItem.start.split(':').map(Number);
+        const [eh,em] = draggedItem.end.split(':').map(Number);
+        const duration = (eh*60+em) - (sh*60+sm);
+        const [h,m] = targetStart.split(':').map(Number);
+        const endTotal = h*60 + m + duration;
+        const endH = Math.floor(endTotal/60)%24, endM = endTotal%60;
+        const updated = {
+          ...draggedItem,
+          start: targetStart,
+          end:   `${String(endH).padStart(2,'0')}:${String(endM).padStart(2,'0')}`
+        };
+        setUserPlans(plans => plans.map(x=>x.id===updated.id?updated:x));
+        setDraggedItem(null);
+      };
+
+      // 삭제
+      const deletePlan = id => {
+        setUserPlans(plans => plans.filter(x=>x.id!==id));
+      };
+
+      // 수정 모달 열기
+      const onEdit = plan => {
+        setEditingPlan(plan);
+        setNewPlan({
+          title: plan.title,
+          memo:  plan.memo,
+          start: plan.start,
+          end:   plan.end,
+          emoji: plan.emoji
+        });
+        setShowModal(true);
+      };
+
+      // AI 추천 생성
+      const generateAiSuggestions = () => {
+        const sugg = [
+          {title:'물리 공식 정리',emoji:'⚛️'},
+          {title:'역사 연표 암기',emoji:'📜'},
+          {title:'생물 세포 구조',emoji:'🔬'},
+          {title:'문학 작품 분석',emoji:'📖'},
+          {title:'화학 반응식',emoji:'🧪'}
+        ];
+        const pick = sugg.sort(()=>0.5-Math.random()).slice(0,3);
+        const newAi = pick.map((it,i)=>({
+          id: Date.now()+i,
+          title: it.title,
+          memo:  '',
+          start: `${19+i}:00`,
+          end:   `${20+i}:00`,
+          emoji: it.emoji
+        }));
+        setAiPlans(newAi);
+      };
+
+      // AI 플랜 적용
+      const applyAiPlans = () => {
+        const cloned = aiPlans.map(pl=>({
+          ...pl, id:Date.now()+Math.random()
+        }));
+        setUserPlans(plans => [...plans, ...cloned]);
+        setAiPlans([]);
+        setCurrentView('schedule');
+      };
+
+      // 새/수정 확정
+      const savePlan = () => {
+        if(!newPlan.title||!newPlan.start||!newPlan.end) return;
+        if(editingPlan) {
+          setUserPlans(plans => plans.map(x=>x.id===editingPlan.id?{...editingPlan,...newPlan}:x));
+        } else {
+          setUserPlans(plans => [...plans, {...newPlan, id:Date.now()}]);
+        }
+        setEditingPlan(null);
+        setNewPlan({title:'',memo:'',start:'21:00',end:'22:00',emoji:'📚'});
+        setShowModal(false);
+      };
+
+      return (
+        <div className="max-w-md mx-auto bg-white min-h-screen relative overflow-hidden">
+          {/* 헤더 */}
+          <header className="bg-orange-50 p-3 border-b border-orange-100 sticky top-0 z-10 flex justify-between items-center">
+            <h1 className="text-xl font-bold text-gray-800">My Plan</h1>
+            <div className="flex gap-2">
+              <button onClick={()=>window.location.reload()} className="p-2 text-orange-600 hover:bg-orange-100 rounded-lg">
+                <i data-lucide="refresh-cw" className="lucide" style={{width:20,height:20}}/>
+              </button>
+              <button onClick={()=>alert('설정')} className="p-2 text-orange-600 hover:bg-orange-100 rounded-lg">
+                <i data-lucide="settings" className="lucide" style={{width:20,height:20}}/>
+              </button>
+            </div>
+          </header>
+
+          {/* 콘텐츠 */}
+          <div className="flex h-full">
+            {/* 스케줄 뷰 */}
+            <div className={`w-full transition-transform duration-300 ${currentView==='ai'?' -translate-x-full ':' translate-x-0'}`}>
+              <div className="p-4 h-screen overflow-y-auto pb-28 bg-orange-50">
+                {timeSlots.map(time => {
+                  const isHour = time.endsWith(':00');
+                  const plansHere = userPlans.filter(p=>p.start===time);
+                  return (
+                    <div key={time}
+                         onDragOver={handleDragOver}
+                         onDrop={e=>handleDrop(e,time)}
+                         className={`flex items-start ${isHour?'min-h-16 bg-white':'min-h-8 bg-gray-50'} border-b border-gray-200`}>
+                      <div className="w-16 text-center text-gray-600 font-medium pt-2">{isHour?time:''}</div>
+                      <div className="flex-1 pl-4 space-y-2 pb-2">
+                        {plansHere.map(plan=>(
+                          <div key={plan.id}
+                               draggable
+                               onDragStart={e=>handleDragStart(e,plan)}
+                               className="relative p-3 bg-white border-2 border-orange-500 rounded-xl shadow-sm cursor-move hover:shadow-md">
+                            <div className="absolute top-1 right-1 flex space-x-1">
+                              <button onClick={()=>onEdit(plan)} className="p-1 rounded hover:bg-gray-200">
+                                <i data-lucide="edit-3" className="lucide" style={{width:14,height:14}}/>
+                              </button>
+                              <button onClick={()=>deletePlan(plan.id)} className="p-1 rounded hover:bg-gray-200">
+                                <i data-lucide="trash-2" className="lucide" style={{width:14,height:14}}/>
+                              </button>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg">{plan.emoji}</span>
+                              <div className="flex-1">
+                                <div className="font-medium text-sm">{plan.title}</div>
+                                <div className="text-xs text-gray-500">{plan.start} ~ {plan.end}</div>
+                                {plan.memo && <div className="text-xs text-gray-600">메모: {plan.memo}</div>}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* AI 뷰 */}
+            <div className={`w-full absolute top-0 transition-transform duration-300 ${
+              currentView==='ai'?'translate-x-0':'translate-x-full'
+            }`}>
+              <div className="p-4 h-screen overflow-y-auto pb-28 bg-orange-100">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-bold flex items-center gap-2">
+                    <span>🤖</span> AI 추천 플랜
+                  </h2>
+                  <button onClick={()=>setCurrentView('schedule')} className="text-orange-600">← 돌아가기</button>
+                </div>
+                <div className="space-y-3">
+                  {aiPlans.map(pl=>(
+                    <div key={pl.id} className="p-4 bg-orange-500 text-white rounded-xl shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{pl.emoji}</span>
+                        <div>
+                          <div className="font-medium">{pl.title}</div>
+                          <div className="text-sm text-orange-100">{pl.start} ~ {pl.end}</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* AI 생성 버튼 */}
+                {aiPlans.length===0 && (
+                  <div className="text-center py-8">
+                    <button onClick={generateAiSuggestions}
+                            className="bg-orange-500 text-white px-6 py-3 rounded-full">
+                      AI 플랜 생성하기
+                    </button>
+                  </div>
+                )}
+
+                {/* 적용 버튼 */}
+                {aiPlans.length>0 && (
+                  <div className="text-center mt-6">
+                    <button onClick={applyAiPlans}
+                            className="bg-orange-500 text-white px-6 py-3 rounded-full">
+                      내 플래너에 적용
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* 하단 명령 바 */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+            <div className="max-w-md mx-auto flex gap-3">
+              {currentView==='schedule' ? (
+                <button onClick={()=>setCurrentView('ai')}
+                        className="flex-1 bg-white border-2 border-orange-500 text-orange-500 py-3 rounded-full">
+                  AI에 명령
+                </button>
+              ) : (
+                <div className="flex-1 flex items-center bg-white border-2 border-orange-500 rounded-full px-3 py-2">
+                  <input
+                  type="text"
+                  placeholder="AI에게 플랜을 요청해보세요"
+                  className="flex-1 outline-none bg-transparent text-orange-500 placeholder-orange-300"
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') generateAiSuggestions();
+                  }}
+                  />
+                  <span className="ml-2 text-2xl">🤖</span>
+                </div>
+              )}
+              {currentView==='ai' && aiPlans.length>0 && (
+                <button onClick={applyAiPlans}
+                        className="flex-1 bg-orange-500 text-white py-3 rounded-full">
+                  적용
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* 플랜 추가/수정 모달 */}
+          {showModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-2xl w-full max-w-sm p-6">
+                <h3 className="text-xl font-bold text-center mb-4">
+                  {editingPlan ? '일정 수정' : '새 일정 추가'}
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block mb-1">할 일</label>
+                    <input type="text" value={newPlan.title}
+                           onChange={e=>setNewPlan(p=>({...p,title:e.target.value}))}
+                           className="w-full border p-2 rounded"/>
+                  </div>
+                  <div>
+                    <label className="block mb-1">메모</label>
+                    <input type="text" value={newPlan.memo}
+                           onChange={e=>setNewPlan(p=>({...p,memo:e.target.value}))}
+                           className="w-full border p-2 rounded"/>
+                  </div>
+                  <div>
+                    <label className="block mb-1">시간</label>
+                    <div className="flex items-center gap-2">
+                      <input type="time" value={newPlan.start}
+                             onChange={e=>setNewPlan(p=>({...p,start:e.target.value}))}
+                             className="border p-2 rounded w-1/2"/>
+                      <span>~</span>
+                      <input type="time" value={newPlan.end}
+                             onChange={e=>setNewPlan(p=>({...p,end:e.target.value}))}
+                             className="border p-2 rounded w-1/2"/>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block mb-1">이모지</label>
+                    <div className="flex gap-2">
+                      {['📚','✏️','📐','🧪','💡'].map(em=>(
+                        <button key={em} onClick={()=>setNewPlan(p=>({...p,emoji:em}))}
+                                className={`p-2 text-2xl rounded ${newPlan.emoji===em?'bg-orange-100':''}`}>
+                          {em}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-6 flex gap-3">
+                  <button onClick={()=>{ setShowModal(false); setEditingPlan(null); }}
+                          className="flex-1 border py-3 rounded">취소</button>
+                  <button onClick={savePlan}
+                          className="flex-1 bg-orange-500 text-white py-3 rounded">
+                    {editingPlan ? '수정 완료' : '추가'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 새 일정 추가 버튼 */}
+          <button onClick={()=>{ setEditingPlan(null); setShowModal(true); }}
+                  className="fixed bottom-24 right-4 bg-orange-500 text-white w-14 h-14 rounded-full flex items-center justify-center">
+            <i data-lucide="plus" className="lucide" style={{width:24,height:24}}/>
+          </button>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<StudyPlannerApp />, document.getElementById('root'));
+  </script>
+</body>
+</html>

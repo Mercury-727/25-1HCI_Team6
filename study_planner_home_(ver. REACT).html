@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>스터디 플래너 홈</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    /* --- 전체 CSS (원본과 동일) --- */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #FDF8F4; color: #333; line-height: 1.5;
+      max-width: 390px; margin: 0 auto; min-height: 100vh;
+    }
+    .header { background: #FFF3F0; padding: 12px 20px;
+      display: flex; justify-content: space-between; align-items: center;
+      backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-size: 20px; font-weight: 700; color: #F96C50; }
+    .header-buttons { display: flex; gap: 8px; }
+    .header-btn {
+      background: none; border: none; font-size: 18px;
+      padding: 8px; border-radius: 8px; cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .header-btn:hover { background: rgba(249,108,80,0.1); transform: scale(1.05); }
+
+    .main-container { padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; }
+    .card {
+      border-radius: 12px; padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      transition: all 0.2s ease;
+    }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+    .daily-recommendation {
+      background: linear-gradient(135deg,#FEE6DD 0%,#FFF3F0 100%);
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .daily-recommendation::before {
+      content:''; position:absolute; top:-50%; left:-50%;
+      width:200%; height:200%;
+      background:linear-gradient(45deg,transparent,rgba(255,255,255,0.1),transparent);
+      animation: shine 3s infinite;
+    }
+    @keyframes shine {
+      0%{transform:translate(-100%,-100%) rotate(45deg);}
+      100%{transform:translate(100%,100%) rotate(45deg);}
+    }
+    .daily-recommendation h3 { font-size:16px; font-weight:600; color:#E14A2E; margin-bottom:8px;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+    }
+    .daily-recommendation p { font-size:12px; color:#666; opacity:0.8; }
+
+    .ai-plan-card {
+      background: linear-gradient(135deg,#F96C50 0%,#E14A2E 100%);
+      color:white; text-align:center; position:relative; overflow:hidden;
+    }
+    .ai-plan-card::before {
+      content:''; position:absolute; top:-50%; left:-50%;
+      width:200%; height:200%;
+      background: linear-gradient(45deg,transparent,rgba(255,255,255,0.2),transparent);
+      animation: shine 4s infinite;
+    }
+    .ai-plan-text { font-size:16px; font-weight:700; margin-bottom:12px;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+    }
+    .ai-plan-btn {
+      background:rgba(255,255,255,0.9); color:#F96C50; border:none;
+      padding:12px 24px; border-radius:20px; font-size:14px; font-weight:600;
+      cursor:pointer; transition:all 0.3s ease; box-shadow:0 2px 8px rgba(0,0,0,0.1);
+    }
+    .ai-plan-btn:hover {
+      background:rgba(255,255,255,1); transform:scale(1.05);
+      box-shadow:0 4px 12px rgba(0,0,0,0.2);
+    }
+    .ai-plan-btn:active { transform:scale(0.98); }
+
+    .floating-ai-btn {
+      position:fixed; bottom:30px; right:20px; z-index:1000;
+      background:linear-gradient(135deg,#E14A2E 0%,#F96C50 100%);
+      color:white; border:none; padding:16px 20px; border-radius:25px;
+      font-size:14px; font-weight:600; cursor:pointer;
+      box-shadow:0 4px 16px rgba(225,74,46,0.3);
+      transition:all 0.3s ease; display:flex; align-items:center; gap:8px;
+    }
+    .tooltip {
+      position:absolute; top:-35px; left:50%; transform:translateX(-50%);
+      background:rgba(51,51,51,0.9); color:white; padding:6px 10px;
+      border-radius:6px; font-size:12px; white-space:nowrap;
+      opacity:0; pointer-events:none; transition:all 0.3s ease;
+    }
+    .tooltip.show { opacity:1; }
+    .feedback-item { margin-bottom:8px; font-size:14px; }
+    .feedback-label { color:#666; font-size:12px; }
+    .feedback-value { color:#333; font-weight:500; }
+    .feedback-positive { color:#66C3A7; }
+    .feedback-quote {
+      background:rgba(255,255,255,0.8); padding:8px; border-radius:8px;
+      font-size:12px; color:#555; font-style:italic; border-left:3px solid #F96C50;
+      margin-top:8px;
+    }
+    .activity-scroll {
+      display:flex; gap:12px; overflow-x:auto; padding-bottom:8px;
+      scrollbar-width:none; -ms-overflow-style:none;
+    }
+    .activity-scroll::-webkit-scrollbar { display:none; }
+    .activity-card {
+      min-width:200px; background:#FFDDD6; border-radius:12px;
+      padding:12px; flex-shrink:0; position:relative; cursor:pointer;
+      transition:all 0.2s ease;
+    }
+    .activity-card:hover { transform:scale(1.02); background:#FFD0C6; }
+    .activity-title { font-size:14px; font-weight:600; color:#333; margin-bottom:4px; }
+    .activity-rating { font-size:12px; color:#666; margin-bottom:8px; }
+    .start-btn {
+      background:#F96C50; color:white; border:none; padding:6px 12px;
+      border-radius:8px; font-size:12px; font-weight:500; cursor:pointer;
+      transition:all 0.2s ease;
+    }
+    .start-btn:hover { background:#E14A2E; transform:scale(1.05); }
+    .learning-style { background: linear-gradient(135deg,#FCDDD3 0%,#FEE6DD 100%); }
+    .learning-style h3 {
+      font-size:16px; font-weight:600; color:#333; margin-bottom:8px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .trend-btn {
+      background:rgba(255,255,255,0.7); border:1px solid #F96C50;
+      color:#F96C50; padding:8px 12px; border-radius:8px;
+      font-size:12px; cursor:pointer; transition:all 0.2s ease;
+    }
+    .trend-btn:hover { background:#F96C50; color:white; }
+    .daily-question {
+      background: linear-gradient(135deg,#FFF7DA 0%,#FFFBEA 100%);
+      cursor:pointer; position:relative; overflow:hidden;
+    }
+    .daily-question h3 {
+      font-size:16px; font-weight:600; color:#B8860B; margin-bottom:8px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .daily-question p { font-size:12px; color:#666; opacity:0.8; }
+    @keyframes bounceIn {
+      0% { transform: scale(0.3) translateY(20px); opacity:0; }
+      50% { transform: scale(1.05) translateY(-5px); opacity:0.8; }
+      100%{ transform: scale(1) translateY(0); opacity:1; }
+    }
+    .floating { animation:float 3s ease-in-out infinite; }
+    @keyframes float {
+      0%,100%{transform:translateY(0px);} 50%{transform:translateY(-4px);}
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React & Babel CDN -->
+  <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    function StudyPlannerHome() {
+      const [showFloating, setShowFloating] = useState(false);
+      const [showTooltip, setShowTooltip] = useState(false);
+      const lastY = useRef(0);
+
+      // 초기 로드 애니메이션 & 스크롤 핸들러
+      useEffect(() => {
+        document.querySelectorAll('.card').forEach((card, i) => {
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(20px)';
+          setTimeout(() => {
+            card.style.transition = 'all 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+          }, i * 100);
+        });
+
+        // 첫 방문 툴팁
+        setTimeout(() => {
+          setShowTooltip(true);
+          setTimeout(() => setShowTooltip(false), 3000);
+        }, 3000);
+
+        const onScroll = () => {
+          const y = window.scrollY;
+          setShowFloating(y > lastY.current && y > 200);
+          lastY.current = y;
+        };
+        window.addEventListener('scroll', onScroll);
+        return () => window.removeEventListener('scroll', onScroll);
+      }, []);
+
+      const alertMsg = msg => alert(msg + ' 기능이 실행됩니다!');
+
+      return (
+        <>
+          <header className="header">
+            <div className="logo">My Study</div>
+            <div className="header-buttons">
+              <button className="header-btn" onClick={() => alertMsg('설정')}>⚙️</button>
+              <button className="header-btn" onClick={() => {
+                const btn = document.querySelector('.header-btn:last-child');
+                btn.style.transform = 'rotate(360deg)';
+                setTimeout(() => {
+                  btn.style.transform = 'rotate(0deg)';
+                  alertMsg('페이지가 새로고침되었습니다');
+                }, 500);
+              }}>🔄</button>
+            </div>
+          </header>
+
+          <main className="main-container">
+            <section className="card daily-recommendation floating">
+              <h3>🎯 오늘은 '집중력 유지'에 도전해보세요!</h3>
+              <p>최근 학습 피드백에서 '산만함' 문제를 언급하셨습니다.</p>
+            </section>
+
+            <section className="card ai-plan-card" onClick={() => {
+              setShowFloating(f => !f);
+              alertMsg(f ? '상단 카드 버튼을 사용해보세요!' : '하단 플로팅 버튼이 활성화되었습니다!');
+            }}>
+              <div className="ai-plan-text">🤖 AI가 오늘의 학습 계획을 짜드릴게요! 🗓️</div>
+              <button className="ai-plan-btn" onClick={e => {
+                e.stopPropagation();
+                alertMsg('AI 학습 플랜 생성 페이지로 이동합니다! 🤖');
+              }}>플랜 짜러 가기</button>
+            </section>
+
+            <section className="card recommended-activities">
+              <h3>📚 추천 학습 활동</h3>
+              <div className="activity-scroll">
+                {[
+                  { name: '타이머 공부법 25분', rating: '4.9' },
+                  { name: '암기 카드 학습', rating: '4.7' },
+                  { name: '개념 정리 노트', rating: '4.8' },
+                ].map((act, i) => (
+                  <div key={i} className="activity-card" onClick={() => alertMsg(act.name + ' 활동을 시작합니다!')}>
+                    <div className="activity-title">⏱️ {act.name}</div>
+                    <div className="activity-rating">⭐ {act.rating}</div>
+                    <button className="start-btn">시작하기</button>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="card learning-style">
+              <h3>🧩 학습 성향 요약</h3>
+              <div className="style-type">
+                현재 유형: <span className="style-highlight">몰입형 + 감각형</span>
+              </div>
+              <button className="trend-btn" onClick={() => alertMsg('학습 성향 변화 추이를 확인합니다!')}>📈 변화 추이 보기</button>
+            </section>
+
+            <section className="card daily-question" onClick={() => alertMsg('회고 탭으로 이동합니다!')}>
+              <h3>💭 오늘의 질문</h3>
+              <p>"오늘 가장 잘한 일이 무엇인가요?"</p>
+              <p>클릭 시 회고 탭으로 이동</p>
+            </section>
+
+            <section className="card weekly-feedback">
+              <h3>📈 주간 피드백 요약</h3>
+              <div className="feedback-item">
+                <div className="feedback-label">학습 시간 변화</div>
+                <div className="feedback-value">2시간 47분 → <span className="feedback-positive">+24분</span></div>
+              </div>
+              <div className="feedback-item">
+                <div className="feedback-label">달성률</div>
+                <div className="feedback-value">목표 대비 70%</div>
+              </div>
+              <div className="feedback-quote">
+                "곱셈 공식 개념이 조금 어려웠어요. 다음엔 복습 시간 추가 예정입니다."
+              </div>
+            </section>
+          </main>
+
+          {showFloating && (
+            <button className="floating-ai-btn" onClick={() => alertMsg('AI 학습 플랜 생성 페이지로 이동합니다! 🤖')}>
+              {showTooltip && <span className="tooltip show">학습 계획이 필요하신가요?</span>}
+              🤖 AI 플랜 생성하기
+            </button>
+          )}
+        </>
+      );
+    }
+
+    ReactDOM.render(<StudyPlannerHome />, document.getElementById('root'));
+  </script>
+</body>
+</html>
