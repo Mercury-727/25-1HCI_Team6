@@ -1,0 +1,27 @@
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "22080:80"
+      - "22443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/letsencrypt:/etc/letsencrypt
+    depends_on:
+      - backend
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/letsencrypt:/etc/letsencrypt
+
+  backend:
+    build:
+      context: .
+    container_name: backend
+    expose:
+      - "8000"
