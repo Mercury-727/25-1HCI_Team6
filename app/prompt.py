@@ -1,31 +1,16 @@
-RULES = """**RULES**
-- you are a helper system for self-directed learning
-- given a user's input, output today's schedule, which is a array of tasks
-- input and output formats are valid JSON
-- the task's duration is the difference of end and start of its schedule
-- when checking progress of the user, refer TEXTBOOK CONTENTS
-- when generating tasks with PROBLEM SET, provide range of pages to solve
-- generated output must satisfy all CONDITIONS
+from model import UserData
+
+SYSTEM_PROMPT = """You are a study planner for self-directed learners.
+
+Your task:
+- Generate today's schedule: an array of tasks in Korean.
+- Each task includes topic, start time, and duration.
+- Use "TEXTBOOK CONTENTS" and "PROBLEM SET CONTENTS" from the KNOWLEDGE BASE to decide the order and scope of study.
+- When using problems from the problem set, specify page ranges.
+- All content and tasks should be in Korean.
 """
 
-INPUT_FORMAT = """
-**INPUT FORMAT**
-<time-interval> := {
-  start: int,
-  end: int,
-}
-
-<input> := {
-  active_time: int,
-  attention_span: int,
-  requirement: <time-interval>
-  constraints: [<time-interval>],
-  progress: int, // rate of progress made at school, in page of textbook
-  tpp: float, // average time per page of user spent to solve problem
-}
-"""
-
-TEXTBOOK_CONTENTS = """
+KNOWLEDGE_BASE = """KNOWLEDGE BASE:
 **TEXTBOOK CONTENTS**
 I. 실수와 그 계산
 1. 제곱근과 실수, 10-36pp
@@ -92,9 +77,7 @@ VI. 통계
 창의융합 프로젝트, 240p
 수학으로 통하다, 241p
 대단원 스스로 마무리하기, 242p
-"""
 
-PROBLEM_SET_CONTENTS = """
 **PROBLEM SET CONTENTS**
 I. 제곱근과 실수
 01 제곱근의 뜻과 성질, 8-27pp
@@ -114,17 +97,13 @@ IV. 이차함수
 12 이차함수의 그래프 ⑵, 178-195pp
 """
 
-CONDITIONS = """
-**CONDITIONS**
-- all tasks' topic are Korean
-- difficult tasks take more duration
-- the sum of all tasks' duration is lesser than or equal to the user's active time
-- all tasks' duration are lesser than or equal to the user's attention span
-- all tasks are seperated by nonzero break time
-- all tasks fit in requirement time interval
-- any schedule of a task in output array do not overlap with any time interval in constraints
+def make_user_input(userdata: UserData):
+    return f"""Please generate a study plan based on the following constraints:
 
-remember, you must satisfy all CONDITIONS
-"""
-
-SYSTEM_PROMPT = f"{RULES}{INPUT_FORMAT}{TEXTBOOK_CONTENTS}{PROBLEM_SET_CONTENTS}{CONDITIONS}"
+- Total study time must be ≤ {userdata.active_time}.
+- Each task's duration must be ≤ {userdata.attention_span}.
+- The full plan must satisfy: {userdata.requirement.model_dump_json()}.
+- Do not schedule any task during: [{",".join(interval.model_dump_json() for interval in userdata.constraints)}].
+- I have studied up to page {userdata.progress} of the textbook.
+- I need {userdata.tpp} minutes to solve each page of the problem set.
+    """

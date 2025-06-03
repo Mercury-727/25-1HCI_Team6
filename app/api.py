@@ -5,7 +5,7 @@ from flask import Flask, session, request, jsonify
 from pydantic import ValidationError
 from openai import OpenAI
 
-from prompt import SYSTEM_PROMPT
+from prompt import SYSTEM_PROMPT, KNOWLEDGE_BASE, make_user_input
 from model import UserData, Plan
 
 app = Flask(__name__)
@@ -41,6 +41,8 @@ def plan():
     if "userdata" not in session:
         return "You must provide user data for planning"
 
+    userdata = UserData.model_validate_json(session["userdata"])
+
     client = OpenAI()
 
     response = client.responses.parse(
@@ -53,7 +55,11 @@ def plan():
             },
             {
                 "role": "user",
-                "content": session["userdata"]
+                "content": KNOWLEDGE_BASE,
+            },
+            {
+                "role": "user",
+                "content": make_user_input(userdata)
             },
         ]
     )
