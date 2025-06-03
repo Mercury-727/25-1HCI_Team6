@@ -1,156 +1,400 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>스터디 플래너 홈</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     /* --- 전체 CSS (원본과 동일) --- */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #FDF8F4; color: #333; line-height: 1.5;
-      max-width: 390px; margin: 0 auto; min-height: 100vh;
+      background-color: #FDF8F4;
+      color: #333;
+      line-height: 1.5;
+      max-width: 390px;
+      margin: 0 auto;
+      min-height: 100vh;
     }
-    .header { background: #FFF3F0; padding: 12px 20px;
-      display: flex; justify-content: space-between; align-items: center;
-      backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100;
-    }
-    .logo { font-size: 20px; font-weight: 700; color: #F96C50; }
-    .header-buttons { display: flex; gap: 8px; }
-    .header-btn {
-      background: none; border: none; font-size: 18px;
-      padding: 8px; border-radius: 8px; cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .header-btn:hover { background: rgba(249,108,80,0.1); transform: scale(1.05); }
 
-    .main-container { padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; }
-    .card {
-      border-radius: 12px; padding: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    .header {
+      background: #FFF3F0;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 700;
+      color: #F96C50;
+    }
+
+    .header-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .header-btn {
+      background: none;
+      border: none;
+      font-size: 18px;
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
       transition: all 0.2s ease;
     }
-    .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+    .header-btn:hover {
+      background: rgba(249, 108, 80, 0.1);
+      transform: scale(1.05);
+    }
+
+    .main-container {
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card {
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      transition: all 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
 
     .daily-recommendation {
-      background: linear-gradient(135deg,#FEE6DD 0%,#FFF3F0 100%);
-      text-align: center; position: relative; overflow: hidden;
+      background: linear-gradient(135deg, #FEE6DD 0%, #FFF3F0 100%);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
     }
+
     .daily-recommendation::before {
-      content:''; position:absolute; top:-50%; left:-50%;
-      width:200%; height:200%;
-      background:linear-gradient(45deg,transparent,rgba(255,255,255,0.1),transparent);
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
       animation: shine 3s infinite;
     }
+
     @keyframes shine {
-      0%{transform:translate(-100%,-100%) rotate(45deg);}
-      100%{transform:translate(100%,100%) rotate(45deg);}
+      0% {
+        transform: translate(-100%, -100%) rotate(45deg);
+      }
+
+      100% {
+        transform: translate(100%, 100%) rotate(45deg);
+      }
     }
-    .daily-recommendation h3 { font-size:16px; font-weight:600; color:#E14A2E; margin-bottom:8px;
-      display:flex; align-items:center; justify-content:center; gap:8px;
+
+    .daily-recommendation h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #E14A2E;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
-    .daily-recommendation p { font-size:12px; color:#666; opacity:0.8; }
+
+    .daily-recommendation p {
+      font-size: 12px;
+      color: #666;
+      opacity: 0.8;
+    }
 
     .ai-plan-card {
-      background: linear-gradient(135deg,#F96C50 0%,#E14A2E 100%);
-      color:white; text-align:center; position:relative; overflow:hidden;
+      background: linear-gradient(135deg, #F96C50 0%, #E14A2E 100%);
+      color: white;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
     }
+
     .ai-plan-card::before {
-      content:''; position:absolute; top:-50%; left:-50%;
-      width:200%; height:200%;
-      background: linear-gradient(45deg,transparent,rgba(255,255,255,0.2),transparent);
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
       animation: shine 4s infinite;
     }
-    .ai-plan-text { font-size:16px; font-weight:700; margin-bottom:12px;
-      display:flex; align-items:center; justify-content:center; gap:8px;
+
+    .ai-plan-text {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
+
     .ai-plan-btn {
-      background:rgba(255,255,255,0.9); color:#F96C50; border:none;
-      padding:12px 24px; border-radius:20px; font-size:14px; font-weight:600;
-      cursor:pointer; transition:all 0.3s ease; box-shadow:0 2px 8px rgba(0,0,0,0.1);
+      background: rgba(255, 255, 255, 0.9);
+      color: #F96C50;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
+
     .ai-plan-btn:hover {
-      background:rgba(255,255,255,1); transform:scale(1.05);
-      box-shadow:0 4px 12px rgba(0,0,0,0.2);
+      background: rgba(255, 255, 255, 1);
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
-    .ai-plan-btn:active { transform:scale(0.98); }
+
+    .ai-plan-btn:active {
+      transform: scale(0.98);
+    }
 
     .floating-ai-btn {
-      position:fixed; bottom:30px; right:20px; z-index:1000;
-      background:linear-gradient(135deg,#E14A2E 0%,#F96C50 100%);
-      color:white; border:none; padding:16px 20px; border-radius:25px;
-      font-size:14px; font-weight:600; cursor:pointer;
-      box-shadow:0 4px 16px rgba(225,74,46,0.3);
-      transition:all 0.3s ease; display:flex; align-items:center; gap:8px;
+      position: fixed;
+      bottom: 30px;
+      right: 20px;
+      z-index: 1000;
+      background: linear-gradient(135deg, #E14A2E 0%, #F96C50 100%);
+      color: white;
+      border: none;
+      padding: 16px 20px;
+      border-radius: 25px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(225, 74, 46, 0.3);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
+
     .tooltip {
-      position:absolute; top:-35px; left:50%; transform:translateX(-50%);
-      background:rgba(51,51,51,0.9); color:white; padding:6px 10px;
-      border-radius:6px; font-size:12px; white-space:nowrap;
-      opacity:0; pointer-events:none; transition:all 0.3s ease;
+      position: absolute;
+      top: -35px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(51, 51, 51, 0.9);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
     }
-    .tooltip.show { opacity:1; }
-    .feedback-item { margin-bottom:8px; font-size:14px; }
-    .feedback-label { color:#666; font-size:12px; }
-    .feedback-value { color:#333; font-weight:500; }
-    .feedback-positive { color:#66C3A7; }
+
+    .tooltip.show {
+      opacity: 1;
+    }
+
+    .feedback-item {
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .feedback-label {
+      color: #666;
+      font-size: 12px;
+    }
+
+    .feedback-value {
+      color: #333;
+      font-weight: 500;
+    }
+
+    .feedback-positive {
+      color: #66C3A7;
+    }
+
     .feedback-quote {
-      background:rgba(255,255,255,0.8); padding:8px; border-radius:8px;
-      font-size:12px; color:#555; font-style:italic; border-left:3px solid #F96C50;
-      margin-top:8px;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #555;
+      font-style: italic;
+      border-left: 3px solid #F96C50;
+      margin-top: 8px;
     }
+
     .activity-scroll {
-      display:flex; gap:12px; overflow-x:auto; padding-bottom:8px;
-      scrollbar-width:none; -ms-overflow-style:none;
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     }
-    .activity-scroll::-webkit-scrollbar { display:none; }
+
+    .activity-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
     .activity-card {
-      min-width:200px; background:#FFDDD6; border-radius:12px;
-      padding:12px; flex-shrink:0; position:relative; cursor:pointer;
-      transition:all 0.2s ease;
+      min-width: 200px;
+      background: #FFDDD6;
+      border-radius: 12px;
+      padding: 12px;
+      flex-shrink: 0;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
-    .activity-card:hover { transform:scale(1.02); background:#FFD0C6; }
-    .activity-title { font-size:14px; font-weight:600; color:#333; margin-bottom:4px; }
-    .activity-rating { font-size:12px; color:#666; margin-bottom:8px; }
+
+    .activity-card:hover {
+      transform: scale(1.02);
+      background: #FFD0C6;
+    }
+
+    .activity-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 4px;
+    }
+
+    .activity-rating {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
     .start-btn {
-      background:#F96C50; color:white; border:none; padding:6px 12px;
-      border-radius:8px; font-size:12px; font-weight:500; cursor:pointer;
-      transition:all 0.2s ease;
+      background: #F96C50;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
-    .start-btn:hover { background:#E14A2E; transform:scale(1.05); }
-    .learning-style { background: linear-gradient(135deg,#FCDDD3 0%,#FEE6DD 100%); }
+
+    .start-btn:hover {
+      background: #E14A2E;
+      transform: scale(1.05);
+    }
+
+    .learning-style {
+      background: linear-gradient(135deg, #FCDDD3 0%, #FEE6DD 100%);
+    }
+
     .learning-style h3 {
-      font-size:16px; font-weight:600; color:#333; margin-bottom:8px;
-      display:flex; align-items:center; gap:8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
+
     .trend-btn {
-      background:rgba(255,255,255,0.7); border:1px solid #F96C50;
-      color:#F96C50; padding:8px 12px; border-radius:8px;
-      font-size:12px; cursor:pointer; transition:all 0.2s ease;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid #F96C50;
+      color: #F96C50;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
-    .trend-btn:hover { background:#F96C50; color:white; }
+
+    .trend-btn:hover {
+      background: #F96C50;
+      color: white;
+    }
+
     .daily-question {
-      background: linear-gradient(135deg,#FFF7DA 0%,#FFFBEA 100%);
-      cursor:pointer; position:relative; overflow:hidden;
+      background: linear-gradient(135deg, #FFF7DA 0%, #FFFBEA 100%);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
     }
+
     .daily-question h3 {
-      font-size:16px; font-weight:600; color:#B8860B; margin-bottom:8px;
-      display:flex; align-items:center; gap:8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #B8860B;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .daily-question p { font-size:12px; color:#666; opacity:0.8; }
+
+    .daily-question p {
+      font-size: 12px;
+      color: #666;
+      opacity: 0.8;
+    }
+
     @keyframes bounceIn {
-      0% { transform: scale(0.3) translateY(20px); opacity:0; }
-      50% { transform: scale(1.05) translateY(-5px); opacity:0.8; }
-      100%{ transform: scale(1) translateY(0); opacity:1; }
+      0% {
+        transform: scale(0.3) translateY(20px);
+        opacity: 0;
+      }
+
+      50% {
+        transform: scale(1.05) translateY(-5px);
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
     }
-    .floating { animation:float 3s ease-in-out infinite; }
+
+    .floating {
+      animation: float 3s ease-in-out infinite;
+    }
+
     @keyframes float {
-      0%,100%{transform:translateY(0px);} 50%{transform:translateY(-4px);}
+
+      0%,
+      100% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-4px);
+      }
     }
   </style>
 </head>
+
 <body>
   <div id="root"></div>
 
@@ -227,6 +471,7 @@
               <button className="ai-plan-btn" onClick={e => {
                 e.stopPropagation();
                 alertMsg('AI 학습 플랜 생성 페이지로 이동합니다! 🤖');
+                window.location.href = "./AI_Plan_side.html";
               }}>플랜 짜러 가기</button>
             </section>
 
@@ -290,4 +535,5 @@
     ReactDOM.render(<StudyPlannerHome />, document.getElementById('root'));
   </script>
 </body>
+
 </html>
