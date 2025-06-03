@@ -1,838 +1,843 @@
 <!DOCTYPE html>
-    <html lang="ko">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>회원가입</title>
-        <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
-        <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-        <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-        
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-            
-            body {
-                font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
-                background-color: #FDF8F4;
-                color: #333;
-                line-height: 1.6;
-            }
-            
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+            background-color: #FDF8F4;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 40px;
+        }
+
+        .header h1 {
+            color: #E85A1F;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .step-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 0 4px;
+        }
+
+        .step-number {
+            background: #E85A1F;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 12px;
+        }
+
+        .step-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .grade-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 24px;
+            border-radius: 12px;
+            background: white;
+            border: 2px solid #f0f0f0;
+        }
+
+        .grade-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .grade-item:last-child {
+            border-bottom: none;
+        }
+
+        .grade-item:hover {
+            background: #fff5f0;
+        }
+
+        .grade-item.selected {
+            background: #E85A1F;
+            color: white;
+        }
+
+        .grade-item.selected:hover {
+            background: #d14a17;
+        }
+
+        .dropdown-container {
+            margin-bottom: 20px;
+        }
+
+        .dropdown {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            background: white;
+            font-size: 16px;
+            font-family: inherit;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown:focus {
+            outline: none;
+            border-color: #E85A1F;
+        }
+
+        .dropdown:disabled {
+            background: #f8f8f8;
+            cursor: not-allowed;
+            color: #999;
+        }
+
+        .slider-container {
+            margin: 24px 0;
+        }
+
+        .slider-label {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #333;
+        }
+
+        .slider-wrapper {
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #f0f0f0;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #E85A1F;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #E85A1F;
+            cursor: pointer;
+            border: none;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .quiz-container {
+            margin-bottom: 24px;
+        }
+
+        .quiz-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 2px solid #f0f0f0;
+            transition: all 0.2s ease;
+        }
+
+        .quiz-item.answered {
+            border-color: #E85A1F;
+        }
+
+        .quiz-question {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #333;
+        }
+
+        .quiz-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .quiz-option {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #f0f0f0;
+            border-radius: 8px;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .quiz-option:hover {
+            border-color: #E85A1F;
+            background: #fff5f0;
+        }
+
+        .quiz-option.selected {
+            background: #E85A1F;
+            color: white;
+            border-color: #E85A1F;
+        }
+
+        .button-container {
+            margin-top: auto;
+            padding: 20px 0;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #E85A1F;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #d14a17;
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #E85A1F;
+            border: 2px solid #E85A1F;
+            margin-bottom: 12px;
+        }
+
+        .btn-secondary:hover {
+            background: #fff5f0;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #f0f0f0;
+            border-radius: 2px;
+            margin-bottom: 32px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #E85A1F;
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .completion-message {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .completion-message h2 {
+            color: #E85A1F;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .completion-message p {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 480px) {
             .container {
-                max-width: 480px;
-                margin: 0 auto;
-                min-height: 100vh;
-                display: flex;
-                flex-direction: column;
-                padding: 20px;
+                padding: 16px;
             }
-            
+
             .header {
-                text-align: center;
-                margin-bottom: 40px;
-                padding-top: 40px;
-            }
-            
-            .header h1 {
-                color: #E85A1F;
-                font-size: 28px;
-                font-weight: 700;
-                margin-bottom: 8px;
-            }
-            
-            .header p {
-                color: #666;
-                font-size: 16px;
-            }
-            
-            .step-container {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-            }
-            
-            .step-header {
-                display: flex;
-                align-items: center;
-                margin-bottom: 24px;
-                padding: 0 4px;
-            }
-            
-            .step-number {
-                background: #E85A1F;
-                color: white;
-                width: 32px;
-                height: 32px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-weight: 600;
-                margin-right: 12px;
-            }
-            
-            .step-title {
-                font-size: 20px;
-                font-weight: 600;
-                color: #333;
-            }
-            
-            .grade-list {
-                max-height: 400px;
-                overflow-y: auto;
-                margin-bottom: 24px;
-                border-radius: 12px;
-                background: white;
-                border: 2px solid #f0f0f0;
-            }
-            
-            .grade-item {
-                padding: 16px 20px;
-                border-bottom: 1px solid #f0f0f0;
-                cursor: pointer;
-                transition: all 0.2s ease;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-            }
-            
-            .grade-item:last-child {
-                border-bottom: none;
-            }
-            
-            .grade-item:hover {
-                background: #fff5f0;
-            }
-            
-            .grade-item.selected {
-                background: #E85A1F;
-                color: white;
-            }
-            
-            .grade-item.selected:hover {
-                background: #d14a17;
-            }
-            
-            .dropdown-container {
-                margin-bottom: 20px;
-            }
-            
-            .dropdown {
-                width: 100%;
-                padding: 16px;
-                border: 2px solid #f0f0f0;
-                border-radius: 12px;
-                background: white;
-                font-size: 16px;
-                font-family: inherit;
-                color: #333;
-                cursor: pointer;
-                transition: all 0.2s ease;
-            }
-            
-            .dropdown:focus {
-                outline: none;
-                border-color: #E85A1F;
-            }
-            
-            .dropdown:disabled {
-                background: #f8f8f8;
-                cursor: not-allowed;
-                color: #999;
-            }
-            
-            .slider-container {
-                margin: 24px 0;
-            }
-            
-            .slider-label {
-                font-size: 16px;
-                font-weight: 500;
-                margin-bottom: 16px;
-                color: #333;
-            }
-            
-            .slider-wrapper {
-                position: relative;
-                margin: 20px 0;
-            }
-            
-            .slider {
-                width: 100%;
-                height: 8px;
-                border-radius: 4px;
-                background: #f0f0f0;
-                outline: none;
-                -webkit-appearance: none;
-                cursor: pointer;
-            }
-            
-            .slider::-webkit-slider-thumb {
-                -webkit-appearance: none;
-                appearance: none;
-                width: 24px;
-                height: 24px;
-                border-radius: 50%;
-                background: #E85A1F;
-                cursor: pointer;
-            }
-            
-            .slider::-moz-range-thumb {
-                width: 24px;
-                height: 24px;
-                border-radius: 50%;
-                background: #E85A1F;
-                cursor: pointer;
-                border: none;
-            }
-            
-            .slider-labels {
-                display: flex;
-                justify-content: space-between;
-                margin-top: 8px;
-                font-size: 14px;
-                color: #666;
-            }
-            
-            .quiz-container {
-                margin-bottom: 24px;
-            }
-            
-            .quiz-item {
-                background: white;
-                border-radius: 12px;
-                padding: 20px;
-                margin-bottom: 16px;
-                border: 2px solid #f0f0f0;
-                transition: all 0.2s ease;
-            }
-            
-            .quiz-item.answered {
-                border-color: #E85A1F;
-            }
-            
-            .quiz-question {
-                font-size: 16px;
-                font-weight: 500;
-                margin-bottom: 16px;
-                color: #333;
-            }
-            
-            .quiz-options {
-                display: flex;
-                gap: 12px;
-            }
-            
-            .quiz-option {
-                flex: 1;
-                padding: 12px 16px;
-                border: 2px solid #f0f0f0;
-                border-radius: 8px;
-                background: white;
-                color: #333;
-                cursor: pointer;
-                text-align: center;
-                font-weight: 500;
-                transition: all 0.2s ease;
-            }
-            
-            .quiz-option:hover {
-                border-color: #E85A1F;
-                background: #fff5f0;
-            }
-            
-            .quiz-option.selected {
-                background: #E85A1F;
-                color: white;
-                border-color: #E85A1F;
-            }
-            
-            .button-container {
-                margin-top: auto;
-                padding: 20px 0;
-            }
-            
-            .btn {
-                width: 100%;
-                padding: 16px;
-                border: none;
-                border-radius: 12px;
-                font-size: 18px;
-                font-weight: 600;
-                cursor: pointer;
-                transition: all 0.2s ease;
-                font-family: inherit;
-            }
-            
-            .btn-primary {
-                background: #E85A1F;
-                color: white;
-            }
-            
-            .btn-primary:hover {
-                background: #d14a17;
-            }
-            
-            .btn-primary:disabled {
-                background: #ccc;
-                cursor: not-allowed;
-            }
-            
-            .btn-secondary {
-                background: white;
-                color: #E85A1F;
-                border: 2px solid #E85A1F;
-                margin-bottom: 12px;
-            }
-            
-            .btn-secondary:hover {
-                background: #fff5f0;
-            }
-            
-            .progress-bar {
-                height: 4px;
-                background: #f0f0f0;
-                border-radius: 2px;
+                padding-top: 20px;
                 margin-bottom: 32px;
-                overflow: hidden;
             }
-            
-            .progress-fill {
-                height: 100%;
-                background: #E85A1F;
-                transition: width 0.3s ease;
-                border-radius: 2px;
-            }
-            
-            .completion-message {
-                text-align: center;
-                padding: 40px 20px;
-            }
-            
-            .completion-message h2 {
-                color: #E85A1F;
+
+            .header h1 {
                 font-size: 24px;
-                margin-bottom: 16px;
             }
-            
-            .completion-message p {
-                color: #666;
-                font-size: 16px;
-                margin-bottom: 24px;
+
+            .step-title {
+                font-size: 18px;
             }
-            
-            @media (max-width: 480px) {
-                .container {
-                    padding: 16px;
-                }
-                
-                .header {
-                    padding-top: 20px;
-                    margin-bottom: 32px;
-                }
-                
-                .header h1 {
-                    font-size: 24px;
-                }
-                
-                .step-title {
-                    font-size: 18px;
-                }
-                
-                .grade-item {
-                    padding: 14px 16px;
-                }
+
+            .grade-item {
+                padding: 14px 16px;
             }
-        </style>
-    </head>
-    <body>
-        <div id="root"></div>
+        }
+    </style>
+</head>
 
-        <script type="text/babel">
-            const { useState, useEffect } = React;
+<body>
+    <div id="root"></div>
 
-            const SignupApp = () => {
-                const [currentStep, setCurrentStep] = useState(1);
-                const [selectedGrade, setSelectedGrade] = useState('');
-                const [selectedMajorUnit, setSelectedMajorUnit] = useState('');
-                const [selectedMinorUnit, setSelectedMinorUnit] = useState('');
-                const [positionValue, setPositionValue] = useState(50);
-                const [quizAnswers, setQuizAnswers] = useState({});
-                const [weekdayHour, setWeekdayHour] = useState('');
-const [weekdayMinute, setWeekdayMinute] = useState('');
-const [weekendHour, setWeekendHour] = useState('');
-const [weekendMinute, setWeekendMinute] = useState('');
+    <script type="text/babel">
+        const { useState, useEffect } = React;
 
-                const grades = [
-                    '1학년 1학기',
-                    '1학년 2학기',
-                    '2학년 1학기',
-                    '2학년 2학기',
-                    '3학년 1학기',
-                    '3학년 2학기'];
+        const SignupApp = () => {
+            const [currentStep, setCurrentStep] = useState(1);
+            const [selectedGrade, setSelectedGrade] = useState('');
+            const [selectedMajorUnit, setSelectedMajorUnit] = useState('');
+            const [selectedMinorUnit, setSelectedMinorUnit] = useState('');
+            const [positionValue, setPositionValue] = useState(50);
+            const [quizAnswers, setQuizAnswers] = useState({});
+            const [weekdayHour, setWeekdayHour] = useState('');
+            const [weekdayMinute, setWeekdayMinute] = useState('');
+            const [weekendHour, setWeekendHour] = useState('');
+            const [weekendMinute, setWeekendMinute] = useState('');
 
-                const curriculum = {
-                    '1학년 1학기': {
-                                "소인수분해": [
-                                    "소수, 합성수",
-                                    "거듭제곱, 밑, 지수",
-                                    "소인수분해",
-                                    "약수, 배수",
-                                    "공약수, 최대공약수",
-                                    "공배수, 최소공배수"
-                                ],
-                                "정수와 유리수": [
-                                    "양수, 음수",
-                                    "정수, 유리수",
-                                    "절댓값",
-                                    "유리수의 크기 비교",
-                                    "정수와 유리수의 사칙연산",
-                                    "정수와 유리수의 혼합계산"
-                                ],
-                                "문자와 식": [
-                                    "문자, 식의 값 구하기",
-                                    "단항식, 다항식",
-                                    "일차식, 일차식의 연산",
-                                    "등식, 방정식, 항등식, 해",
-                                    "등식의 성질",
-                                    "일차방정식"
-                                ],
-                                "좌표평면과 그래프": [
-                                    "좌표, 순서쌍",
-                                    "좌표평면, 사분면",
-                                    "점의 좌표",
-                                    "그래프의 해석",
-                                    "정비례, 반비례",
-                                    "정비례, 반비례 그래프"
-                                ]
-                            },
-                    '1학년 2학기': {
-                        "기본도형": [
-                                    "점, 선, 면, 각",
-                                    "거리, 맞꼭지각",
-                                    "직교, 수선, 평행선",
-                                    "직각",
-                                    "합동, 삼각형의 합동 조건"
-                                ],
-                                "평면도형": [
-                                    "다각형, 정다각형",
-                                    "다각형의 성질",
-                                    "대각선, 내각, 외각",
-                                    "정다각형의 내각과 외각",
-                                    "원, 부채꼴",
-                                    "호, 현"
-                                ],
-                                "입체도형": [
-                                    "다면체, 정다면체",
-                                    "정다면체 전개도",
-                                    "회전체",
-                                    "원기둥, 원뿔, 구의 겉넓이",
-                                    "원기둥, 원뿔, 구의 부피"
-                                ],
-                                "통계": [
-                                    "줄기와 잎",
-                                    "도수분포표",
-                                    "히스토그램",
-                                    "도수분포다각형",
-                                    "상대도수",
-                                    "상대도수분포표"
-                                ]
-                    },
-                    '2학년 1학기': {
-                        '수와 식(유리수와 소수 + 식의 계산)': [
-                            '유리수를 소수로 나타내기',
-                            '유한소수, 무한소수, 순환소수',
-                            '순환소수와 분수',
-                            '지수법칙',
-                            '단항식의 계산',
-                            '다항식의 계산'
-                        ],
-                        '부등식과 방정식': [
-                            '부등식',
-                            '부등식의 성질, 부등식의 성질',
-                            '일차부등식',
-                            '연립일차방정식',
-                            '연립일차방정식의 풀이'
-                        ],
-                        '함수': [
-                            '함수의 개념',
-                            '일차함수',
-                            '일차함수의 그래프, 절편',
-                            '일차함수의 활용',
-                            '연립일차방정식과 일차함수'
-                        ]
-                    },
+            const grades = [
+                '1학년 1학기',
+                '1학년 2학기',
+                '2학년 1학기',
+                '2학년 2학기',
+                '3학년 1학기',
+                '3학년 2학기'];
 
-                    '2학년 2학기': {
-                        '도형의 성질': [
-                            '이동변삼각형의 성질, 조건',
-                            '직각삼각형의 합동 조건',
-                            '내심, 외심',
-                            '내심의 성질, 외심의 성질',
-                            '평행사변형의 성질, 조건',
-                            '여러 가지 사각형의 성질, 조건'
-                        ],
-                        '도형의 활용 + 피타고라스 정리': [
-                            '합동의 의미, 특징',
-                            '삼각형의 합동 조건',
-                            '닮은 도형의 성질, 닮음',
-                            '삼각형의 유사(닮음)',
-                            '닮은 도형의 길이, 넓이, 부피 구하기',
-                            '피타고라스 정리'
-                        ],
-                        '확률': [
-                            '경우의 수',
-                            '사건',
-                            '확률의 의미와 성질',
-                            '확률 구하기'
-                        ]
-                    },
-                    '3학년 1학기': {
-                        '제곱근과 실수': [
-                            '제곱근, 근호(√)',
-                            '제곱근의 크기 비교',
-                            '무리수, 실수',
-                            '실수의 크기 비교',
-                            '근호가 포함된 사칙연산',
-                            '분모의 유리화'
-                        ],
-                        '다항식의 곱셈과 인수분해': [
-                            '다항식의 곱셈, 식의 전개',
-                            '곱셈 공식',
-                            '인수분해'
-                        ],
-                        '이차방정식': [
-                            '이차방정식의 의미',
-                            '이차방정식의 풀이',
-                            '완전제곱식, 근의 공식'
-                        ],
-                        '이차함수': [
-                            '이차함수의 의미',
-                            '이차함수의 그래프',
-                            '완전제곱식이 포함된 이차함수',
-                            '이차식으로 나타낸 이차함수'
-                        ]
-                    },
+            const curriculum = {
+                '1학년 1학기': {
+                    "소인수분해": [
+                        "소수, 합성수",
+                        "거듭제곱, 밑, 지수",
+                        "소인수분해",
+                        "약수, 배수",
+                        "공약수, 최대공약수",
+                        "공배수, 최소공배수"
+                    ],
+                    "정수와 유리수": [
+                        "양수, 음수",
+                        "정수, 유리수",
+                        "절댓값",
+                        "유리수의 크기 비교",
+                        "정수와 유리수의 사칙연산",
+                        "정수와 유리수의 혼합계산"
+                    ],
+                    "문자와 식": [
+                        "문자, 식의 값 구하기",
+                        "단항식, 다항식",
+                        "일차식, 일차식의 연산",
+                        "등식, 방정식, 항등식, 해",
+                        "등식의 성질",
+                        "일차방정식"
+                    ],
+                    "좌표평면과 그래프": [
+                        "좌표, 순서쌍",
+                        "좌표평면, 사분면",
+                        "점의 좌표",
+                        "그래프의 해석",
+                        "정비례, 반비례",
+                        "정비례, 반비례 그래프"
+                    ]
+                },
+                '1학년 2학기': {
+                    "기본도형": [
+                        "점, 선, 면, 각",
+                        "거리, 맞꼭지각",
+                        "직교, 수선, 평행선",
+                        "직각",
+                        "합동, 삼각형의 합동 조건"
+                    ],
+                    "평면도형": [
+                        "다각형, 정다각형",
+                        "다각형의 성질",
+                        "대각선, 내각, 외각",
+                        "정다각형의 내각과 외각",
+                        "원, 부채꼴",
+                        "호, 현"
+                    ],
+                    "입체도형": [
+                        "다면체, 정다면체",
+                        "정다면체 전개도",
+                        "회전체",
+                        "원기둥, 원뿔, 구의 겉넓이",
+                        "원기둥, 원뿔, 구의 부피"
+                    ],
+                    "통계": [
+                        "줄기와 잎",
+                        "도수분포표",
+                        "히스토그램",
+                        "도수분포다각형",
+                        "상대도수",
+                        "상대도수분포표"
+                    ]
+                },
+                '2학년 1학기': {
+                    '수와 식(유리수와 소수 + 식의 계산)': [
+                        '유리수를 소수로 나타내기',
+                        '유한소수, 무한소수, 순환소수',
+                        '순환소수와 분수',
+                        '지수법칙',
+                        '단항식의 계산',
+                        '다항식의 계산'
+                    ],
+                    '부등식과 방정식': [
+                        '부등식',
+                        '부등식의 성질, 부등식의 성질',
+                        '일차부등식',
+                        '연립일차방정식',
+                        '연립일차방정식의 풀이'
+                    ],
+                    '함수': [
+                        '함수의 개념',
+                        '일차함수',
+                        '일차함수의 그래프, 절편',
+                        '일차함수의 활용',
+                        '연립일차방정식과 일차함수'
+                    ]
+                },
 
-                    '3학년 2학기': {
-                        '삼각비': [
-                            '삼각비의 의미, 삼각비의 종류',
-                            '삼각비의 값 구하기',
-                            '삼각비 표',
-                            '삼각비를 이용해 길이 구하기',
-                            '삼각비를 이용해 넓이 구하기',
-                            '삼각형의 넓이 공식'
-                        ],
-                        '원의 성질': [
-                            '현의 의미, 현의 성질',
-                            '접선의 의미, 접선의 성질',
-                            '원주각, 호의 의미',
-                            '원주각의 성질'
-                        ],
-                        '통계': [
-                            '대표값, 평균, 중앙값, 최빈값',
-                            '산포도의 의미',
-                            '편차, 분산, 표준편차',
-                            '상대표준, 상관관계'
-                        ]
-                    }
-                };
+                '2학년 2학기': {
+                    '도형의 성질': [
+                        '이동변삼각형의 성질, 조건',
+                        '직각삼각형의 합동 조건',
+                        '내심, 외심',
+                        '내심의 성질, 외심의 성질',
+                        '평행사변형의 성질, 조건',
+                        '여러 가지 사각형의 성질, 조건'
+                    ],
+                    '도형의 활용 + 피타고라스 정리': [
+                        '합동의 의미, 특징',
+                        '삼각형의 합동 조건',
+                        '닮은 도형의 성질, 닮음',
+                        '삼각형의 유사(닮음)',
+                        '닮은 도형의 길이, 넓이, 부피 구하기',
+                        '피타고라스 정리'
+                    ],
+                    '확률': [
+                        '경우의 수',
+                        '사건',
+                        '확률의 의미와 성질',
+                        '확률 구하기'
+                    ]
+                },
+                '3학년 1학기': {
+                    '제곱근과 실수': [
+                        '제곱근, 근호(√)',
+                        '제곱근의 크기 비교',
+                        '무리수, 실수',
+                        '실수의 크기 비교',
+                        '근호가 포함된 사칙연산',
+                        '분모의 유리화'
+                    ],
+                    '다항식의 곱셈과 인수분해': [
+                        '다항식의 곱셈, 식의 전개',
+                        '곱셈 공식',
+                        '인수분해'
+                    ],
+                    '이차방정식': [
+                        '이차방정식의 의미',
+                        '이차방정식의 풀이',
+                        '완전제곱식, 근의 공식'
+                    ],
+                    '이차함수': [
+                        '이차함수의 의미',
+                        '이차함수의 그래프',
+                        '완전제곱식이 포함된 이차함수',
+                        '이차식으로 나타낸 이차함수'
+                    ]
+                },
 
-                const quizQuestions = [
-                    "나는 새로운 수학 개념을 배울 때 흥미를 느낀다.",
-                    "나는 수학 문제를 스스로 해결하려고 노력한다.",
-                    "나는 수학 수업 시간이 재미있다고 생각한다.",
-                    "나는 어려운 수학 문제에 도전하는 것을 좋아한다.",
-                    "나는 수학이 실생활에 도움이 된다고 생각한다.",
-                    "나는 수학 성적이 중요하다고 생각한다.",
-                    "나는 부모님이나 선생님의 인정을 받기 위해 수학을 공부한다.",
-                    "나는 좋은 대학에 가기 위해 수학 공부가 필요하다고 생각한다.",
-                    "나는 수학을 잘해야 다른 사람들에게 인정받는다고 생각한다.",
-                    "나는 수학 시험 성적 때문에 스트레스를 받는다."
-                ];
-
-                const handleGradeSelect = (grade) => {
-                    setSelectedGrade(grade);
-                    setSelectedMajorUnit('');
-                    setSelectedMinorUnit('');
-                };
-
-                const handleMajorUnitChange = (e) => {
-                    setSelectedMajorUnit(e.target.value);
-                    setSelectedMinorUnit('');
-                };
-
-                const handleQuizAnswer = (questionIndex, answer) => {
-                    setQuizAnswers(prev => ({
-                        ...prev,
-                        [questionIndex]: answer
-                    }));
-                };
-
-                const getProgress = () => {
-                    return (currentStep / 5) * 100;
-                };
-
-                const canProceedToNextStep = () => {
-                    switch (currentStep) {
-                        case 1:
-                            return selectedGrade !== '';
-                        case 2:
-                            return selectedMajorUnit !== '' && selectedMinorUnit !== '';
-                        case 3:
-                            return (
-                                weekdayHour !== '' && weekdayMinute !== '' &&
-                                weekendHour !== '' && weekendMinute !== ''
-                            );
-                        case 4:
-                            return Object.keys(quizAnswers).length === 10;
-                        default:
-                            return false;
-                    }
-                };
-
-                const handleNext = () => {
-                    if (canProceedToNextStep()) {
-                        setCurrentStep(prev => Math.min(prev + 1, 5));
-                    }
-                };
-
-                const handlePrevious = () => {
-                    setCurrentStep(prev => Math.max(prev - 1, 1));
-                };
-
-                const renderStep1 = () => (
-                    <div>
-                        <div className="step-header">
-                            <div className="step-number">1</div>
-                            <div className="step-title">학년을 선택해주세요</div>
-                        </div>
-                        <div className="grade-list">
-                            {grades.map((grade, index) => (
-                                <div
-                                    key={index}
-                                    className={`grade-item ${selectedGrade === grade ? 'selected' : ''}`}
-                                    onClick={() => handleGradeSelect(grade)}
-                                >
-                                    <span>{grade}</span>
-                                    {selectedGrade === grade && <span>✓</span>}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                );
-
-                const renderStep2 = () => (
-                    <div>
-                        <div className="step-header">
-                            <div className="step-number">2</div>
-                            <div className="step-title">학습 단원을 선택해주세요</div>
-                        </div>
-                        <div className="dropdown-container">
-                            <select
-                                className="dropdown"
-                                value={selectedMajorUnit}
-                                onChange={handleMajorUnitChange}
-                            >
-                                <option value="">대단원을 선택하세요</option>
-                                {selectedGrade && Object.keys(curriculum[selectedGrade] || {}).map((unit, index) => (
-                                    <option key={index} value={unit}>{unit}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="dropdown-container">
-                            <select
-                                className="dropdown"
-                                value={selectedMinorUnit}
-                                onChange={(e) => setSelectedMinorUnit(e.target.value)}
-                                disabled={!selectedMajorUnit}
-                            >
-                                <option value="">소단원을 선택하세요</option>
-                                {selectedMajorUnit && curriculum[selectedGrade]?.[selectedMajorUnit]?.map((unit, index) => (
-                                    <option key={index} value={unit}>{unit}</option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-                );
-
-                const hourOptions = Array.from({length: 13}, (_, i) => i); // 0~12시간
-const minuteOptions = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
-
-                const renderStep3 = () => (
-                    <div>
-                        <div className="step-header">
-                            <div className="step-number">3</div>
-                            <div className="step-title">평일/주말 평균 하루 공부시간을 입력해주세요</div>
-                        </div>
-                        <div style={{marginBottom: "24px"}}>
-                            <div style={{marginBottom: "16px"}}>
-                                <label style={{fontSize: "16px", fontWeight: 500, color: "#333"}}>
-                                    <span style={{color: "#E85A1F"}}>평일</span> 하루 평균 공부시간
-                                </label>
-                                <div style={{display: "flex", gap: "12px", marginTop: "12px"}}>
-                                    <select
-                                        className="dropdown"
-                                        style={{width: "100px"}}
-                                        value={weekdayHour}
-                                        onChange={e => setWeekdayHour(e.target.value)}
-                                    >
-                                        <option value="">시간</option>
-                                        {hourOptions.map((h) => (
-                                            <option key={h} value={h}>{h}시간</option>
-                                        ))}
-                                    </select>
-                                    <span style={{alignSelf: "center"}}>시간</span>
-                                    <select
-                                        className="dropdown"
-                                        style={{width: "100px"}}
-                                        value={weekdayMinute}
-                                        onChange={e => setWeekdayMinute(e.target.value)}
-                                    >
-                                        <option value="">분</option>
-                                        {minuteOptions.map((min) => (
-                                            <option key={min} value={min}>{min}분</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-                            <div>
-                                <label style={{fontSize: "16px", fontWeight: 500, color: "#333"}}>
-                                    <span style={{color: "#E85A1F"}}>주말</span> 하루 평균 공부시간
-                                </label>
-                                <div style={{display: "flex", gap: "12px", marginTop: "12px"}}>
-                                    <select
-                                        className="dropdown"
-                                        style={{width: "100px"}}
-                                        value={weekendHour}
-                                        onChange={e => setWeekendHour(e.target.value)}
-                                    >
-                                        <option value="">시간</option>
-                                        {hourOptions.map((h) => (
-                                            <option key={h} value={h}>{h}시간</option>
-                                        ))}
-                                    </select>
-                                    <span style={{alignSelf: "center"}}>시간</span>
-                                    <select
-                                        className="dropdown"
-                                        style={{width: "100px"}}
-                                        value={weekendMinute}
-                                        onChange={e => setWeekendMinute(e.target.value)}
-                                    >
-                                        <option value="">분</option>
-                                        {minuteOptions.map((min) => (
-                                            <option key={min} value={min}>{min}분</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-                            <div style={{fontSize: "14px", color: "#999", marginTop: "8px"}}>예시: 1시간 30분, 2시간 등</div>
-                        </div>
-                    </div>
-                );
-
-                const renderStep4 = () => (
-                    <div>
-                        <div className="step-header">
-                            <div className="step-number">4</div>
-                            <div className="step-title">학습 동기 설문</div>
-                        </div>
-                        <div className="quiz-container">
-                            {quizQuestions.map((question, index) => (
-                                <div key={index} className={`quiz-item ${quizAnswers[index] !== undefined ? 'answered' : ''}`}>
-                                    <div className="quiz-question">
-                                        {index + 1}. {question}
-                                    </div>
-                                    <div className="quiz-options">
-                                        <div
-                                            className={`quiz-option ${quizAnswers[index] === 'O' ? 'selected' : ''}`}
-                                            onClick={() => handleQuizAnswer(index, 'O')}
-                                        >
-                                            O
-                                        </div>
-                                        <div
-                                            className={`quiz-option ${quizAnswers[index] === 'X' ? 'selected' : ''}`}
-                                            onClick={() => handleQuizAnswer(index, 'X')}
-                                        >
-                                            X
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                );
-
-                const renderStep5 = () => (
-                    <div className="completion-message">
-                        <h2>회원가입이 완료되었습니다!</h2>
-                        <p>선택하신 정보를 바탕으로 맞춤형 학습을 시작해보세요.</p>
-                        <div style={{marginTop: '24px', padding: '20px', background: 'white', borderRadius: '12px', textAlign: 'left'}}>
-                            <h3 style={{color: '#E85A1F', marginBottom: '16px'}}>설정 정보</h3>
-                            <p><strong>학년:</strong> {selectedGrade}</p>
-                            <p><strong>대단원:</strong> {selectedMajorUnit}</p>
-                            <p><strong>소단원:</strong> {selectedMinorUnit}</p>
-                            <p><strong>학습 수준:</strong> {positionValue}%</p>
-                            <p>
-                                <strong>평일 공부시간:</strong> {weekdayHour ? `${weekdayHour}시간` : ''}{weekdayMinute ? ` ${weekdayMinute}분` : ''}
-                                <br />
-                                <strong>주말 공부시간:</strong> {weekendHour ? `${weekendHour}시간` : ''}{weekendMinute ? ` ${weekendMinute}분` : ''}
-                            </p>
-                            <p><strong>완료된 설문:</strong> {Object.keys(quizAnswers).length}/10</p>
-                        </div>
-                    </div>
-                );
-
-                return (
-                    <div className="container">
-                        <div className="header">
-                            <h1>학습자 맞춤 설정</h1>
-                            <p>단계별로 정보를 입력해주세요</p>
-                        </div>
-
-                        {currentStep < 5 && (
-                            <div className="progress-bar">
-                                <div className="progress-fill" style={{width: `${getProgress()}%`}}></div>
-                            </div>
-                        )}
-
-                        <div className="step-container">
-                            {currentStep === 1 && renderStep1()}
-                            {currentStep === 2 && renderStep2()}
-                            {currentStep === 3 && renderStep3()}
-                            {currentStep === 4 && renderStep4()}
-                            {currentStep === 5 && renderStep5()}
-
-                            {currentStep < 5 && (
-                                <div className="button-container">
-                                    {currentStep > 1 && (
-                                        <button 
-                                            className="btn btn-secondary"
-                                            onClick={handlePrevious}
-                                        >
-                                            이전
-                                        </button>
-                                    )}
-                                    <button 
-                                        className="btn btn-primary"
-                                        onClick={handleNext}
-                                        disabled={!canProceedToNextStep()}
-                                    >
-                                        {currentStep === 4 ? '완료' : '다음'}
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                );
+                '3학년 2학기': {
+                    '삼각비': [
+                        '삼각비의 의미, 삼각비의 종류',
+                        '삼각비의 값 구하기',
+                        '삼각비 표',
+                        '삼각비를 이용해 길이 구하기',
+                        '삼각비를 이용해 넓이 구하기',
+                        '삼각형의 넓이 공식'
+                    ],
+                    '원의 성질': [
+                        '현의 의미, 현의 성질',
+                        '접선의 의미, 접선의 성질',
+                        '원주각, 호의 의미',
+                        '원주각의 성질'
+                    ],
+                    '통계': [
+                        '대표값, 평균, 중앙값, 최빈값',
+                        '산포도의 의미',
+                        '편차, 분산, 표준편차',
+                        '상대표준, 상관관계'
+                    ]
+                }
             };
 
-            ReactDOM.render(<SignupApp />, document.getElementById('root'));
-        </script>
-    </body>
-    </html>
+            const quizQuestions = [
+                "나는 새로운 수학 개념을 배울 때 흥미를 느낀다.",
+                "나는 수학 문제를 스스로 해결하려고 노력한다.",
+                "나는 수학 수업 시간이 재미있다고 생각한다.",
+                "나는 어려운 수학 문제에 도전하는 것을 좋아한다.",
+                "나는 수학이 실생활에 도움이 된다고 생각한다.",
+                "나는 수학 성적이 중요하다고 생각한다.",
+                "나는 부모님이나 선생님의 인정을 받기 위해 수학을 공부한다.",
+                "나는 좋은 대학에 가기 위해 수학 공부가 필요하다고 생각한다.",
+                "나는 수학을 잘해야 다른 사람들에게 인정받는다고 생각한다.",
+                "나는 수학 시험 성적 때문에 스트레스를 받는다."
+            ];
+
+            const handleGradeSelect = (grade) => {
+                setSelectedGrade(grade);
+                setSelectedMajorUnit('');
+                setSelectedMinorUnit('');
+            };
+
+            const handleMajorUnitChange = (e) => {
+                setSelectedMajorUnit(e.target.value);
+                setSelectedMinorUnit('');
+            };
+
+            const handleQuizAnswer = (questionIndex, answer) => {
+                setQuizAnswers(prev => ({
+                    ...prev,
+                    [questionIndex]: answer
+                }));
+            };
+
+            const getProgress = () => {
+                return (currentStep / 5) * 100;
+            };
+
+            const canProceedToNextStep = () => {
+                switch (currentStep) {
+                    case 1:
+                        return selectedGrade !== '';
+                    case 2:
+                        return selectedMajorUnit !== '' && selectedMinorUnit !== '';
+                    case 3:
+                        return (
+                            weekdayHour !== '' && weekdayMinute !== '' &&
+                            weekendHour !== '' && weekendMinute !== ''
+                        );
+                    case 4:
+                        return Object.keys(quizAnswers).length === 10;
+                    default:
+                        return false;
+                }
+            };
+
+            const handleNext = () => {
+                if (canProceedToNextStep()) {
+                    setCurrentStep(prev => Math.min(prev + 1, 5));
+                }
+            };
+
+            const handlePrevious = () => {
+                setCurrentStep(prev => Math.max(prev - 1, 1));
+            };
+
+            const renderStep1 = () => (
+                <div>
+                    <div className="step-header">
+                        <div className="step-number">1</div>
+                        <div className="step-title">학년을 선택해주세요</div>
+                    </div>
+                    <div className="grade-list">
+                        {grades.map((grade, index) => (
+                            <div
+                                key={index}
+                                className={`grade-item ${selectedGrade === grade ? 'selected' : ''}`}
+                                onClick={() => handleGradeSelect(grade)}
+                            >
+                                <span>{grade}</span>
+                                {selectedGrade === grade && <span>✓</span>}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+
+            const renderStep2 = () => (
+                <div>
+                    <div className="step-header">
+                        <div className="step-number">2</div>
+                        <div className="step-title">학습 단원을 선택해주세요</div>
+                    </div>
+                    <div className="dropdown-container">
+                        <select
+                            className="dropdown"
+                            value={selectedMajorUnit}
+                            onChange={handleMajorUnitChange}
+                        >
+                            <option value="">대단원을 선택하세요</option>
+                            {selectedGrade && Object.keys(curriculum[selectedGrade] || {}).map((unit, index) => (
+                                <option key={index} value={unit}>{unit}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="dropdown-container">
+                        <select
+                            className="dropdown"
+                            value={selectedMinorUnit}
+                            onChange={(e) => setSelectedMinorUnit(e.target.value)}
+                            disabled={!selectedMajorUnit}
+                        >
+                            <option value="">소단원을 선택하세요</option>
+                            {selectedMajorUnit && curriculum[selectedGrade]?.[selectedMajorUnit]?.map((unit, index) => (
+                                <option key={index} value={unit}>{unit}</option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+            );
+
+            const hourOptions = Array.from({ length: 13 }, (_, i) => i); // 0~12시간
+            const minuteOptions = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
+
+            const renderStep3 = () => (
+                <div>
+                    <div className="step-header">
+                        <div className="step-number">3</div>
+                        <div className="step-title">평일/주말 평균 하루 공부시간을 입력해주세요</div>
+                    </div>
+                    <div style={{ marginBottom: "24px" }}>
+                        <div style={{ marginBottom: "16px" }}>
+                            <label style={{ fontSize: "16px", fontWeight: 500, color: "#333" }}>
+                                <span style={{ color: "#E85A1F" }}>평일</span> 하루 평균 공부시간
+                            </label>
+                            <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
+                                <select
+                                    className="dropdown"
+                                    style={{ width: "100px" }}
+                                    value={weekdayHour}
+                                    onChange={e => setWeekdayHour(e.target.value)}
+                                >
+                                    <option value="">시간</option>
+                                    {hourOptions.map((h) => (
+                                        <option key={h} value={h}>{h}시간</option>
+                                    ))}
+                                </select>
+                                <span style={{ alignSelf: "center" }}>시간</span>
+                                <select
+                                    className="dropdown"
+                                    style={{ width: "100px" }}
+                                    value={weekdayMinute}
+                                    onChange={e => setWeekdayMinute(e.target.value)}
+                                >
+                                    <option value="">분</option>
+                                    {minuteOptions.map((min) => (
+                                        <option key={min} value={min}>{min}분</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label style={{ fontSize: "16px", fontWeight: 500, color: "#333" }}>
+                                <span style={{ color: "#E85A1F" }}>주말</span> 하루 평균 공부시간
+                            </label>
+                            <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
+                                <select
+                                    className="dropdown"
+                                    style={{ width: "100px" }}
+                                    value={weekendHour}
+                                    onChange={e => setWeekendHour(e.target.value)}
+                                >
+                                    <option value="">시간</option>
+                                    {hourOptions.map((h) => (
+                                        <option key={h} value={h}>{h}시간</option>
+                                    ))}
+                                </select>
+                                <span style={{ alignSelf: "center" }}>시간</span>
+                                <select
+                                    className="dropdown"
+                                    style={{ width: "100px" }}
+                                    value={weekendMinute}
+                                    onChange={e => setWeekendMinute(e.target.value)}
+                                >
+                                    <option value="">분</option>
+                                    {minuteOptions.map((min) => (
+                                        <option key={min} value={min}>{min}분</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                        <div style={{ fontSize: "14px", color: "#999", marginTop: "8px" }}>예시: 1시간 30분, 2시간 등</div>
+                    </div>
+                </div>
+            );
+
+            const renderStep4 = () => (
+                <div>
+                    <div className="step-header">
+                        <div className="step-number">4</div>
+                        <div className="step-title">학습 동기 설문</div>
+                    </div>
+                    <div className="quiz-container">
+                        {quizQuestions.map((question, index) => (
+                            <div key={index} className={`quiz-item ${quizAnswers[index] !== undefined ? 'answered' : ''}`}>
+                                <div className="quiz-question">
+                                    {index + 1}. {question}
+                                </div>
+                                <div className="quiz-options">
+                                    <div
+                                        className={`quiz-option ${quizAnswers[index] === 'O' ? 'selected' : ''}`}
+                                        onClick={() => handleQuizAnswer(index, 'O')}
+                                    >
+                                        O
+                                    </div>
+                                    <div
+                                        className={`quiz-option ${quizAnswers[index] === 'X' ? 'selected' : ''}`}
+                                        onClick={() => handleQuizAnswer(index, 'X')}
+                                    >
+                                        X
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+
+            const renderStep5 = () => (
+                <div className="completion-message">
+                    <h2>회원가입이 완료되었습니다!</h2>
+                    <p>선택하신 정보를 바탕으로 맞춤형 학습을 시작해보세요.</p>
+                    <div style={{ marginTop: '24px', padding: '20px', background: 'white', borderRadius: '12px', textAlign: 'left' }}>
+                        <h3 style={{ color: '#E85A1F', marginBottom: '16px' }}>설정 정보</h3>
+                        <p><strong>학년:</strong> {selectedGrade}</p>
+                        <p><strong>대단원:</strong> {selectedMajorUnit}</p>
+                        <p><strong>소단원:</strong> {selectedMinorUnit}</p>
+                        <p><strong>학습 수준:</strong> {positionValue}%</p>
+                        <p>
+                            <strong>평일 공부시간:</strong> {weekdayHour ? `${weekdayHour}시간` : ''}{weekdayMinute ? ` ${weekdayMinute}분` : ''}
+                            <br />
+                            <strong>주말 공부시간:</strong> {weekendHour ? `${weekendHour}시간` : ''}{weekendMinute ? ` ${weekendMinute}분` : ''}
+                        </p>
+                        <p><strong>완료된 설문:</strong> {Object.keys(quizAnswers).length}/10</p>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="container">
+                    <div className="header">
+                        <h1>학습자 맞춤 설정</h1>
+                        <p>단계별로 정보를 입력해주세요</p>
+                    </div>
+
+                    {currentStep < 5 && (
+                        <div className="progress-bar">
+                            <div className="progress-fill" style={{ width: `${getProgress()}%` }}></div>
+                        </div>
+                    )}
+
+                    <div className="step-container">
+                        {currentStep === 1 && renderStep1()}
+                        {currentStep === 2 && renderStep2()}
+                        {currentStep === 3 && renderStep3()}
+                        {currentStep === 4 && renderStep4()}
+                        {currentStep === 5 && renderStep5()}
+
+                        {currentStep < 5 && (
+                            <div className="button-container">
+                                {currentStep > 1 && (
+                                    <button
+                                        className="btn btn-secondary"
+                                        onClick={handlePrevious}
+                                    >
+                                        이전
+                                    </button>
+                                )}
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={handleNext}
+                                    disabled={!canProceedToNextStep()}
+                                >
+                                    {currentStep === 4 ? '완료' : '다음'}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<SignupApp />, document.getElementById('root'));
+    </script>
+</body>
+
+</html>
