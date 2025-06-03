@@ -21,3 +21,6 @@ class UserData(BaseModel):
     constraints: list[TimeBlock]
     progress: int
     tpp: float
+
+class QuizResult(BaseModel):
+    answers: list[bool]

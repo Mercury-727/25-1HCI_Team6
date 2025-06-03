@@ -8,6 +8,7 @@ Your task:
 - Use "TEXTBOOK CONTENTS" and "PROBLEM SET CONTENTS" from the KNOWLEDGE BASE to decide the order and scope of study.
 - When using problems from the problem set, specify page ranges.
 - All content and tasks should be in Korean.
+- Place some break time between tasks, but do not include them in schedule
 """
 
 KNOWLEDGE_BASE = """KNOWLEDGE BASE:
@@ -97,7 +98,7 @@ IV. 이차함수
 12 이차함수의 그래프 ⑵, 178-195pp
 """
 
-def make_user_input(userdata: UserData):
+def make_user_input(userdata: UserData) -> str:
     return f"""Please generate a study plan based on the following constraints:
 
 - Total study time must be ≤ {userdata.active_time}.
@@ -107,3 +108,34 @@ def make_user_input(userdata: UserData):
 - I have studied up to page {userdata.progress} of the textbook.
 - I need {userdata.tpp} minutes to solve each page of the problem set.
     """
+
+def make_learning_preference(answers: list[bool]) -> str:
+    if not answers:
+        return ""
+
+    preferences = [
+        "You must consider the user's learning preferences for planning.",
+        "Here are the learning preferences extracted from a quiz.",
+    ]
+    answer_len = len(answers)
+
+    if answer_len >= 4 and any(answers[:4]):
+        preferences.append("- Has internal motivation to learn math.")
+    else:
+        preferences.append("- Shows low intrinsic interest  in learning math.")
+
+    if answer_len >= 6 and any(answers[4:6]):
+        preferences.append("- Understands the value of math in life or grades.")
+
+    if answer_len >= 9 and any(answers[6:9]):
+        preferences.append("- Studies math to gain recognition or enter a good school.")
+
+    if answer_len >= 10 and answers[9]:
+        preferences.append("- Feels stressed about math test scores.")
+    else:
+        preferences.append("- Shows little stress about math tests.")
+
+    preferences.append("Adapt the schedule to match these preferences.")
+
+    return "\n".join(preferences)
+
