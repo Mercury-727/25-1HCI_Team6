@@ -789,6 +789,16 @@
                         </p>
                         <p><strong>완료된 설문:</strong> {Object.keys(quizAnswers).length}/10</p>
                     </div>
+                    <div className="button-container">
+                        <button
+                            className="btn btn-secondary"
+                            onClick={() => {
+                                window.location.href = "./study_planner_home_(ver. REACT).html";
+                            }}
+                        >
+                            확인
+                        </button>
+                    </div>
                 </div>
             );
 
