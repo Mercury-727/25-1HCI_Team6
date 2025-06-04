@@ -7,46 +7,63 @@ from openai import OpenAI
 
 from prompt import SYSTEM_PROMPT, KNOWLEDGE_BASE, make_learning_preference, make_user_input
 from model import UserData, Plan, QuizResult
+from db import InMemoryDB
 
 app = Flask(__name__)
 app.secret_key = secrets.token_bytes()
+
+db = InMemoryDB()
 
 DEBUG = True
 
 @app.route("/me", methods=["GET", "POST"])
 def me():
+    user_id = get_uuid()
+
     if request.method == "GET":
-        if "userdata" in session:
-            return session["userdata"]
+        userdata = db.get(user_id, "userdata")
+
+        if userdata:
+            return userdata.model_dump_json()
         else:
-            return "No user data submitted"
+            return "No user data: please submit"
+
     elif request.method == "POST":
         if "uuid" not in session:
             session["uuid"] = uuid.uuid4()
 
         try:
             data = request.get_json()
-            validated = UserData(**data)
-            session["userdata"] = validated.model_dump_json()
-            return session["userdata"]
+            userdata = UserData(**data)
+            db.put(session["uuid"], "userdata", userdata)
+
+            return userdata.model_dump_json()
         except ValidationError as e:
             return jsonify(e.errors(), 400)
     else:
         return ""
 
 
-@app.route("/quiz", methods=["POST"])
+@app.route("/me/quiz", methods=["GET", "POST"])
 def quiz():
-    if "uuid" not in session:
-        session["uuid"] = uuid.uuid4()
+    user_id = get_uuid()
 
-    try:
-        data = request.get_json()
-        validated = QuizResult(**data)
-        session["quiz_result"] = validated.model_dump_json()
-        return session["quiz_result"]
-    except ValidationError as e:
-        return jsonify(e.errors(), 400)
+    if request.method == "GET":
+        quiz_result = db.get(user_id, "quiz_result", QuizResult(answers=[]))
+
+        return quiz_result.model_dump_json()
+
+    elif request.method == "POST":
+        try:
+            data = request.get_json()
+            quiz_result = QuizResult(**data)
+            db.put(user_id, "quiz_result", quiz_result)
+
+            return quiz_result.model_dump_json()
+        except ValidationError as e:
+            return jsonify(e.errors(), 400)
+    
+    return ""
 
 
 @app.route("/ping")
@@ -56,16 +73,14 @@ def ping():
 
 @app.route("/plan")
 def plan():
-    if "userdata" not in session:
+    user_id = get_uuid()
+
+    userdata = db.get(user_id, "userdata")
+
+    if not userdata:
         return "You must provide user data for planning"
 
-    userdata = UserData.model_validate_json(session["userdata"])
-
-    if "quiz_result" in session:
-        validated = QuizResult.model_validate_json(session["quiz_result"])
-        answers = validated.answers
-    else:
-        answers = []
+    quiz_result = db.get(user_id, "quiz_result", QuizResult(answers=[]))
 
     if DEBUG:
         return """{
@@ -120,7 +135,7 @@ def plan():
             },
             {
                 "role": "user",
-                "content": make_learning_preference(answers)
+                "content": make_learning_preference(quiz_result.answers)
             },
         ]
     )
@@ -129,6 +144,13 @@ def plan():
         return '''{"plan": []}'''
 
     return response.output_parsed.model_dump_json()
+
+
+def get_uuid():
+    if "uuid" not in session:
+        session["uuid"] = uuid.uuid4()
+
+    return session["uuid"]
 
 
 if __name__ == "__main__":
