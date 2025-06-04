@@ -6,4 +6,4 @@ COPY pyproject.toml poetry.lock ./
 RUN pip install poetry && poetry install
 
 COPY entrypoint.sh ./
-COPY ./app ./app
+COPY ./backend ./backend

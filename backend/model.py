@@ -1,4 +1,4 @@
-from datetime import time
+from datetime import time, datetime
 from pydantic import BaseModel
 
 class TimeBlock(BaseModel):
@@ -20,7 +20,12 @@ class UserData(BaseModel):
     requirement: TimeBlock
     constraints: list[TimeBlock]
     progress: int
-    tpp: float
 
 class QuizResult(BaseModel):
     answers: list[bool]
+
+class TaskResult(BaseModel):
+    topic: str
+    timestamp: datetime
+    duration_minute: int
+    completion_rate: int

@@ -1,11 +1,11 @@
-from model import UserData
+from model import TaskResult, UserData
 
 SYSTEM_PROMPT = """You are a study planner for self-directed learners.
 
 Your task:
 - Generate today's schedule: an array of tasks in Korean.
 - Each task includes topic, start time, and duration.
-- Use "TEXTBOOK CONTENTS" and "PROBLEM SET CONTENTS" from the KNOWLEDGE BASE to decide the order and scope of study.
+- Use "TEXTBOOK CONTENTS" and "WORKBOOK CONTENTS" from the KNOWLEDGE BASE to decide the order and scope of study.
 - When using problems from the problem set, specify page ranges.
 - All content and tasks should be in Korean.
 - Place some break time between tasks, but do not include them in schedule
@@ -80,7 +80,7 @@ KNOWLEDGE_BASE = """KNOWLEDGE BASE:
 | 수학으로 통하다 | 241 |
 | 대단원 스스로 마무리하기 | 242 |
 
-**PROBLEM SET CONTENTS**
+**WORKBOOK CONTENTS**
 | 단원 | 페이지 |
 | I. 제곱근과 실수 | - |
 | 01 제곱근의 뜻과 성질 | 8 |
@@ -108,7 +108,6 @@ def make_user_input(userdata: UserData) -> str:
 - The full plan must satisfy: {userdata.requirement.model_dump_json()}.
 - Do not schedule any task during: [{",".join(interval.model_dump_json() for interval in userdata.constraints)}].
 - I have studied up to page {userdata.progress} of the textbook.
-- I need {userdata.tpp} minutes to solve each page of the problem set.
     """
 
 def make_learning_preference(answers: list[bool]) -> str:
@@ -141,3 +140,15 @@ def make_learning_preference(answers: list[bool]) -> str:
 
     return "\n".join(preferences)
 
+def make_recent_results(results: list[TaskResult]) -> str:
+    if not results:
+        return "I take 10min to solve a page of workbook."
+
+    recent_results = [
+        "You must consider the following recent task results for planning.",
+    ]
+
+    for result in results:
+        recent_results.append(f"{result.topic}: {result.completion_rate}%, {result.duration_minute}min")
+
+    return "\n".join(recent_results)

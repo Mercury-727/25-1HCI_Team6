@@ -1,27 +1,25 @@
-import secrets
 import uuid
 
-from flask import Flask, session, request, jsonify
+from typing import cast
+from datetime import timedelta, datetime
+from flask import session, request, jsonify, current_app, Blueprint
 from pydantic import ValidationError
 from openai import OpenAI
 
-from prompt import SYSTEM_PROMPT, KNOWLEDGE_BASE, make_learning_preference, make_user_input
-from model import UserData, Plan, QuizResult
-from db import InMemoryDB
+from prompt import SYSTEM_PROMPT, KNOWLEDGE_BASE, make_learning_preference, make_recent_results, make_user_input
+from model import UserData, Plan, QuizResult, TaskResult
+from core import DoziFlask
 
-app = Flask(__name__)
-app.secret_key = secrets.token_bytes()
+DEBUG = False
 
-db = InMemoryDB()
+bp = Blueprint("main", __name__)
 
-DEBUG = True
-
-@app.route("/me", methods=["GET", "POST"])
+@bp.route("/me", methods=["GET", "POST"])
 def me():
     user_id = get_uuid()
 
     if request.method == "GET":
-        userdata = db.get(user_id, "userdata")
+        userdata = get_db(user_id, "userdata")
 
         if userdata:
             return userdata.model_dump_json()
@@ -29,13 +27,10 @@ def me():
             return "No user data: please submit"
 
     elif request.method == "POST":
-        if "uuid" not in session:
-            session["uuid"] = uuid.uuid4()
-
         try:
             data = request.get_json()
             userdata = UserData(**data)
-            db.put(session["uuid"], "userdata", userdata)
+            put_db(user_id, "userdata", userdata)
 
             return userdata.model_dump_json()
         except ValidationError as e:
@@ -44,12 +39,12 @@ def me():
         return ""
 
 
-@app.route("/me/quiz", methods=["GET", "POST"])
+@bp.route("/me/quiz", methods=["GET", "POST"])
 def quiz():
     user_id = get_uuid()
 
     if request.method == "GET":
-        quiz_result = db.get(user_id, "quiz_result", QuizResult(answers=[]))
+        quiz_result = get_db(user_id, "quiz_result", QuizResult(answers=[]))
 
         return quiz_result.model_dump_json()
 
@@ -57,30 +52,40 @@ def quiz():
         try:
             data = request.get_json()
             quiz_result = QuizResult(**data)
-            db.put(user_id, "quiz_result", quiz_result)
+            put_db(user_id, "quiz_result", quiz_result)
 
             return quiz_result.model_dump_json()
         except ValidationError as e:
             return jsonify(e.errors(), 400)
-    
+
     return ""
 
 
-@app.route("/ping")
+@bp.route("/ping")
 def ping():
     return "pong"
 
 
-@app.route("/plan")
+@bp.route("/plan")
 def plan():
     user_id = get_uuid()
 
-    userdata = db.get(user_id, "userdata")
+    userdata = get_db(user_id, "userdata")
 
     if not userdata:
         return "You must provide user data for planning"
 
-    quiz_result = db.get(user_id, "quiz_result", QuizResult(answers=[]))
+    quiz_result = get_db(user_id, "quiz_result", QuizResult(answers=[]))
+
+    recent_results: list[TaskResult] = get_db(user_id, "recent_results", [])
+    now = datetime.now()
+    recent_results = list(
+        filter(
+            lambda task: now < task.timestamp + timedelta(days=7),
+            recent_results,
+        )
+    )
+    put_db(user_id, "recent_results", recent_results)
 
     if DEBUG:
         return """{
@@ -135,7 +140,11 @@ def plan():
             },
             {
                 "role": "user",
-                "content": make_learning_preference(quiz_result.answers)
+                "content": make_learning_preference(quiz_result.answers),
+            },
+            {
+                "role": "user",
+                "content": make_recent_results(recent_results),
             },
         ]
     )
@@ -145,6 +154,36 @@ def plan():
 
     return response.output_parsed.model_dump_json()
 
+@bp.route("/tasks/complete", methods=["GET", "POST"])
+def complete_task():
+    user_id = get_uuid()
+
+    if request.method == "GET":
+        recent_results: list[TaskResult] = get_db(user_id, "recent_results", [])
+        now = datetime.now()
+        recent_results = list(
+            filter(
+                lambda task: now < task.timestamp + timedelta(days=7),
+                recent_results,
+            )
+        )
+        put_db(user_id, "recent_results", recent_results)
+
+        return f'{{"recent_results": [{",".join(result.model_dump_json() for result in recent_results)}]}}'
+    elif request.method == "POST":
+        try:
+            data = request.get_json()
+            task_result = TaskResult(**data)
+
+            recent_results: list[TaskResult] = get_db(user_id, "recent_results", [])
+            recent_results.append(task_result)
+            put_db(user_id, "recent_results", recent_results)
+
+            return task_result.model_dump_json()
+        except ValidationError as e:
+            return jsonify(e.errors(), 400)
+
+    return ""
 
 def get_uuid():
     if "uuid" not in session:
@@ -153,5 +192,9 @@ def get_uuid():
     return session["uuid"]
 
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5050)
+def get_db(user_id, key, default=None):
+    value = cast(DoziFlask, current_app).db.get(user_id, key, default)
+    return value
+
+def put_db(user_id, key, value):
+    cast(DoziFlask, current_app).db.put(user_id, key, value)
