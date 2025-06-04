@@ -6,7 +6,7 @@ from flask import session, request, jsonify, current_app, Blueprint
 from pydantic import ValidationError
 from openai import OpenAI
 
-from prompt import SYSTEM_PROMPT, KNOWLEDGE_BASE, make_learning_preference, make_recent_results, make_user_input
+from prompt import *
 from model import UserData, Plan, QuizResult, TaskResult
 from core import DoziFlask
 
@@ -140,12 +140,12 @@ def plan():
             },
             {
                 "role": "user",
-                "content": make_learning_preference(quiz_result.answers),
+                "content": make_planning_considerations(quiz_result.answers, recent_results),
             },
             {
                 "role": "user",
-                "content": make_recent_results(recent_results),
-            },
+                "content": ADDITIONAL_INSTRUCTIONS,
+            }
         ]
     )
 

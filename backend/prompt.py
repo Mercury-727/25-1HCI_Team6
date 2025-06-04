@@ -3,12 +3,12 @@ from model import TaskResult, UserData
 SYSTEM_PROMPT = """You are a study planner for self-directed learners.
 
 Your task:
-- Generate today's schedule: an array of tasks in Korean.
-- Each task includes topic, start time, and duration.
+- Generate today's schedule as an array of tasks in Korean.
+- Each task should include topic, start time, and duration.
 - Use "TEXTBOOK CONTENTS" and "WORKBOOK CONTENTS" from the KNOWLEDGE BASE to decide the order and scope of study.
-- When using problems from the problem set, specify page ranges.
+- When assigning workbook problems, specify the exact page ranges.
 - All content and tasks should be in Korean.
-- Place some break time between tasks, but do not include them in schedule
+- Insert break times between tasks(do not include breaks in the schedule).
 """
 
 KNOWLEDGE_BASE = """KNOWLEDGE BASE:
@@ -100,24 +100,38 @@ KNOWLEDGE_BASE = """KNOWLEDGE BASE:
 | 12 이차함수의 그래프 ⑵ | 178 |
 """
 
+ADDITIONAL_INSTRUCTIONS = """
+Additional Instructions:
+- Analyze the user's recent task results—especially completion rate and actual duration—to estimate their current learning level and pace.
+- For both the textbook and workbook, determine the current progress based on the most recently completed tasks (e.g., last studied page).
+- When creating new tasks, always start from where the last task was completed.
+- When scheduling workbook tasks, dynamically adjust the number of pages per task based on recent performance:
+    - If the completion rate for recent workbook tasks is low or the actual duration exceeded the planned time, reduce the number of pages for the next workbook task.
+    - If the completion rate is high and the actual duration was within the planned time, you may slightly increase the number of pages.
+- Explicitly state the page ranges for each workbook task, and ensure the workload is appropriate for the user's current ability.
+- Reflect the user's progress and preferences in all scheduling decisions.
+
+Respond only with the final schedule in Korean.
+"""
+
 def make_user_input(userdata: UserData) -> str:
     return f"""Please generate a study plan based on the following constraints:
 
 - Total study time must be ≤ {userdata.active_time}.
 - Each task's duration must be ≤ {userdata.attention_span}.
-- The full plan must satisfy: {userdata.requirement.model_dump_json()}.
+- The plan must satisfy: {userdata.requirement.model_dump_json()}.
 - Do not schedule any task during: [{",".join(interval.model_dump_json() for interval in userdata.constraints)}].
 - I have studied up to page {userdata.progress} of the textbook.
     """
 
-def make_learning_preference(answers: list[bool]) -> str:
-    if not answers:
-        return ""
-
+def _make_learning_preference(answers: list[bool]) -> str:
     preferences = [
-        "You must consider the user's learning preferences for planning.",
-        "Here are the learning preferences extracted from a quiz.",
+        "- The user's following learning preferences extracted from a quiz:",
     ]
+
+    if not answers:
+        return preferences[0]
+
     answer_len = len(answers)
 
     if answer_len >= 4 and any(answers[:4]):
@@ -140,15 +154,25 @@ def make_learning_preference(answers: list[bool]) -> str:
 
     return "\n".join(preferences)
 
-def make_recent_results(results: list[TaskResult]) -> str:
+def _make_recent_results(results: list[TaskResult]) -> str:
     if not results:
         return "I take 10min to solve a page of workbook."
 
     recent_results = [
-        "You must consider the following recent task results for planning.",
+        "- The user's recent task results (topic, completion rate, actual duration):",
     ]
 
     for result in results:
         recent_results.append(f"{result.topic}: {result.completion_rate}%, {result.duration_minute}min")
 
     return "\n".join(recent_results)
+
+def make_planning_considerations(answers: list[bool], results: list[TaskResult]):
+    prompt = [
+        "For planning, consider:",
+    ]
+
+    prompt.append(_make_learning_preference(answers))
+    prompt.append(_make_recent_results(results))
+
+    return "\n".join(prompt)
