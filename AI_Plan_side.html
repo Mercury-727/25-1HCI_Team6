@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Study Planner App</title>
+  <title>Study Planner App (5분 단위 조정)</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -24,17 +23,34 @@
     const { useState, useEffect, useRef } = React;
 
     function StudyPlannerApp() {
-      // ==========================
-      // 1) 상태 정의
-      // ==========================
+      // =============== 상수 정의 ===============
+      const startHour = 8;
+      const endHour = 24;
+      // 1) 30분 슬롯당 높이(px)
+      const slotHeight30 = 84;
+      // 2) 5분 슬롯당 높이(px) = slotHeight30 / 6
+      const slotHeight5 = slotHeight30 / 6; // 84 / 6 = 14px
+      // 시각 그리드에서는 30분 단위 라인만 표시
+      const total30Slots = (endHour - startHour) * 2; // 16시간 * 2 = 32
+      const timeSlots = Array.from({ length: total30Slots }, (_, i) => {
+        const totalMinutes = startHour * 60 + i * 30;
+        const hh = String(Math.floor(totalMinutes / 60)).padStart(2, '0');
+        const mm = String(totalMinutes % 60).padStart(2, '0');
+        return `${hh}:${mm}`;
+      });
+
+      // =============== 상태 정의 ===============
       const [currentView, setCurrentView] = useState('schedule'); // 'schedule' 또는 'ai'
       const [userPlans, setUserPlans] = useState([
+        // 초기 예시 플랜들
         { id: 1, title: '영어 단어 암기', memo: '새 단어 20개', start: '16:00', end: '17:30', emoji: '📚' },
         { id: 2, title: '수학 문제 풀이', memo: '기출문제 5개', start: '18:00', end: '19:00', emoji: '📐' }
       ]);
-      // (A) 리사이즈 관련 상태를 ref로 관리
+      // AI 제안 플랜들
+      const [aiPlans, setAiPlans] = useState([]);
+
+      // 카드 이동/리사이징용 ref
       const resizeDataRef = useRef(null);
-      // (B) 이동(드래그) 관련 상태를 ref로 관리
       const dragDataRef = useRef(null);
 
       // 모달 관련 상태
@@ -48,38 +64,15 @@
         emoji: '📚'
       });
 
-      // ==========================
-      // 2) Lucide 아이콘 렌더링
-      // ==========================
+      // Lucide 아이콘 렌더링
       useEffect(() => {
         lucide.createIcons();
       }, []);
 
-      // ==========================
-      // 3) 시간 슬롯 계산 (08:00 ~ 20:00)
-      // ==========================
-      const slotHeight = 84; // 30분 슬롯당 높이(px)
-      const startHour = 8, endHour = 24;
-      const totalSlots = (endHour - startHour) * 2; // 12시간 * 2 = 24 슬롯
-
-      // 예: ['08:00','08:30','09:00',...,'19:30']
-      const timeSlots = Array.from({ length: totalSlots }, (_, i) => {
-        const totalMinutes = startHour * 60 + i * 30;
-        const hh = String(Math.floor(totalMinutes / 60)).padStart(2, '0');
-        const mm = String(totalMinutes % 60).padStart(2, '0');
-        return `${hh}:${mm}`;
-      });
-
-      // ==========================
-      // 4) 플랜 삭제
-      // ==========================
+      // =============== 플랜 삭제 & 편집 ===============
       const deletePlan = id => {
         setUserPlans(plans => plans.filter(x => x.id !== id));
       };
-
-      // ==========================
-      // 5) 편집 모달 열기
-      // ==========================
       const onEdit = plan => {
         setEditingPlan(plan);
         setNewPlan({
@@ -92,11 +85,7 @@
         setShowModal(true);
       };
 
-      // ==========================
-      // 6) AI 제안 생성
-      // ==========================
-      const [aiPlans, setAiPlans] = useState([]);
-
+      // =============== AI 제안 생성 (랜덤 더미) ===============
       const generateAiSuggestions = () => {
         const suggestions = [
           { title: '물리 공식 정리', emoji: '⚛️' },
@@ -110,13 +99,13 @@
           id: Date.now() + i,
           title: it.title,
           memo: '',
+          // 예시: 19:00~20:00, 20:00~21:00, 21:00~22:00
           start: `${19 + i}:00`,
           end: `${20 + i}:00`,
           emoji: it.emoji
         }));
         setAiPlans(newAi);
       };
-
       const applyAiPlans = () => {
         const cloned = aiPlans.map(pl => ({ ...pl, id: Date.now() + Math.random() }));
         setUserPlans(plans => [...plans, ...cloned]);
@@ -124,20 +113,16 @@
         setCurrentView('schedule');
       };
 
-      // ==========================
-      // 7) 새/수정 저장
-      // ==========================
+      // =============== 신규/수정 저장 ===============
       const savePlan = () => {
         if (!newPlan.title || !newPlan.start || !newPlan.end) return;
         if (editingPlan) {
-          // 수정
           setUserPlans(plans =>
             plans.map(x =>
               x.id === editingPlan.id ? { ...editingPlan, ...newPlan } : x
             )
           );
         } else {
-          // 새로 추가
           setUserPlans(plans => [...plans, { ...newPlan, id: Date.now() }]);
         }
         setEditingPlan(null);
@@ -145,95 +130,101 @@
         setShowModal(false);
       };
 
-      // ==========================
-      // 8) 카드 리사이즈/이동 로직
-      // ==========================
-      // (A) 리사이즈 시작
+      // =============== 카드 리사이즈/이동 로직 (5분 단위) ===============
+      // 리사이즈 시작
       const startResizing = (e, planId, edge) => {
         e.preventDefault();
         e.stopPropagation();
-        // 만약 이동 중이던 상태가 남아 있으면 초기화
         dragDataRef.current = null;
 
         const plan = userPlans.find(p => p.id === planId);
         if (!plan) return;
+
+        // 기존 start/end 문자열을 “h:mm” → 총 분 계산
         const [sh, sm] = plan.start.split(':').map(Number);
-        const startIdx = ((sh * 60 + sm) - (startHour * 60)) / 30;
+        const totalStartMins = sh * 60 + sm;
+        const startIdx5 = (totalStartMins - startHour * 60) / 5; // 5분 단위 인덱스
 
         const [eh, em] = plan.end.split(':').map(Number);
-        const endIdx = ((eh * 60 + em) - (startHour * 60)) / 30;
+        const totalEndMins = eh * 60 + em;
+        const endIdx5 = (totalEndMins - startHour * 60) / 5;
 
         resizeDataRef.current = {
           planId,
           edge,
           initialMouseY: e.clientY,
-          initialStartIdx: startIdx,
-          initialEndIdx: endIdx
+          initialStartIdx5: startIdx5,
+          initialEndIdx5: endIdx5
         };
       };
 
-      // (B) 이동 시작 (카드 상단/하단 리사이저가 아닌 곳에서 눌렀을 때)
+      // 이동 시작 (카드 전체 영역 클릭 시)
       const startDragging = (e, planId) => {
         e.preventDefault();
         e.stopPropagation();
-        // 만약 리사이즈 중이던 상태가 남아 있으면 초기화
         resizeDataRef.current = null;
 
         const plan = userPlans.find(p => p.id === planId);
         if (!plan) return;
+
         const [sh, sm] = plan.start.split(':').map(Number);
-        const startIdx = ((sh * 60 + sm) - (startHour * 60)) / 30;
+        const startIdx5 = ((sh * 60 + sm) - startHour * 60) / 5;
 
         const [eh, em] = plan.end.split(':').map(Number);
-        const endIdx = ((eh * 60 + em) - (startHour * 60)) / 30;
+        const endIdx5 = ((eh * 60 + em) - startHour * 60) / 5;
 
-        const durationSlots = endIdx - startIdx;
+        const durationSlots5 = endIdx5 - startIdx5;
         dragDataRef.current = {
           planId,
           initialMouseY: e.clientY,
-          initialStartIdx: startIdx,
-          durationSlots
+          initialStartIdx5: startIdx5,
+          durationSlots5
         };
       };
 
-      // (C) 마우스 이동 시 처리: 리사이즈 우선, 아니면 이동 처리
+      // 마우스 움직일 때: 리사이즈 우선 → 이동 처리
       const onMouseMove = e => {
         // --- 리사이즈 중일 때 ---
         if (resizeDataRef.current) {
-          const { planId, edge, initialMouseY, initialStartIdx, initialEndIdx } = resizeDataRef.current;
+          const { planId, edge, initialMouseY, initialStartIdx5, initialEndIdx5 } = resizeDataRef.current;
           const deltaY = e.clientY - initialMouseY;
-          const deltaSlots = Math.round(deltaY / slotHeight);
+          // 5분 단위로 변경: deltaSlots5 = round(deltaY / slotHeight5)
+          const deltaSlots5 = Math.round(deltaY / slotHeight5);
 
           const plan = userPlans.find(p => p.id === planId);
           if (!plan) return;
 
-          let newStartIdx = initialStartIdx;
-          let newEndIdx = initialEndIdx;
+          let newStartIdx5 = initialStartIdx5;
+          let newEndIdx5 = initialEndIdx5;
 
           if (edge === 'top') {
-            newStartIdx = initialStartIdx + deltaSlots;
-            if (newStartIdx < 0) newStartIdx = 0;
-            if (newStartIdx >= initialEndIdx) newStartIdx = initialEndIdx - 1;
+            newStartIdx5 = initialStartIdx5 + deltaSlots5;
+            // 상한/하한 처리: 시작 인덱스는 0 이상, 시작인덱스 < 기존 endIdx5
+            if (newStartIdx5 < 0) newStartIdx5 = 0;
+            if (newStartIdx5 >= initialEndIdx5) newStartIdx5 = initialEndIdx5 - 1;
           } else if (edge === 'bottom') {
-            newEndIdx = initialEndIdx + deltaSlots;
-            if (newEndIdx <= initialStartIdx) newEndIdx = initialStartIdx + 1;
-            if (newEndIdx > totalSlots) newEndIdx = totalSlots;
+            newEndIdx5 = initialEndIdx5 + deltaSlots5;
+            // endIdx5는 startIdx5+1 이상, 최대 (total60Slots) 
+            // total60Slots = ((endHour-startHour)*60)/5
+            const total5Slots = ((endHour - startHour) * 60) / 5;
+            if (newEndIdx5 <= initialStartIdx5) newEndIdx5 = initialStartIdx5 + 1;
+            if (newEndIdx5 > total5Slots) newEndIdx5 = total5Slots;
           }
 
-          // 시간 문자열 계산
+          // 시간 문자열로 변환
           let updatedStart = plan.start;
           let updatedEnd = plan.end;
 
-          if (edge === 'top' && newStartIdx !== initialStartIdx) {
-            const newStartTotalMins = startHour * 60 + newStartIdx * 30;
-            const nsH = Math.floor(newStartTotalMins / 60);
-            const nsM = newStartTotalMins % 60;
+          if (edge === 'top' && newStartIdx5 !== initialStartIdx5) {
+            const newStartMins = startHour * 60 + newStartIdx5 * 5;
+            const nsH = Math.floor(newStartMins / 60);
+            const nsM = newStartMins % 60;
             updatedStart = `${String(nsH).padStart(2, '0')}:${String(nsM).padStart(2, '0')}`;
           }
-          if (edge === 'bottom' && newEndIdx !== initialEndIdx) {
-            const newEndTotalMins = startHour * 60 + newEndIdx * 30;
-            const neH = Math.floor(newEndTotalMins / 60);
-            const neM = newEndTotalMins % 60;
+          if (edge === 'bottom' && newEndIdx5 !== initialEndIdx5) {
+            const newEndMins = startHour * 60 + newEndIdx5 * 5;
+            const neH = Math.floor(newEndMins / 60);
+            const neM = newEndMins % 60;
             updatedEnd = `${String(neH).padStart(2, '0')}:${String(neM).padStart(2, '0')}`;
           }
 
@@ -248,29 +239,30 @@
 
         // --- 이동 중일 때 ---
         if (dragDataRef.current) {
-          const { planId, initialMouseY, initialStartIdx, durationSlots } = dragDataRef.current;
+          const { planId, initialMouseY, initialStartIdx5, durationSlots5 } = dragDataRef.current;
           const deltaY = e.clientY - initialMouseY;
-          const deltaSlots = Math.round(deltaY / slotHeight);
+          // 5분 단위 delta
+          const deltaSlots5 = Math.round(deltaY / slotHeight5);
 
-          let newStartIdx = initialStartIdx + deltaSlots;
-          // 범위 한정
-          if (newStartIdx < 0) newStartIdx = 0;
-          if (newStartIdx + durationSlots > totalSlots) newStartIdx = totalSlots - durationSlots;
+          let newStartIdx5 = initialStartIdx5 + deltaSlots5;
+          // 범위 한정: newStartIdx5 >=0, newStartIdx5 + durationSlots5 <= total5Slots
+          const total5Slots = ((endHour - startHour) * 60) / 5;
+          if (newStartIdx5 < 0) newStartIdx5 = 0;
+          if (newStartIdx5 + durationSlots5 > total5Slots) newStartIdx5 = total5Slots - durationSlots5;
 
-          const newEndIdx = newStartIdx + durationSlots;
-
+          const newEndIdx5 = newStartIdx5 + durationSlots5;
           const plan = userPlans.find(p => p.id === planId);
           if (!plan) return;
 
           // 새로운 시간 문자열 계산
-          const newStartTotalMins = startHour * 60 + newStartIdx * 30;
-          const nsH = Math.floor(newStartTotalMins / 60);
-          const nsM = newStartTotalMins % 60;
+          const newStartMins = startHour * 60 + newStartIdx5 * 5;
+          const nsH = Math.floor(newStartMins / 60);
+          const nsM = newStartMins % 60;
           const updatedStart = `${String(nsH).padStart(2, '0')}:${String(nsM).padStart(2, '0')}`;
 
-          const newEndTotalMins = startHour * 60 + newEndIdx * 30;
-          const neH = Math.floor(newEndTotalMins / 60);
-          const neM = newEndTotalMins % 60;
+          const newEndMins = startHour * 60 + newEndIdx5 * 5;
+          const neH = Math.floor(newEndMins / 60);
+          const neM = newEndMins % 60;
           const updatedEnd = `${String(neH).padStart(2, '0')}:${String(neM).padStart(2, '0')}`;
 
           setUserPlans(plans =>
@@ -282,7 +274,7 @@
         }
       };
 
-      // (D) 마우스 업 시 리셋
+      // 마우스 업 시 리셋
       const onMouseUp = () => {
         resizeDataRef.current = null;
         dragDataRef.current = null;
@@ -297,14 +289,10 @@
         };
       }, [userPlans]);
 
-      // ==========================
-      // 9) 렌더링
-      // ==========================
+      // =============== 렌더링 ===============
       return (
         <div className="max-w-md mx-auto bg-white min-h-screen relative overflow-hidden">
-          {/* ======================= */}
-          {/*        헤더 부분       */}
-          {/* ======================= */}
+          {/* ─────────── 헤더 ─────────── */}
           <header className="bg-orange-50 p-3 border-b border-orange-100 sticky top-0 z-10 flex justify-between items-center">
             <h1 className="text-xl font-bold text-gray-800">My Plan</h1>
             <div className="flex gap-2">
@@ -325,13 +313,11 @@
             </div>
           </header>
 
-          {/* ======================= */}
-          {/*      메인 콘텐츠       */}
-          {/* ======================= */}
+          {/* ─────────── 메인 콘텐츠 ─────────── */}
           <div className="flex h-full">
-            {/* — 스케줄 뷰 — */}
+            {/* ◼ 스케줄 뷰 */}
             <div className={`w-full relative transition-transform duration-300 ${currentView === 'ai' ? '-translate-x-full' : 'translate-x-0'}`}>
-              {/* ◼︎ 시간 슬롯 그리드 */}
+              {/* ─ 시간 슬롯 그리드 (30분 단위만 렌더링) ─ */}
               <div className="h-full overflow-y-auto bg-orange-50 pb-28">
                 {timeSlots.map(time => {
                   const isHour = time.endsWith(':00');
@@ -340,7 +326,7 @@
                       key={time}
                       className="flex items-start border-b border-gray-200"
                       style={{
-                        height: `${slotHeight}px`,
+                        height: `${slotHeight30}px`,
                         backgroundColor: isHour ? '#ffffff' : '#f8fafd'
                       }}
                     >
@@ -353,20 +339,18 @@
                 })}
               </div>
 
-              {/* ◼︎ 절대 위치: 일정 카드 오버레이 */}
+              {/* ◼ 일정 카드 오버레이 (5분 단위로 위치/높이 조정) */}
               {userPlans.map(plan => {
-                // 1) 시작/종료 슬롯 인덱스 계산
+                // 1) 문자열 "HH:MM" → 총 분 계산 → startIdx5, endIdx5
                 const [sh, sm] = plan.start.split(':').map(Number);
-                const startTotal = (sh * 60 + sm) - (startHour * 60);
-                const startIdx = startTotal / 30;
+                const startIdx5 = ((sh * 60 + sm) - (startHour * 60)) / 5;
 
                 const [eh, em] = plan.end.split(':').map(Number);
-                const endTotal = (eh * 60 + em) - (startHour * 60);
-                const endIdx = endTotal / 30;
+                const endIdx5 = ((eh * 60 + em) - (startHour * 60)) / 5;
 
-                const spanSlots = endIdx - startIdx;
-                const topPx = startIdx * slotHeight;
-                const heightPx = spanSlots * slotHeight;
+                const spanSlots5 = endIdx5 - startIdx5;
+                const topPx = startIdx5 * slotHeight5;    // startIdx5 * 14px
+                const heightPx = spanSlots5 * slotHeight5; // durationSlots5 * 14px
 
                 return (
                   <div
@@ -377,14 +361,14 @@
                       height: `${heightPx}px`
                     }}
                     onMouseDown={e => {
-                      // 리사이저나 아이콘을 클릭했을 때 이동 시작을 막음
+                      // 리사이저나 아이콘 클릭 방지
                       if (e.target.closest('.cursor-ns-resize') || e.target.closest('button') || e.target.closest('.lucide')) {
                         return;
                       }
                       startDragging(e, plan.id);
                     }}
                   >
-                    {/* ◼︎ 상단 리사이저 */}
+                    {/* ◼ 상단 리사이저 (5분 단위 이동) */}
                     <div
                       draggable={false}
                       className="absolute left-0 right-0 h-2 cursor-ns-resize z-30"
@@ -394,7 +378,7 @@
                       }}
                     />
 
-                    {/* ◼︎ 카드 헤더: 이모지, 제목, 편집/삭제 아이콘 */}
+                    {/* ◼ 카드 헤더: 이모지, 제목, 편집/삭제 */}
                     <div className="flex items-center justify-between px-3 py-1 select-none">
                       <div className="flex items-center gap-2">
                         <span className="text-2xl">{plan.emoji}</span>
@@ -410,13 +394,13 @@
                       </div>
                     </div>
 
-                    {/* ◼︎ 카드 콘텐츠 */}
+                    {/* ◼ 카드 콘텐츠: 시간표시, 메모 */}
                     <div className="px-3 pb-2">
                       <div className="text-xs text-gray-500">{plan.start} ~ {plan.end}</div>
                       {plan.memo && <div className="text-xs text-gray-600">메모: {plan.memo}</div>}
                     </div>
 
-                    {/* ◼︎ 하단 리사이저 */}
+                    {/* ◼ 하단 리사이저 (5분 단위 이동) */}
                     <div
                       draggable={false}
                       className="absolute left-0 right-0 h-2 cursor-ns-resize z-30"
@@ -430,23 +414,15 @@
               })}
             </div>
 
-            {/* ======================= */}
-            {/*      2) AI 뷰 화면     */}
-            {/* ======================= */}
-            <div
-              className={`w-full absolute top-0 transition-transform duration-300 ${currentView === 'ai' ? 'translate-x-0' : 'translate-x-full'
-                }`}
-            >
+            {/* ───────── AI 뷰 ───────── */}
+            <div className={`w-full absolute top-0 transition-transform duration-300 ${currentView === 'ai' ? 'translate-x-0' : 'translate-x-full'}`}>
               <div className="p-4 h-screen overflow-y-auto pb-28 bg-orange-100">
                 {/* 뒤로 가기 버튼 및 타이틀 */}
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg font-bold flex items-center gap-2">
                     <span>🤖</span> AI 추천 플랜
                   </h2>
-                  <button
-                    onClick={() => setCurrentView('schedule')}
-                    className="text-orange-600"
-                  >
+                  <button onClick={() => setCurrentView('schedule')} className="text-orange-600">
                     ← 돌아가기
                   </button>
                 </div>
@@ -454,17 +430,12 @@
                 {/* AI 제안 플랜 카드 목록 */}
                 <div className="space-y-3">
                   {aiPlans.map(pl => (
-                    <div
-                      key={pl.id}
-                      className="p-4 bg-orange-500 text-white rounded-xl shadow-sm"
-                    >
+                    <div key={pl.id} className="p-4 bg-orange-500 text-white rounded-xl shadow-sm">
                       <div className="flex items-center gap-3">
                         <span className="text-2xl">{pl.emoji}</span>
                         <div>
                           <div className="font-medium">{pl.title}</div>
-                          <div className="text-sm text-orange-100">
-                            {pl.start} ~ {pl.end}
-                          </div>
+                          <div className="text-sm text-orange-100">{pl.start} ~ {pl.end}</div>
                         </div>
                       </div>
                     </div>
@@ -474,10 +445,7 @@
                 {/* AI 생성 버튼 */}
                 {aiPlans.length === 0 && (
                   <div className="text-center py-8">
-                    <button
-                      onClick={generateAiSuggestions}
-                      className="bg-orange-500 text-white px-6 py-3 rounded-full"
-                    >
+                    <button onClick={generateAiSuggestions} className="bg-orange-500 text-white px-6 py-3 rounded-full">
                       AI 플랜 생성하기
                     </button>
                   </div>
@@ -486,10 +454,7 @@
                 {/* AI 적용 버튼 */}
                 {aiPlans.length > 0 && (
                   <div className="text-center mt-6">
-                    <button
-                      onClick={applyAiPlans}
-                      className="bg-orange-500 text-white px-6 py-3 rounded-full"
-                    >
+                    <button onClick={applyAiPlans} className="bg-orange-500 text-white px-6 py-3 rounded-full">
                       내 플래너에 적용
                     </button>
                   </div>
@@ -498,16 +463,11 @@
             </div>
           </div>
 
-          {/* ======================= */}
-          {/* 3) 하단 명령 바     */}
-          {/* ======================= */}
+          {/* ───────── 하단 명령 바 ───────── */}
           <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
             <div className="max-w-md mx-auto flex gap-3">
               {currentView === 'schedule' ? (
-                <button
-                  onClick={() => setCurrentView('ai')}
-                  className="flex-1 bg-white border-2 border-orange-500 text-orange-500 py-3 rounded-full"
-                >
+                <button onClick={() => setCurrentView('ai')} className="flex-1 bg-white border-2 border-orange-500 text-orange-500 py-3 rounded-full">
                   AI에 명령
                 </button>
               ) : (
@@ -525,19 +485,14 @@
               )}
 
               {currentView === 'ai' && aiPlans.length > 0 && (
-                <button
-                  onClick={applyAiPlans}
-                  className="flex-1 bg-orange-500 text-white py-3 rounded-full"
-                >
+                <button onClick={applyAiPlans} className="flex-1 bg-orange-500 text-white py-3 rounded-full">
                   적용
                 </button>
               )}
             </div>
           </div>
 
-          {/* ======================= */}
-          {/* 4) 플랜 추가/수정 모달 */}
-          {/* ======================= */}
+          {/* ───────── 새 일정 추가/수정 모달 ───────── */}
           {showModal && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
               <div className="bg-white rounded-2xl w-full max-w-sm p-6">
@@ -606,10 +561,7 @@
                   >
                     취소
                   </button>
-                  <button
-                    onClick={savePlan}
-                    className="flex-1 bg-orange-500 text-white py-3 rounded"
-                  >
+                  <button onClick={savePlan} className="flex-1 bg-orange-500 text-white py-3 rounded">
                     {editingPlan ? '수정 완료' : '추가'}
                   </button>
                 </div>
@@ -617,9 +569,7 @@
             </div>
           )}
 
-          {/* ======================= */}
-          {/* 5) 새 일정 추가 버튼   */}
-          {/* ======================= */}
+          {/* ───────── 새 일정 추가 버튼 ───────── */}
           <button
             onClick={() => {
               setEditingPlan(null);
@@ -636,5 +586,4 @@
     ReactDOM.render(<StudyPlannerApp />, document.getElementById('root'));
   </script>
 </body>
-
 </html>
