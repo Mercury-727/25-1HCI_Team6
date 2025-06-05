@@ -64,6 +64,23 @@
         emoji: '📚'
       });
 
+      // Load user plan from browser local storage
+      useEffect(() => {
+        const saved = localStorage.getItem("userPlans");
+        if (saved) {
+          try {
+            setUserPlans(JSON.parse(saved));
+          } catch (e) {
+            console.error("저장된 일정 데이터를 불러오지 못했습니다.", e);
+          }
+        }
+      }, []);
+
+      // Save user plan into browser local storage
+      useEffect(() => {
+        localStorage.setItem("userPlans", JSON.stringify(userPlans));
+      }, [userPlans]);
+
       // Lucide 아이콘 렌더링
       useEffect(() => {
         lucide.createIcons();
