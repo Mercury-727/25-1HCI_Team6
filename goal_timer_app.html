@@ -78,10 +78,10 @@
       return `${m}:${s}`;
     }
 
-    const GoalCard = ({ goal }) => (
+    const GoalCard = ({ emoji, goal, memo }) => (
       <div className="goal-card">
-        <h3>🎯 현재 목표</h3>
-        <p>{goal}</p>
+        <h3>{emoji} {goal}</h3>
+        <p>{memo}</p>
       </div>
     );
 
@@ -162,8 +162,13 @@
       const [isRunning, setIsRunning] = useState(false);
       const [phase, setPhase] = useState('timer'); // 'timer', 'confirm', 'achievement', 'feedback'
       const [achievement, setAchievement] = useState(50);
-      const goal = "곱셈 공식 개념 공부";
-      const targetMinutes = 2;
+
+      const stored = localStorage.getItem("currentPlan");
+      const parsed = stored ? JSON.parse(stored) : null;
+      const goal = parsed?.title || "목표 없음";
+      const memo = parsed?.memo || "";
+      const targetMinutes = parsed?.duration || 25;
+      const emoji = parsed?.emoji || "🎯";
       const timerRef = useRef(null);
 
       useEffect(() => {
@@ -184,7 +189,7 @@
 
       return (
         <div className="container">
-          <GoalCard goal={goal} />
+          <GoalCard emoji={emoji} goal={goal} memo={memo}/>
           {phase === 'timer' && (
             <Timer
               seconds={seconds}

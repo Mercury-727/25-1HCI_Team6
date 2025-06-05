@@ -503,9 +503,21 @@
                 {
                   userPlans.slice(0, 3).map((plan, i) => (
                     <div key={i} className="activity-card" onClick={() => alertMsg(act.name + ' 활동을 시작합니다!')}>
-                        <div className="activity-title">{plan.emoji} {plan.title}</div>
-                        <div className="activity-duration">⏱️ {plan.start} ~ {plan.end}</div>
-                      <button className="start-btn">시작하기</button>
+                      <div className="activity-title">{plan.emoji} {plan.title}</div>
+                      <div className="activity-duration">⏱️ {plan.start} ~ {plan.end}</div>
+                      <button className="start-btn" onClick={() => {
+                        const [sh, sm] = plan.start.split(':').map(Number);
+                        const [eh, em] = plan.end.split(':').map(Number);
+                        const duration = (eh * 60 + em) - (sh * 60 + sm);
+                        const currentPlan = {
+                          title: plan.title,
+                          memo: plan.memo,
+                          emoji: plan.emoji,
+                          duration: duration
+                        };
+                        localStorage.setItem("currentPlan", JSON.stringify(currentPlan));
+                        window.location.href = "goal_timer_app.html";
+                      }}>시작하기</button>
                     </div>
                   ))
                 }
