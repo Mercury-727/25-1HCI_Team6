@@ -406,6 +406,16 @@
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
 
+    function jumpToTimer(e, plan) {
+      e.stopPropagation();
+
+      alert(plan.title + ' 활동을 시작합니다!')
+
+      const currentPlanID = plan.id;
+      localStorage.setItem("currentPlanID", JSON.stringify(currentPlanID));
+      window.location.href = "goal_timer_app.html";
+    }
+
     function StudyPlannerHome() {
       const [showFloating, setShowFloating] = useState(false);
       const [showTooltip, setShowTooltip] = useState(false);
@@ -501,25 +511,17 @@
               <h3>📚 추천 학습 활동</h3>
               <div className="activity-scroll">
                 {
-                  userPlans.slice(0, 3).map((plan, i) => (
-                    <div key={i} className="activity-card" onClick={() => alertMsg(act.name + ' 활동을 시작합니다!')}>
-                      <div className="activity-title">{plan.emoji} {plan.title}</div>
-                      <div className="activity-duration">⏱️ {plan.start} ~ {plan.end}</div>
-                      <button className="start-btn" onClick={() => {
-                        const [sh, sm] = plan.start.split(':').map(Number);
-                        const [eh, em] = plan.end.split(':').map(Number);
-                        const duration = (eh * 60 + em) - (sh * 60 + sm);
-                        const currentPlan = {
-                          title: plan.title,
-                          memo: plan.memo,
-                          emoji: plan.emoji,
-                          duration: duration
-                        };
-                        localStorage.setItem("currentPlan", JSON.stringify(currentPlan));
-                        window.location.href = "goal_timer_app.html";
-                      }}>시작하기</button>
-                    </div>
-                  ))
+                  userPlans
+                    .filter(p => !p.done) // 1. 완료 안 된 것만
+                    .sort((a, b) => a.start.localeCompare(b.start)) // 2. 시작 시간 오름차순 정렬
+                    .slice(0, 3) // 3. 상위 3개만
+                    .map((plan, i) => (
+                      <div key={i} className="activity-card" onClick={e => jumpToTimer(e, plan)}>
+                        <div className="activity-title">{plan.emoji} {plan.title}</div>
+                        <div className="activity-duration">⏱️ {plan.start} ~ {plan.end}</div>
+                        <button className="start-btn" onClick={e => jumpToTimer(e, plan)}>시작하기</button>
+                      </div>
+                    ))
                 }
               </div>
             </section>
