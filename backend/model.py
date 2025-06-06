@@ -29,3 +29,8 @@ class TaskResult(BaseModel):
     timestamp: datetime
     duration_minute: int
     completion_rate: int
+
+class DailyFeedback(BaseModel):
+    analysis: str
+    suggestion: str
+    encouragement: str

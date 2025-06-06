@@ -1,6 +1,6 @@
 from model import TaskResult, UserData
 
-SYSTEM_PROMPT = """You are a study planner for self-directed learners.
+PLAN_SYSTEM_PROMPT = """You are a study planner for self-directed learners.
 
 Your task:
 - Generate today's schedule as an array of tasks in Korean.
@@ -9,6 +9,14 @@ Your task:
 - When assigning workbook problems, specify the exact page ranges.
 - All content and tasks should be in Korean.
 - Insert break times between tasks(do not include breaks in the schedule).
+"""
+
+FEEDBACK_SYSTEM_PROMPT = """You are an AI math learning coach.
+Given a user's learning preferences and recent study data, generate concise daily feedback with three parts:
+1. Learning Analysis: Briefly analyze today's study using the provided data and learning preference. Highlight strengths and areas for improvement.
+2. Actionable Suggestion: Give one practical, specific suggestion for tomorrow's study, tailored to the user's style and recent performance.
+3. Encouragement: Add a short, positive message to motivate the user.
+All content should be in Korean.
 """
 
 KNOWLEDGE_BASE = """KNOWLEDGE BASE:
@@ -124,7 +132,7 @@ def make_user_input(userdata: UserData) -> str:
 - I have studied up to page {userdata.progress} of the textbook.
     """
 
-def _make_learning_preference(answers: list[bool]) -> str:
+def make_learning_preference(answers: list[bool]) -> str:
     preferences = [
         "- The user's following learning preferences extracted from a quiz:",
     ]
@@ -154,7 +162,7 @@ def _make_learning_preference(answers: list[bool]) -> str:
 
     return "\n".join(preferences)
 
-def _make_recent_results(results: list[TaskResult]) -> str:
+def make_recent_results(results: list[TaskResult]) -> str:
     if not results:
         return "I take 10min to solve a page of workbook."
 
@@ -172,7 +180,7 @@ def make_planning_considerations(answers: list[bool], results: list[TaskResult])
         "For planning, consider:",
     ]
 
-    prompt.append(_make_learning_preference(answers))
-    prompt.append(_make_recent_results(results))
+    prompt.append(make_learning_preference(answers))
+    prompt.append(make_recent_results(results))
 
     return "\n".join(prompt)

@@ -7,7 +7,7 @@ from pydantic import ValidationError
 from openai import OpenAI
 
 from prompt import *
-from model import UserData, Plan, QuizResult, TaskResult
+from model import DailyFeedback, UserData, Plan, QuizResult, TaskResult
 from core import DoziFlask
 
 DEBUG = False
@@ -128,7 +128,7 @@ def plan():
         input=[
             {
                 "role": "system",
-                "content": SYSTEM_PROMPT,
+                "content": PLAN_SYSTEM_PROMPT,
             },
             {
                 "role": "user",
@@ -184,6 +184,51 @@ def complete_task():
             return jsonify(e.errors(), 400)
 
     return ""
+
+@bp.route("/feedback/daily")
+def daily_feedback():
+    user_id = get_uuid()
+
+    quiz_result = get_db(user_id, "quiz_result", QuizResult(answers=[]))
+    answers = quiz_result.answers
+
+    recent_results: list[TaskResult] = get_db(user_id, "recent_results", [])
+
+    now = datetime.now()
+    today_results = list(filter(
+        lambda result: now < result.timestamp + timedelta(days=1),
+        recent_results,
+    ))
+
+    if not (answers and recent_results):
+        return ""
+
+    client = OpenAI()
+
+    response = client.responses.parse(
+        model="o4-mini-2025-04-16",
+        text_format=DailyFeedback,
+        input=[
+            {
+                "role": "system",
+                "content": FEEDBACK_SYSTEM_PROMPT,
+            },
+            {
+                "role": "user",
+                "content": make_learning_preference(answers)
+            },
+            {
+                "role": "user",
+                "content": make_recent_results(today_results),
+            },
+        ]
+    )
+
+    if not response.output_parsed:
+        return '''{"analysis": "", "suggestion": "", "encouragement": ""}'''
+
+    return response.output_parsed.model_dump_json()
+
 
 def get_uuid():
     if "uuid" not in session:
