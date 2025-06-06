@@ -78,10 +78,10 @@
       return `${m}:${s}`;
     }
 
-    const GoalCard = ({ goal }) => (
+    const GoalCard = ({ plan }) => (
       <div className="goal-card">
-        <h3>🎯 현재 목표</h3>
-        <p>{goal}</p>
+        <h3>{plan.emoji} {plan.title}</h3>
+        <p>{plan.memo}</p>
       </div>
     );
 
@@ -142,17 +142,28 @@
       );
     };
 
-    const FeedbackCard = ({ goal, seconds, achievement, onRestart }) => {
+    const FeedbackCard = ({ plan, seconds, achievement }) => {
       const getEmoji = val => val <= 30 ? "😓" : val <= 70 ? "🙂" : "😄";
       const getText = val => val <= 30 ? "낮음" : val <= 70 ? "보통" : "높음";
 
       return (
         <div className="timer">
           <h3>🌟 오늘의 학습 완료!</h3>
-          <p>📚 {goal}</p>
+          <p>{plan.emoji} {plan.title}</p>
           <p>⏱ 총 학습 시간: {formatTime(seconds)}</p>
           <p>{getEmoji(achievement)} 목표 달성률: {getText(achievement)}</p>
-          <button className="btn start" onClick={onRestart}>🔁 새로운 목표로 시작하기</button>
+          <button className="btn start" onClick={() => {
+            // set plan done
+            const plans = JSON.parse(localStorage.getItem("userPlans")) || [];
+            const updatedPlans = plans.map(p =>
+              p.id === plan.id ? { ...p, done: true } : p
+            );
+            localStorage.setItem("userPlans", JSON.stringify(updatedPlans));
+            // reset currentPlanID
+            localStorage.setItem("currentPlanID", JSON.stringify({}));
+            // jump to home
+            window.location.href = "./study_planner_home_(ver. REACT).html";
+          }}>확인</button>
         </div>
       );
     };
@@ -162,8 +173,21 @@
       const [isRunning, setIsRunning] = useState(false);
       const [phase, setPhase] = useState('timer'); // 'timer', 'confirm', 'achievement', 'feedback'
       const [achievement, setAchievement] = useState(50);
-      const goal = "곱셈 공식 개념 공부";
-      const targetMinutes = 2;
+
+      const planID = Number(localStorage.getItem("currentPlanID"));
+      const plans = JSON.parse(localStorage.getItem("userPlans")) || [];
+      const plan = !isNaN(planID) ? plans.find(p => p.id === planID) : {
+        emoji: "🎯",
+        title: "목표 없음",
+        memo: "",
+        start: "08:00",
+        end: "09:00",
+        id: 0,
+        done: false
+      };
+      const [sh, sm] = plan.start.split(':').map(Number);
+      const [eh, em] = plan.end.split(':').map(Number);
+      const targetMinutes = (eh * 60 + em) - (sh * 60 + sm);
       const timerRef = useRef(null);
 
       useEffect(() => {
@@ -184,7 +208,7 @@
 
       return (
         <div className="container">
-          <GoalCard goal={goal} />
+          <GoalCard plan={plan}/>
           {phase === 'timer' && (
             <Timer
               seconds={seconds}
@@ -208,7 +232,7 @@
             <AchievementInput onSubmit={(val) => { setAchievement(val); setPhase('feedback'); }} />
           )}
           {phase === 'feedback' && (
-            <FeedbackCard goal={goal} seconds={seconds} achievement={achievement} onRestart={resetAll} />
+            <FeedbackCard plan={plan} seconds={seconds} achievement={achievement} />
           )}
         </div>
       );

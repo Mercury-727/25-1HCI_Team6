@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 학습 플래너 - 당신만의 맞춤형 학습 여정</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff7f50 0%, #ff6b35 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            color: white;
+            max-width: 600px;
+            padding: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            font-weight: 300;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+            line-height: 1.6;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .start-button {
+            background: white;
+            color: #ff6b35;
+            border: none;
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            animation: fadeInUp 1s ease-out 0.4s both;
+            min-width: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .start-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+            background: #f8f8f8;
+        }
+
+        .start-button:active {
+            transform: translateY(0);
+        }
+
+        .start-button:focus {
+            outline: 3px solid rgba(255,255,255,0.5);
+            outline-offset: 4px;
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .circle-1 {
+            width: 100px;
+            height: 100px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .circle-2 {
+            width: 60px;
+            height: 60px;
+            top: 20%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+
+        .circle-3 {
+            width: 80px;
+            height: 80px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        .circle-4 {
+            width: 40px;
+            height: 40px;
+            bottom: 30%;
+            right: 10%;
+            animation-delay: 1s;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+                max-width: 90%;
+            }
+            
+            .logo {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+                margin-bottom: 2.5rem;
+            }
+            
+            .start-button {
+                padding: 0.8rem 2.5rem;
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-elements">
+        <div class="floating-circle circle-1"></div>
+        <div class="floating-circle circle-2"></div>
+        <div class="floating-circle circle-3"></div>
+        <div class="floating-circle circle-4"></div>
+    </div>
+    
+    <div class="container">
+        <h1 class="logo">AI 학습 플래너</h1>
+        <p class="subtitle">
+            당신만의 맞춤형 학습 여정을 시작하세요<br>
+            AI와 함께 더 똑똑하고 효율적으로 배워보세요
+        </p>
+        <button class="start-button" onclick="startPlanning()">
+            시작하기
+        </button>
+    </div>
+
+    <script>
+
+        function startPlanning() {
+            // signupInfo가 있는지 확인
+            const  signupInfo = localStorage.signupInfo;
+            if (signupInfo) {
+                // 회원가입 정보가 있으면 홈으로 이동
+                window.location.href = 'study_planner_home_(ver. REACT).html';
+            } else {
+                // 회원가입 정보가 없으면 설문조사로 이동
+                window.location.href = 'edt_survey.html';
+            }
+        }
+
+        // 접근성을 위한 키보드 네비게이션
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && document.activeElement.classList.contains('start-button')) {
+                startPlanning();
+            }
+        });
+
+        // 테스트용: 콘솔에서 signupInfo 설정 가능
+        // appData.signupInfo = {name: "테스트사용자"}; 를 콘솔에서 실행하면 home.html로 이동
+        console.log('테스트용: appData.signupInfo = {name: "사용자이름"}; 을 콘솔에서 실행하여 회원가입 상태를 시뮬레이션할 수 있습니다.');
+    </script>
+</body>
+</html>

@@ -284,7 +284,7 @@
       margin-bottom: 4px;
     }
 
-    .activity-rating {
+    .activity-duration {
       font-size: 12px;
       color: #666;
       margin-bottom: 8px;
@@ -406,10 +406,44 @@
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
 
+    function jumpToTimer(e, plan) {
+      e.stopPropagation();
+
+      alert(plan.title + ' 활동을 시작합니다!')
+
+      const currentPlanID = plan.id;
+      localStorage.setItem("currentPlanID", JSON.stringify(currentPlanID));
+      window.location.href = "goal_timer_app.html";
+    }
+
     function StudyPlannerHome() {
       const [showFloating, setShowFloating] = useState(false);
       const [showTooltip, setShowTooltip] = useState(false);
+      const [showTypeDesc, setShowTypeDesc] = useState(false);
+      const [learningType, setLearningType] = useState(null);
       const lastY = useRef(0);
+      const [userPlans, setUserPlans] = useState([]);
+
+        // localStorage에서 불러오기
+        useEffect(() => {
+          const saved = localStorage.getItem("userPlans");
+          console.log("\u{1F4DD} raw:", saved);
+          if (saved) {
+            try {
+              const parsed = JSON.parse(saved);
+              console.log("\u{2705} parsed:", parsed);
+              if (Array.isArray(parsed)) {
+                setUserPlans(parsed);
+              } else {
+                console.warn("\u{26A0} userPlans가 배열이 아닙니다.");
+              }
+            } catch (e) {
+              console.error("\u{274C} JSON parse error:", e);
+            }
+          } else {
+            console.warn("\u{2753} localStorage에 userPlans 없음");
+          }
+        }, []);
 
       // 초기 로드 애니메이션 & 스크롤 핸들러
       useEffect(() => {
@@ -438,6 +472,19 @@
         return () => window.removeEventListener('scroll', onScroll);
       }, []);
 
+      // signupInfo에서 learningType 불러오기
+      useEffect(() => {
+        const info = localStorage.getItem('signupInfo');
+        if (info) {
+          try {
+            const parsed = JSON.parse(info);
+            setLearningType(parsed.learningType || null);
+          } catch (e) {
+            setLearningType(null);
+          }
+        }
+      }, []);
+
       const alertMsg = msg => alert(msg + ' 기능이 실행됩니다!');
 
       return (
@@ -445,15 +492,27 @@
           <header className="header">
             <div className="logo">My Study</div>
             <div className="header-buttons">
-              <button className="header-btn" onClick={() => alertMsg('설정')}>⚙️</button>
-              <button className="header-btn" onClick={() => {
-                const btn = document.querySelector('.header-btn:last-child');
-                btn.style.transform = 'rotate(360deg)';
-                setTimeout(() => {
-                  btn.style.transform = 'rotate(0deg)';
-                  alertMsg('페이지가 새로고침되었습니다');
-                }, 500);
-              }}>🔄</button>
+              <button
+                className="header-btn"
+                onClick={() => {
+                  window.location.href = "setting.html";
+                }}
+              >
+                ⚙️
+              </button>
+              <button
+                className="header-btn"
+                onClick={() => {
+                  const btn = document.querySelector('.header-btn:last-child');
+                  btn.style.transform = 'rotate(360deg)';
+                  setTimeout(() => {
+                    btn.style.transform = 'rotate(0deg)';
+                    alertMsg('페이지가 새로고침되었습니다');
+                  }, 500);
+                }}
+              >
+                🔄
+              </button>
             </div>
           </header>
 
@@ -478,26 +537,20 @@
             <section className="card recommended-activities">
               <h3>📚 추천 학습 활동</h3>
               <div className="activity-scroll">
-                {[
-                  { name: '타이머 공부법 25분', rating: '4.9' },
-                  { name: '암기 카드 학습', rating: '4.7' },
-                  { name: '개념 정리 노트', rating: '4.8' },
-                ].map((act, i) => (
-                  <div key={i} className="activity-card" onClick={() => alertMsg(act.name + ' 활동을 시작합니다!')}>
-                    <div className="activity-title">⏱️ {act.name}</div>
-                    <div className="activity-rating">⭐ {act.rating}</div>
-                    <button className="start-btn">시작하기</button>
-                  </div>
-                ))}
+                {
+                  userPlans
+                    .filter(p => !p.done) // 1. 완료 안 된 것만
+                    .sort((a, b) => a.start.localeCompare(b.start)) // 2. 시작 시간 오름차순 정렬
+                    .slice(0, 3) // 3. 상위 3개만
+                    .map((plan, i) => (
+                      <div key={i} className="activity-card" onClick={e => jumpToTimer(e, plan)}>
+                        <div className="activity-title">{plan.emoji} {plan.title}</div>
+                        <div className="activity-duration">⏱️ {plan.start} ~ {plan.end}</div>
+                        <button className="start-btn" onClick={e => jumpToTimer(e, plan)}>시작하기</button>
+                      </div>
+                    ))
+                }
               </div>
-            </section>
-
-            <section className="card learning-style">
-              <h3>🧩 학습 성향 요약</h3>
-              <div className="style-type">
-                현재 유형: <span className="style-highlight">몰입형 + 감각형</span>
-              </div>
-              <button className="trend-btn" onClick={() => alertMsg('학습 성향 변화 추이를 확인합니다!')}>📈 변화 추이 보기</button>
             </section>
 
             <section className="card daily-question" onClick={() => alertMsg('회고 탭으로 이동합니다!')}>
@@ -506,19 +559,140 @@
               <p>클릭 시 회고 탭으로 이동</p>
             </section>
 
+            {/* 학습성향 요약 카드 오늘의 질문 밑으로 이동 및 내용 변경 */}
+            <section className="card learning-style">
+              <h3>🧩 학습 성향 요약</h3>
+              <div className="style-type">
+                현재 유형:{" "}
+                <span className="style-highlight">
+                  {learningType ? learningType.name : "설정 필요"}
+                </span>
+              </div>
+              <button
+                className="trend-btn"
+                onClick={() => setShowTypeDesc(true)}
+              >
+                📝 자세한 설명보기
+              </button>
+              {showTypeDesc && learningType && (
+                <div
+                  style={{
+                    marginTop: 16,
+                    background: "#fff",
+                    border: "1px solid #F96C50",
+                    borderRadius: 10,
+                    padding: 16,
+                    color: "#333",
+                    fontSize: 14,
+                    boxShadow: "0 2px 8px rgba(249,108,80,0.08)",
+                    position: "relative",
+                  }}
+                >
+                  <strong style={{ color: "#F96C50" }}>{learningType.name}</strong>
+                  <div style={{ margin: "12px 0 0 0", whiteSpace: "pre-line" }}>
+                    {learningType.desc}
+                  </div>
+                  <button
+                    style={{
+                      position: "absolute",
+                      top: 8,
+                      right: 12,
+                      background: "none",
+                      border: "none",
+                      color: "#F96C50",
+                      fontWeight: 700,
+                      fontSize: 16,
+                      cursor: "pointer",
+                    }}
+                    onClick={() => setShowTypeDesc(false)}
+                    aria-label="닫기"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+            </section>
+
             <section className="card weekly-feedback">
               <h3>📈 주간 피드백 요약</h3>
-              <div className="feedback-item">
-                <div className="feedback-label">학습 시간 변화</div>
-                <div className="feedback-value">2시간 47분 → <span className="feedback-positive">+24분</span></div>
-              </div>
-              <div className="feedback-item">
-                <div className="feedback-label">달성률</div>
-                <div className="feedback-value">목표 대비 70%</div>
-              </div>
-              <div className="feedback-quote">
-                "곱셈 공식 개념이 조금 어려웠어요. 다음엔 복습 시간 추가 예정입니다."
-              </div>
+              {(() => {
+                // 학년별 평균 학습 시간 및 설명
+                const gradeInfo = {
+                  "1학년": {
+                    avg: "1시간 ~ 1시간 30분",
+                    color: "#3B82F6",
+                    summary: "학습 목표: 중학교 생활에 적응하고, 기초 학습 습관을 형성하는 시기입니다.\n\n학습 내용: 주요 과목(국어, 수학, 영어 등)의 복습과 예습을 중심으로 학습합니다.\n\n학습 방법: 교과서 위주의 학습을 통해 개념을 정확히 이해하고, 간단한 문제를 풀어보는 것이 좋습니다."
+                  },
+                  "2학년": {
+                    avg: "1시간 30분 ~ 2시간",
+                    color: "#22A366",
+                    summary: "학습 목표: 기초 개념을 확장하고, 다양한 문제 해결 능력을 키우는 시기입니다.\n\n학습 내용: 심화된 개념 학습과 다양한 유형의 문제를 풀어보며 응용력을 높입니다.\n\n학습 방법: 교과서 외에도 참고서나 문제집을 활용하여 다양한 문제를 접해보는 것이 효과적입니다."
+                  },
+                  "3학년": {
+                    avg: "2시간 ~ 2시간 30분",
+                    color: "#E14A2E",
+                    summary: "학습 목표: 고등학교 진학을 준비하고, 내신 성적을 향상시키는 시기입니다.\n\n학습 내용: 심화된 학습과 내신 대비를 위한 문제 풀이에 집중합니다.\n\n학습 방법: 모의고사나 기출문제를 풀어보며 실전 감각을 익히고, 오답 노트를 활용하여 약점을 보완합니다."
+                  }
+                };
+
+                // localStorage에서 학습 데이터가 있는지 확인 (예시: studyData)
+                const studyData = localStorage.getItem('studyData');
+                const signupInfo = localStorage.getItem('signupInfo');
+                let grade = "";
+                let gradeKey = "";
+                if (signupInfo) {
+                  try {
+                    const parsed = JSON.parse(signupInfo);
+                    grade = parsed.grade || "";
+                    // "2학년 2학기" → "2학년"
+                    gradeKey = grade.split(" ")[0];
+                  } catch (e) {}
+                }
+                const info = gradeInfo[gradeKey];
+
+                if (!studyData) {
+                  // 학습 데이터가 없을 때
+                  return (
+                    <>
+                      <div className="feedback-item">
+                        <div className="feedback-label">
+                          {gradeKey === "1학년" && "📘 1학년 권장학습시간"}
+                          {gradeKey === "2학년" && "📗 2학년 권장학습시간"}
+                          {gradeKey === "3학년" && "📕 3학년 권장학습시간"}
+                        </div>
+                        <div className="feedback-value" style={{ color: info ? info.color : "#F96C50" }}>
+                          {info ? info.avg : "1시간 ~ 2시간 30분"}
+                        </div>
+                      </div>
+                      {info && (
+                        <div className="feedback-quote" style={{ whiteSpace: "pre-line" }}>
+                          {info.summary}
+                        </div>
+                      )}
+                      <div className="feedback-quote" style={{ marginTop: 8, color: "#F96C50", fontWeight: 600 }}>
+                        학습을 하면 본인 학습데이터 기반으로 피드백을 줄겁니다!
+                      </div>
+                    </>
+                  );
+                } else {
+                  // 학습 데이터가 있을 때 기존 피드백 예시
+                  return (
+                    <>
+                      <div className="feedback-item">
+                        <div className="feedback-label">학습 시간 변화</div>
+                        <div className="feedback-value">2시간 47분 → <span className="feedback-positive">+24분</span></div>
+                      </div>
+                      <div className="feedback-item">
+                        <div className="feedback-label">달성률</div>
+                        <div className="feedback-value">목표 대비 70%</div>
+                      </div>
+                      <div className="feedback-quote">
+                        "곱셈 공식 개념이 조금 어려웠어요. 다음엔 복습 시간 추가 예정입니다."
+                      </div>
+                    </>
+                  );
+                }
+              })()}
             </section>
           </main>
 

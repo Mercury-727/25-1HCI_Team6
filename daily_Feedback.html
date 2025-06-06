@@ -231,9 +231,8 @@
         padding: 16px;
         background: rgba(255, 255, 255, 0.7);
         border-radius: 8px;
-        font-style: italic;
         display: flex;
-        align-items: center;
+        flex-direction: column;
         gap: 8px;
       }
 
@@ -573,7 +572,7 @@
       <div class="card">
         <h2 class="card-title">
           <i class="fas fa-chart-line"></i>
-          오늘의 학습 요약 📊
+          오늘의 학습 요약
         </h2>
 
         <div class="summary-stats">
@@ -601,7 +600,7 @@
       <div class="card">
         <h2 class="card-title">
           <i class="fas fa-book"></i>
-          오늘의 공부 목록 📚
+          오늘의 공부 목록
         </h2>
 
         <ul id="study-list" class="study-list">
@@ -619,34 +618,11 @@
       <div class="card feedback-card">
         <h2 class="card-title">
           <i class="fas fa-comment-dots"></i>
-          오늘의 피드백 💬
+          오늘의 피드백
         </h2>
 
         <div id="feedback-text" class="feedback-text">
           <!-- API 에서 받아온 피드백 텍스트가 여기에 렌더링됩니다. -->
-        </div>
-      </div>
-
-      <!-- 주간 학습 변화 -->
-      <div class="card">
-        <h2 class="card-title">
-          <i class="fas fa-chart-pie"></i>
-          주간 학습 변화 📈
-        </h2>
-
-        <div class="chart-container">
-          <div class="chart-visual">
-            <span id="chart-value" class="chart-value">--%</span>
-          </div>
-          <div class="chart-info">
-            <h3>이번 주 학습 현황</h3>
-            <p>목표 시간 대비 달성률</p>
-            <div id="trend-text" class="trend-positive" style="display: none">
-              <i class="fas fa-arrow-up"></i>
-              <!-- 전주 대비 퍼센트 메시지 -->
-              지난주 평균보다 --% 더 공부했어요
-            </div>
-          </div>
         </div>
       </div>
 
@@ -712,7 +688,7 @@
       <!-- 오늘 하루도 수고했어요 -->
       <div class="encouragement-section">
         <div class="encouragement-text">오늘 하루도 수고했어요! 🎉</div>
-        <div class="encouragement-subtitle">
+        <div class="encouragement-subtitle" id="encouragement-subtitle">
           꾸준한 노력이 큰 성과를 만들어냅니다
         </div>
         <button id="encourage-btn" class="btn-secondary">
@@ -767,9 +743,71 @@
     <script>
       // 페이지가 로드되면 API를 통해 오늘의 피드백 데이터를 가져와서
       // UI 요소에 렌더링합니다.
+      const generateFeedback = function() {
+          const feedbacks = [
+            {
+                "analysis": "오늘 이차함수 개념 복습을 60분에 100% 완료해 개념 이해가 탄탄해졌습니다. 반면 스스로 확인하기 문제는 45분에 70% 풀어 정확도와 실전 적용 연습이 더 필요합니다.",
+                "suggestion": "내일은 실제 시험처럼 30분 동안 이차함수 문제 10문제를 풀어보세요. 목표는 최소 8문제 맞히기, 틀린 문제는 오답 노트에 핵심 풀이 과정을 2~3줄로 정리해두면 효율적으로 점수를 올릴 수 있습니다.",
+                "encouragement": "작은 성취가 모여 큰 점수 차이를 만듭니다. 꾸준히 연습하며 한 걸음씩 나아가요!"
+            },
+            {
+                "analysis": "오늘 이차함수 개념 복습은 100% 완벽히 마쳤고 60분을 투자해 기초를 다졌습니다. 문제 풀이(45분)는 70% 정확도로, 특히 꼭짓점 좌표와 대칭축 문제에서 오답이 있었습니다. 꾸준한 복습은 강점이지만 문제 정확도를 높일 여지가 보입니다.",
+                "suggestion": "내일은 오늘 틀린 3~5문제를 골라 풀이 과정을 필기하며 오답 노트를 만들고, 유사 문제 5개를 30분 타이머를 켜고 풀어 즉시 채점 후 오답 원인을 정리해보세요.",
+                "encouragement": "작은 노력들이 모여 높은 점수로 이어집니다. 오늘도 잘했어요, 내일도 파이팅!"
+            },
+            {
+                "analysis": "오늘 이차함수 복습에서 개념 이해를 100% 달성해 탄탄한 기초를 다졌습니다. 그러나 실전 문제 풀이는 70% 수준으로, 특히 응용 문제에서 시간이 부족하거나 풀이 절차가 헷갈린 것으로 보입니다.",
+                "suggestion": "내일은 시험 직전처럼 30분 안에 이차함수 문제 10문제를 풀고, 틀리거나 시간이 오래 걸린 문제는 즉시 오답 노트에 정리해 보세요.",
+                "encouragement": "지금처럼 기초를 다지고 실전 연습을 늘리면 곧 점수 향상이 눈에 보일 거예요!"
+            },
+            {
+                "analysis": "오늘 이차함수 핵심 개념 복습을 100% 완료하며 그래프 개형 이해가 탄탄해졌습니다. 하지만 스스로 확인하기 문제는 70%만 맞춰 시험 대비가 부족한 부분이 남아 있습니다.",
+                "suggestion": "내일은 틀린 문제 위주로 오답노트를 만들어 핵심 공식과 풀이 과정을 정리한 뒤, 30분 동안 타이머를 켜고 10문제를 풀어보세요. 스스로 채점해 목표 맞힌 개수를 기록하면 성취감을 느끼기 좋습니다.",
+                "encouragement": "지금처럼 꾸준히 해나가면 점점 시험 성적에 자신감이 생길 거예요. 화이팅!"
+            },
+            {
+                "analysis": "오늘 이차함수 핵심 개념 복습을 100% 완료하며 기초를 탄탄히 다졌습니다. 하지만 문제 풀이에서는 70%의 정답률을 보여, 특히 꼭짓점 좌표와 이차식 변형 문제에서 실수가 있었습니다.",
+                "suggestion": "내일은 오답 노트에 틀린 문제를 유형별로 정리한 뒤, 비슷한 문제 3개를 각각 제한시간 10분 안에 풀어 보세요. 시험 실전 감각과 문제 해결 속도를 동시에 높일 수 있습니다.",
+                "encouragement": "작은 성취들이 쌓이면 점수가 크게 오릅니다. 꾸준히 해 나가면 원하는 목표에 꼭 도달할 거예요!"
+            },
+          ];
+
+          const feedback = feedbacks[Math.floor(Math.random() * feedbacks.length)];
+
+          return [`<b>🔍 학습 분석</b>${feedback.analysis}<b>💬 제안</b>${feedback.suggestion}`, feedback.encouragement];
+      }
+      const myfetch = function(url, options) {
+          if (url === "/api/feedback/daily") {
+              return Promise.resolve({
+                  ok: true,
+                  status: 200,
+                  json: () => Promise.resolve({
+                      date: (new Date()).toLocaleString("default", {
+                          year: "numeric",
+                          day: "numeric",
+                          month: "numeric",
+                          weekday: "long",
+                      }),
+                      achievement: 87,
+                      totalTime: 105,
+                      studyItems: [
+                        "이차함수 복습: 핵심 개념 및 ax^2 그래프 개형(pp.118-129)",
+                        "이차함수 문제: 스스로 확인하기 풀기(p.121, p.128, p.133)",
+                      ],
+                  })
+              });
+          }
+
+          return Promise.resolve({
+              ok: false,
+              status: 404,
+              json: () => Promise.resolve({ error: "Not found" })
+          });
+      };
+
       document.addEventListener("DOMContentLoaded", function () {
         // 예시 엔드포인트: '/api/today-feedback'
-        fetch("/api/today-feedback")
+        myfetch("/api/feedback/daily")
           .then((response) => response.json())
           .then((data) => {
             // 날짜 표기
@@ -780,7 +818,7 @@
             // 오늘의 학습 요약
             document.getElementById("stat-achievement").textContent =
               data.achievement + "%";
-            document.getElementById("stat-time").textContent = data.totalTime;
+            document.getElementById("stat-time").textContent = Math.floor(data.totalTime / 60) + "시간 " + (data.totalTime % 60) + "분";
             document.getElementById("progress-fill").style.width =
               data.achievement + "%";
 
@@ -803,22 +841,16 @@
               studyList.appendChild(li);
             });
 
-            // 오늘의 피드백
-            document.getElementById("feedback-text").textContent =
-              data.feedbackText;
+            const [feedback, encouragement] = generateFeedback();
 
-            // 주간 학습 변화
-            document.getElementById("chart-value").textContent =
-              data.weeklyAchievement + "%";
-            if (data.trendText) {
-              const trendElem = document.getElementById("trend-text");
-              trendElem.style.display = "flex";
-              trendElem.innerHTML = `<i class="fas fa-arrow-up"></i> ${data.trendText}`;
-            }
+            // 오늘의 피드백
+            document.getElementById("feedback-text").innerHTML = feedback;
 
             // 모달 내용
-            const modalBody = document.getElementById("modal-body");
-            modalBody.innerHTML = data.detailedFeedbackHTML;
+            // const modalBody = document.getElementById("modal-body");
+            // modalBody.innerHTML = data.detailedFeedbackHTML;
+
+            document.getElementById("encouragement-subtitle").textContent = encouragement;
           })
           .catch((err) => {
             console.error("피드백을 가져오는 중 오류 발생:", err);
