@@ -86,6 +86,7 @@
       text-align: center;
       position: relative;
       overflow: hidden;
+      cursor: pointer;
     }
 
     @keyframes shine {
@@ -454,7 +455,7 @@
         const totalMinutes = Math.floor(totalDuration / 60);
 
         return (
-            <section className="card daily-summary">
+            <section className="card daily-summary" onClick={e => { e.stopPropagation(); window.location.href = "daily_Feedback.html"; }}>
                 <h3>오늘의 학습 요약</h3>
                 <div className="summary-stats">
                     <div className="stat-item">
