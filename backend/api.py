@@ -7,7 +7,7 @@ from pydantic import ValidationError
 from openai import OpenAI
 
 from prompt import *
-from model import DailyFeedback, UserData, Plan, QuizResult, TaskResult
+from model import DailyFeedback, UserData, Plan, QuizResult, TaskResult, BookInformation
 from core import DoziFlask
 
 DEBUG = False
@@ -60,6 +60,37 @@ def quiz():
 
     return ""
 
+@bp.route("/me/books", methods=["GET", "POST"])
+def books():
+    user_id = get_uuid()
+
+    if request.method == "GET":
+        book_info = get_db(user_id, "books")
+
+        if not book_info:
+            return "No book information: please submit"
+
+        return f'''{{"textbook": "${book_info.textbook}", "workbook": "${book_info.workbook}"}}'''
+    elif request.method == "POST":
+        try:
+            data = request.get_json()
+            new_book_info = BookInformation(**data)
+            book_info: BookInformation = get_db(user_id, "books", BookInformation(textbook="", workbook=""))
+
+            if new_book_info.textbook:
+                book_info.textbook = new_book_info.textbook
+            if new_book_info.workbook:
+                book_info.workbook = new_book_info.workbook
+
+            if book_info.textbook or book_info.workbook:
+                put_db(user_id, "books", book_info)
+
+            return book_info.model_dump_json()
+        except ValidationError as e:
+            return jsonify(e.errors(), 400)
+
+    return ""
+
 
 @bp.route("/ping")
 def ping():
@@ -75,16 +106,19 @@ def plan():
     if not userdata:
         return "You must provide user data for planning"
 
+    book_info = get_db(user_id, "books")
+
+    if not book_info:
+        return "You must provide your book information for planning"
+
     quiz_result = get_db(user_id, "quiz_result", QuizResult(answers=[]))
 
     recent_results: list[TaskResult] = get_db(user_id, "recent_results", [])
     now = datetime.now()
-    recent_results = list(
-        filter(
+    recent_results = list(filter(
             lambda task: now < task.timestamp + timedelta(days=7),
             recent_results,
-        )
-    )
+    ))
     put_db(user_id, "recent_results", recent_results)
 
     if DEBUG:
@@ -132,11 +166,11 @@ def plan():
             },
             {
                 "role": "user",
-                "content": KNOWLEDGE_BASE,
+                "content": make_knowledge_base(book_info.textbook, book_info.workbook),
             },
             {
                 "role": "user",
-                "content": make_user_input(userdata),
+                "content": make_user_input(userdata, data_available=bool(recent_results)),
             },
             {
                 "role": "user",

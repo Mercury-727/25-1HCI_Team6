@@ -1,3 +1,4 @@
+from typing import Optional
 from datetime import time, datetime
 from pydantic import BaseModel
 
@@ -34,3 +35,7 @@ class DailyFeedback(BaseModel):
     analysis: str
     suggestion: str
     encouragement: str
+
+class BookInformation(BaseModel):
+    textbook: Optional[str]
+    workbook: Optional[str]
