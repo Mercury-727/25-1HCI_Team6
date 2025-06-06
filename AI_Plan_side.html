@@ -43,8 +43,8 @@
       const [currentView, setCurrentView] = useState('schedule'); // 'schedule' 또는 'ai'
       const [userPlans, setUserPlans] = useState([
         // 초기 예시 플랜들
-        { id: 1, title: '영어 단어 암기', memo: '새 단어 20개', start: '16:00', end: '17:30', emoji: '📚', done: false },
-        { id: 2, title: '수학 문제 풀이', memo: '기출문제 5개', start: '18:00', end: '19:00', emoji: '📐', done: false }
+        { id: 1, title: '영어 단어 암기', memo: '새 단어 20개', start: '16:00', end: '17:30', emoji: '📚', done: false, duration: 0, achievement: 0 },
+        { id: 2, title: '수학 문제 풀이', memo: '기출문제 5개', start: '18:00', end: '19:00', emoji: '📐', done: false, duration: 0, achievement: 0 }
       ]);
       // AI 제안 플랜들
       const [aiPlans, setAiPlans] = useState([]);
@@ -125,7 +125,7 @@
         setAiPlans(newAi);
       };
       const applyAiPlans = () => {
-        const cloned = aiPlans.map(pl => ({ ...pl, id: Date.now() + Math.random(), done: false }));
+        const cloned = aiPlans.map(pl => ({ ...pl, id: Date.now() + Math.random(), done: false, duration: 0, achievement: 0 }));
         setUserPlans(plans => [...plans, ...cloned]);
         setAiPlans([]);
         setCurrentView('schedule');
@@ -141,7 +141,7 @@
             )
           );
         } else {
-          setUserPlans(plans => [...plans, { ...newPlan, id: Date.now(), done: false }]);
+          setUserPlans(plans => [...plans, { ...newPlan, id: Date.now(), done: false, duration: 0, achievement: 0 }]);
         }
         setEditingPlan(null);
         setNewPlan({ title: '', memo: '', start: '21:00', end: '22:00', emoji: '📚' });
