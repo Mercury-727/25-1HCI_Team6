@@ -43,8 +43,8 @@
       const [currentView, setCurrentView] = useState('schedule'); // 'schedule' 또는 'ai'
       const [userPlans, setUserPlans] = useState([
         // 초기 예시 플랜들
-        { id: 1, title: '영어 단어 암기', memo: '새 단어 20개', start: '16:00', end: '17:30', emoji: '📚' },
-        { id: 2, title: '수학 문제 풀이', memo: '기출문제 5개', start: '18:00', end: '19:00', emoji: '📐' }
+        { id: 1, title: '영어 단어 암기', memo: '새 단어 20개', start: '16:00', end: '17:30', emoji: '📚', done: false },
+        { id: 2, title: '수학 문제 풀이', memo: '기출문제 5개', start: '18:00', end: '19:00', emoji: '📐', done: false }
       ]);
       // AI 제안 플랜들
       const [aiPlans, setAiPlans] = useState([]);
@@ -61,8 +61,26 @@
         memo: '',
         start: '21:00',
         end: '22:00',
-        emoji: '📚'
+        emoji: '📚',
+        done: false
       });
+
+      // Load user plan from browser local storage
+      useEffect(() => {
+        const saved = localStorage.getItem("userPlans");
+        if (saved) {
+          try {
+            setUserPlans(JSON.parse(saved));
+          } catch (e) {
+            console.error("저장된 일정 데이터를 불러오지 못했습니다.", e);
+          }
+        }
+      }, []);
+
+      // Save user plan into browser local storage
+      useEffect(() => {
+        localStorage.setItem("userPlans", JSON.stringify(userPlans));
+      }, [userPlans]);
 
       // Lucide 아이콘 렌더링
       useEffect(() => {
@@ -107,7 +125,7 @@
         setAiPlans(newAi);
       };
       const applyAiPlans = () => {
-        const cloned = aiPlans.map(pl => ({ ...pl, id: Date.now() + Math.random() }));
+        const cloned = aiPlans.map(pl => ({ ...pl, id: Date.now() + Math.random(), done: false }));
         setUserPlans(plans => [...plans, ...cloned]);
         setAiPlans([]);
         setCurrentView('schedule');
@@ -123,7 +141,7 @@
             )
           );
         } else {
-          setUserPlans(plans => [...plans, { ...newPlan, id: Date.now() }]);
+          setUserPlans(plans => [...plans, { ...newPlan, id: Date.now(), done: false }]);
         }
         setEditingPlan(null);
         setNewPlan({ title: '', memo: '', start: '21:00', end: '22:00', emoji: '📚' });
@@ -355,7 +373,7 @@
                 return (
                   <div
                     key={plan.id}
-                    className="absolute left-16 right-4 bg-white border-2 border-orange-500 rounded-xl shadow-md hover:shadow-lg overflow-hidden cursor-pointer"
+                    className={`absolute left-16 right-4 border-2 ${plan.done ? "border-green-300 bg-green-50": "border-orange-500 bg-white"} rounded-xl shadow-md hover:shadow-lg overflow-hidden cursor-pointer`}
                     style={{
                       top: `${topPx}px`,
                       height: `${heightPx}px`
@@ -383,6 +401,9 @@
                       <div className="flex items-center gap-2">
                         <span className="text-2xl">{plan.emoji}</span>
                         <span className="font-medium text-sm">{plan.title}</span>
+                        {plan.done && (
+                          <span className="text-green-600 text-lg font-semibold">✓</span>
+                        )}
                       </div>
                       <div className="flex gap-1">
                         <button onClick={() => onEdit(plan)} className="p-1 rounded hover:bg-gray-200">
