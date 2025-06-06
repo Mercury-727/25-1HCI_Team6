@@ -26,12 +26,9 @@
       // =============== 상수 정의 ===============
       const startHour = 8;
       const endHour = 24;
-      // 1) 30분 슬롯당 높이(px)
       const slotHeight30 = 84;
-      // 2) 5분 슬롯당 높이(px) = slotHeight30 / 6
-      const slotHeight5 = slotHeight30 / 6; // 84 / 6 = 14px
-      // 시각 그리드에서는 30분 단위 라인만 표시
-      const total30Slots = (endHour - startHour) * 2; // 16시간 * 2 = 32
+      const slotHeight5 = slotHeight30 / 6;
+      const total30Slots = (endHour - startHour) * 2;
       const timeSlots = Array.from({ length: total30Slots }, (_, i) => {
         const totalMinutes = startHour * 60 + i * 30;
         const hh = String(Math.floor(totalMinutes / 60)).padStart(2, '0');
@@ -40,18 +37,21 @@
       });
 
       // =============== 상태 정의 ===============
-      const [currentView, setCurrentView] = useState('schedule'); // 'schedule' 또는 'ai'
+      const [currentView, setCurrentView] = useState('schedule');
       const [userPlans, setUserPlans] = useState([
         // 초기 예시 플랜들
         { id: 1, title: '영어 단어 암기', memo: '새 단어 20개', start: '16:00', end: '17:30', emoji: '📚', done: false, duration: 0, achievement: 0 },
         { id: 2, title: '수학 문제 풀이', memo: '기출문제 5개', start: '18:00', end: '19:00', emoji: '📐', done: false, duration: 0, achievement: 0 }
       ]);
-      // AI 제안 플랜들
       const [aiPlans, setAiPlans] = useState([]);
 
       // 카드 이동/리사이징용 ref
       const resizeDataRef = useRef(null);
       const dragDataRef = useRef(null);
+
+      // 겹침/원복용 ref
+      const originalPlanTimeRef = useRef({});
+      const lastTapRef = useRef({});
 
       // 모달 관련 상태
       const [showModal, setShowModal] = useState(false);
@@ -61,31 +61,28 @@
         memo: '',
         start: '21:00',
         end: '22:00',
-        emoji: '📚',
-        done: false
+        emoji: '📚'
       });
 
-      // Load user plan from browser local storage
-      useEffect(() => {
-        const saved = localStorage.getItem("userPlans");
-        if (saved) {
-          try {
-            setUserPlans(JSON.parse(saved));
-          } catch (e) {
-            console.error("저장된 일정 데이터를 불러오지 못했습니다.", e);
-          }
-        }
-      }, []);
-
-      // Save user plan into browser local storage
-      useEffect(() => {
-        localStorage.setItem("userPlans", JSON.stringify(userPlans));
-      }, [userPlans]);
-
-      // Lucide 아이콘 렌더링
       useEffect(() => {
         lucide.createIcons();
       }, [userPlans]);
+
+      // =============== 시간 겹침 검사 ===============
+      function isTimeOverlap(newPlan, plans, editingId = null) {
+        const [s2, e2] = [newPlan.start, newPlan.end].map(t => {
+          const [h, m] = t.split(':').map(Number);
+          return h * 60 + m;
+        });
+        return plans.some(p => {
+          if (editingId && p.id === editingId) return false;
+          const [s1, e1] = [p.start, p.end].map(t => {
+            const [h, m] = t.split(':').map(Number);
+            return h * 60 + m;
+          });
+          return Math.max(s1, s2) < Math.min(e1, e2);
+        });
+      }
 
       // =============== 플랜 삭제 & 편집 ===============
       const deletePlan = id => {
@@ -117,7 +114,6 @@
           id: Date.now() + i,
           title: it.title,
           memo: '',
-          // 예시: 19:00~20:00, 20:00~21:00, 21:00~22:00
           start: `${19 + i}:00`,
           end: `${20 + i}:00`,
           emoji: it.emoji
@@ -131,9 +127,14 @@
         setCurrentView('schedule');
       };
 
-      // =============== 신규/수정 저장 ===============
+      // =============== 신규/수정 저장(겹침 검사) ===============
       const savePlan = () => {
         if (!newPlan.title || !newPlan.start || !newPlan.end) return;
+        const overlap = isTimeOverlap(newPlan, userPlans, editingPlan?.id);
+        if (overlap) {
+          alert("이미 다른 플랜과 시간이 겹칩니다!");
+          return;
+        }
         if (editingPlan) {
           setUserPlans(plans =>
             plans.map(x =>
@@ -149,7 +150,6 @@
       };
 
       // =============== 카드 리사이즈/이동 로직 (5분 단위) ===============
-      // 리사이즈 시작
       const startResizing = (e, planId, edge) => {
         e.preventDefault();
         e.stopPropagation();
@@ -158,10 +158,12 @@
         const plan = userPlans.find(p => p.id === planId);
         if (!plan) return;
 
-        // 기존 start/end 문자열을 “h:mm” → 총 분 계산
+        // 원래 시간 저장
+        originalPlanTimeRef.current[planId] = { start: plan.start, end: plan.end };
+
         const [sh, sm] = plan.start.split(':').map(Number);
         const totalStartMins = sh * 60 + sm;
-        const startIdx5 = (totalStartMins - startHour * 60) / 5; // 5분 단위 인덱스
+        const startIdx5 = (totalStartMins - startHour * 60) / 5;
 
         const [eh, em] = plan.end.split(':').map(Number);
         const totalEndMins = eh * 60 + em;
@@ -176,7 +178,6 @@
         };
       };
 
-      // 이동 시작 (카드 전체 영역 클릭 시)
       const startDragging = (e, planId) => {
         e.preventDefault();
         e.stopPropagation();
@@ -184,6 +185,9 @@
 
         const plan = userPlans.find(p => p.id === planId);
         if (!plan) return;
+
+        // 원래 시간 저장
+        originalPlanTimeRef.current[planId] = { start: plan.start, end: plan.end };
 
         const [sh, sm] = plan.start.split(':').map(Number);
         const startIdx5 = ((sh * 60 + sm) - startHour * 60) / 5;
@@ -200,13 +204,11 @@
         };
       };
 
-      // 마우스 움직일 때: 리사이즈 우선 → 이동 처리
       const onMouseMove = e => {
         // --- 리사이즈 중일 때 ---
         if (resizeDataRef.current) {
           const { planId, edge, initialMouseY, initialStartIdx5, initialEndIdx5 } = resizeDataRef.current;
           const deltaY = e.clientY - initialMouseY;
-          // 5분 단위로 변경: deltaSlots5 = round(deltaY / slotHeight5)
           const deltaSlots5 = Math.round(deltaY / slotHeight5);
 
           const plan = userPlans.find(p => p.id === planId);
@@ -217,19 +219,15 @@
 
           if (edge === 'top') {
             newStartIdx5 = initialStartIdx5 + deltaSlots5;
-            // 상한/하한 처리: 시작 인덱스는 0 이상, 시작인덱스 < 기존 endIdx5
             if (newStartIdx5 < 0) newStartIdx5 = 0;
             if (newStartIdx5 >= initialEndIdx5) newStartIdx5 = initialEndIdx5 - 1;
           } else if (edge === 'bottom') {
             newEndIdx5 = initialEndIdx5 + deltaSlots5;
-            // endIdx5는 startIdx5+1 이상, 최대 (total60Slots) 
-            // total60Slots = ((endHour-startHour)*60)/5
             const total5Slots = ((endHour - startHour) * 60) / 5;
             if (newEndIdx5 <= initialStartIdx5) newEndIdx5 = initialStartIdx5 + 1;
             if (newEndIdx5 > total5Slots) newEndIdx5 = total5Slots;
           }
 
-          // 시간 문자열로 변환
           let updatedStart = plan.start;
           let updatedEnd = plan.end;
 
@@ -246,7 +244,6 @@
             updatedEnd = `${String(neH).padStart(2, '0')}:${String(neM).padStart(2, '0')}`;
           }
 
-          // 상태 업데이트
           setUserPlans(plans =>
             plans.map(x =>
               x.id === planId ? { ...x, start: updatedStart, end: updatedEnd } : x
@@ -259,11 +256,9 @@
         if (dragDataRef.current) {
           const { planId, initialMouseY, initialStartIdx5, durationSlots5 } = dragDataRef.current;
           const deltaY = e.clientY - initialMouseY;
-          // 5분 단위 delta
           const deltaSlots5 = Math.round(deltaY / slotHeight5);
 
           let newStartIdx5 = initialStartIdx5 + deltaSlots5;
-          // 범위 한정: newStartIdx5 >=0, newStartIdx5 + durationSlots5 <= total5Slots
           const total5Slots = ((endHour - startHour) * 60) / 5;
           if (newStartIdx5 < 0) newStartIdx5 = 0;
           if (newStartIdx5 + durationSlots5 > total5Slots) newStartIdx5 = total5Slots - durationSlots5;
@@ -272,7 +267,6 @@
           const plan = userPlans.find(p => p.id === planId);
           if (!plan) return;
 
-          // 새로운 시간 문자열 계산
           const newStartMins = startHour * 60 + newStartIdx5 * 5;
           const nsH = Math.floor(newStartMins / 60);
           const nsM = newStartMins % 60;
@@ -292,18 +286,53 @@
         }
       };
 
-      // 마우스 업 시 리셋
-      const onMouseUp = () => {
-        resizeDataRef.current = null;
-        dragDataRef.current = null;
-      };
-
+      // =============== 드래그/리사이즈 종료 시 겹침 검사 및 원복 ===============
       useEffect(() => {
+        const handleMouseUp = () => {
+          if (dragDataRef.current) {
+            const { planId } = dragDataRef.current;
+            const changedPlan = userPlans.find(p => p.id === planId);
+            if (changedPlan) {
+              if (isTimeOverlap(changedPlan, userPlans.filter(x => x.id !== planId))) {
+                // 겹치면 원복
+                const orig = originalPlanTimeRef.current[planId];
+                setUserPlans(plans =>
+                  plans.map(x =>
+                    x.id === planId
+                      ? { ...x, start: orig.start, end: orig.end }
+                      : x
+                  )
+                );
+                alert("다른 플랜과 시간이 겹칠 수 없습니다!");
+              }
+            }
+          }
+          if (resizeDataRef.current) {
+            const { planId } = resizeDataRef.current;
+            const changedPlan = userPlans.find(p => p.id === planId);
+            if (changedPlan) {
+              if (isTimeOverlap(changedPlan, userPlans.filter(x => x.id !== planId))) {
+                const orig = originalPlanTimeRef.current[planId];
+                setUserPlans(plans =>
+                  plans.map(x =>
+                    x.id === planId
+                      ? { ...x, start: orig.start, end: orig.end }
+                      : x
+                  )
+                );
+                alert("다른 플랜과 시간이 겹칠 수 없습니다!");
+              }
+            }
+          }
+          dragDataRef.current = null;
+          resizeDataRef.current = null;
+        };
+
         window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseup', onMouseUp);
+        window.addEventListener('mouseup', handleMouseUp);
         return () => {
           window.removeEventListener('mousemove', onMouseMove);
-          window.removeEventListener('mouseup', onMouseUp);
+          window.removeEventListener('mouseup', handleMouseUp);
         };
       }, [userPlans]);
 
@@ -359,32 +388,40 @@
 
               {/* ◼ 일정 카드 오버레이 (5분 단위로 위치/높이 조정) */}
               {userPlans.map(plan => {
-                // 1) 문자열 "HH:MM" → 총 분 계산 → startIdx5, endIdx5
                 const [sh, sm] = plan.start.split(':').map(Number);
                 const startIdx5 = ((sh * 60 + sm) - (startHour * 60)) / 5;
-
                 const [eh, em] = plan.end.split(':').map(Number);
                 const endIdx5 = ((eh * 60 + em) - (startHour * 60)) / 5;
-
                 const spanSlots5 = endIdx5 - startIdx5;
-                const topPx = startIdx5 * slotHeight5;    // startIdx5 * 14px
-                const heightPx = spanSlots5 * slotHeight5; // durationSlots5 * 14px
+                const topPx = startIdx5 * slotHeight5;
+                const heightPx = spanSlots5 * slotHeight5;
+
+                // 더블탭 구현 (플랜별로 lastTapRef 사용)
+                const handleTouchEnd = e => {
+                  const now = Date.now();
+                  if (!lastTapRef.current[plan.id]) lastTapRef.current[plan.id] = 0;
+                  if (now - lastTapRef.current[plan.id] < 300) {
+                    onEdit(plan);
+                  }
+                  lastTapRef.current[plan.id] = now;
+                };
 
                 return (
                   <div
                     key={plan.id}
-                    className={`absolute left-16 right-4 border-2 ${plan.done ? "border-green-300 bg-green-50": "border-orange-500 bg-white"} rounded-xl shadow-md hover:shadow-lg overflow-hidden cursor-pointer`}
+                    className="absolute left-16 right-4 bg-white border-2 border-orange-500 rounded-xl shadow-md hover:shadow-lg overflow-hidden cursor-pointer"
                     style={{
                       top: `${topPx}px`,
                       height: `${heightPx}px`
                     }}
                     onMouseDown={e => {
-                      // 리사이저나 아이콘 클릭 방지
                       if (e.target.closest('.cursor-ns-resize') || e.target.closest('button') || e.target.closest('.lucide')) {
                         return;
                       }
                       startDragging(e, plan.id);
                     }}
+                    onDoubleClick={() => onEdit(plan)}
+                    onTouchEnd={handleTouchEnd}
                   >
                     {/* ◼ 상단 리사이저 (5분 단위 이동) */}
                     <div
@@ -401,9 +438,6 @@
                       <div className="flex items-center gap-2">
                         <span className="text-2xl">{plan.emoji}</span>
                         <span className="font-medium text-sm">{plan.title}</span>
-                        {plan.done && (
-                          <span className="text-green-600 text-lg font-semibold">✓</span>
-                        )}
                       </div>
                       <div className="flex gap-1">
                         <button onClick={() => onEdit(plan)} className="p-1 rounded hover:bg-gray-200">
@@ -438,7 +472,6 @@
             {/* ───────── AI 뷰 ───────── */}
             <div className={`w-full absolute top-0 transition-transform duration-300 ${currentView === 'ai' ? 'translate-x-0' : 'translate-x-full'}`}>
               <div className="p-4 h-screen overflow-y-auto pb-28 bg-orange-100">
-                {/* 뒤로 가기 버튼 및 타이틀 */}
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg font-bold flex items-center gap-2">
                     <span>🤖</span> AI 추천 플랜
@@ -447,8 +480,6 @@
                     ← 돌아가기
                   </button>
                 </div>
-
-                {/* AI 제안 플랜 카드 목록 */}
                 <div className="space-y-3">
                   {aiPlans.map(pl => (
                     <div key={pl.id} className="p-4 bg-orange-500 text-white rounded-xl shadow-sm">
@@ -462,8 +493,6 @@
                     </div>
                   ))}
                 </div>
-
-                {/* AI 생성 버튼 */}
                 {aiPlans.length === 0 && (
                   <div className="text-center py-8">
                     <button onClick={generateAiSuggestions} className="bg-orange-500 text-white px-6 py-3 rounded-full">
@@ -471,8 +500,6 @@
                     </button>
                   </div>
                 )}
-
-                {/* AI 적용 버튼 */}
                 {aiPlans.length > 0 && (
                   <div className="text-center mt-6">
                     <button onClick={applyAiPlans} className="bg-orange-500 text-white px-6 py-3 rounded-full">
