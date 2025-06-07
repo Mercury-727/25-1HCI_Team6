@@ -81,22 +81,12 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
-    .daily-recommendation {
+    .daily-summary {
       background: linear-gradient(135deg, #FEE6DD 0%, #FFF3F0 100%);
       text-align: center;
       position: relative;
       overflow: hidden;
-    }
-
-    .daily-recommendation::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-      animation: shine 3s infinite;
+      cursor: pointer;
     }
 
     @keyframes shine {
@@ -109,21 +99,58 @@
       }
     }
 
-    .daily-recommendation h3 {
-      font-size: 16px;
+    .daily-summary h3 {
+      font-size: 20px;
       font-weight: 600;
       color: #E14A2E;
       margin-bottom: 8px;
-      display: flex;
+      text-align: left;
       align-items: center;
       justify-content: center;
       gap: 8px;
     }
 
-    .daily-recommendation p {
-      font-size: 12px;
-      color: #666;
-      opacity: 0.8;
+    .summary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+    }
+
+    .stat-item {
+    text-align: center;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    }
+
+    .stat-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: #f96c50;
+    margin-bottom: 4px;
+    }
+
+    .stat-label {
+    font-size: 14px;
+    color: #666;
+    }
+
+    .progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #e8ddd4;
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 10px 0;
+    }
+
+    .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f96c50, #ff8a75);
+    width: 0%;
+    border-radius: 3px; /* Adjusted for height */
+    transition: width 0.5s ease;
     }
 
     .ai-plan-card {
@@ -416,6 +443,39 @@
       window.location.href = "goal_timer_app.html";
     }
 
+    function DailySummary({ userPlans }) {
+        console.log(userPlans);
+        const [averageAchievement, totalDuration] = userPlans
+            .filter(p => p.done)
+            .reduce(
+                ([avg, weight], plan) => [Math.floor((avg * weight + plan.achievement * plan.duration) / (weight + plan.duration)), weight + plan.duration],
+                [0, 0]
+            );
+        const totalHours = Math.floor(totalDuration / 3600);
+        const totalMinutes = Math.floor(totalDuration / 60);
+
+        return (
+            <section className="card daily-summary" onClick={e => { e.stopPropagation(); window.location.href = "daily_Feedback.html"; }}>
+                <h3>오늘의 학습 요약</h3>
+                <div className="summary-stats">
+                    <div className="stat-item">
+                        <div className="stat-value">{averageAchievement}%</div>
+                        <div className="stat-label">목표 달성률</div>
+                        <div className="progress-bar">
+                            <div className="progress-fill" style={{ width: `${averageAchievement}%` }}></div>
+                        </div>
+                    </div>
+                    <div className="stat-item">
+                        <div className="stat-value">
+                            {totalHours}시간 {totalMinutes}분
+                        </div>
+                        <div className="stat-label">총 학습 시간</div>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
     function StudyPlannerHome() {
       const [showFloating, setShowFloating] = useState(false);
       const [showTooltip, setShowTooltip] = useState(false);
@@ -517,10 +577,7 @@
           </header>
 
           <main className="main-container">
-            <section className="card daily-recommendation floating">
-              <h3>🎯 오늘은 '집중력 유지'에 도전해보세요!</h3>
-              <p>최근 학습 피드백에서 '산만함' 문제를 언급하셨습니다.</p>
-            </section>
+            <DailySummary userPlans={userPlans} />
 
             <section className="card ai-plan-card" onClick={() => {
               setShowFloating(f => !f);

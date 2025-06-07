@@ -156,7 +156,7 @@
             // set plan done
             const plans = JSON.parse(localStorage.getItem("userPlans")) || [];
             const updatedPlans = plans.map(p =>
-              p.id === plan.id ? { ...p, done: true } : p
+              p.id === plan.id ? { ...p, done: true, achievement: achievement, duration: seconds } : p
             );
             localStorage.setItem("userPlans", JSON.stringify(updatedPlans));
             // reset currentPlanID

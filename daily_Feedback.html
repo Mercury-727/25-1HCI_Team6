@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>오늘의 학습 피드백</title>
 
-    <!-- 기존 프로젝트 CSS 및 폰트 -->
+    <!-- Existing Project CSS and Fonts -->
+    <!-- Make sure css/styles.css exists if you're using it -->
     <link rel="stylesheet" href="css/styles.css" />
     <link
       rel="stylesheet"
@@ -16,965 +17,878 @@
       rel="stylesheet"
     />
 
+    <!-- Keep the inline styles as they are global -->
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
-        background-color: #fdf8f4;
-        color: #333;
-        line-height: 1.6;
-      }
-
-      /* 상단 네비게이션 바 */
-      .header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        background-color: #fdf8f4;
-        padding: 12px 20px;
-        border-bottom: 1px solid #e8ddd4;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        z-index: 1000;
-      }
-
-      .logo {
-        display: flex;
-        align-items: center;
-        font-size: 18px;
-        font-weight: 700;
-        color: #f96c50;
-      }
-
-      .logo i {
-        margin-right: 8px;
-        font-size: 24px;
-      }
-
-      .header-actions {
-        display: flex;
-        gap: 16px;
-      }
-
-      .header-btn {
-        background: none;
-        border: none;
-        font-size: 20px;
-        color: #666;
-        cursor: pointer;
-        transition: color 0.3s ease;
-      }
-
-      .header-btn:hover {
-        color: #f96c50;
-      }
-
-      /* 메인 컨테이너 */
-      .main-container {
-        margin-top: 80px;
-        padding: 20px;
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
-      }
-
-      /* 페이지 타이틀 */
-      .page-title {
-        text-align: center;
-        margin-bottom: 30px;
-      }
-
-      .page-title h1 {
-        font-size: 28px;
-        font-weight: 700;
-        color: #333;
-        margin-bottom: 8px;
-      }
-
-      .page-title p {
-        font-size: 16px;
-        color: #666;
-      }
-
-      /* 카드 공통 스타일 */
-      .card {
-        background: white;
-        border-radius: 16px;
-        padding: 24px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        border: 1px solid #f0f0f0;
-      }
-
-      .card-title {
-        font-size: 20px;
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 16px;
-        display: flex;
-        align-items: center;
-      }
-
-      .card-title i {
-        margin-right: 8px;
-        color: #f96c50;
-      }
-
-      /* 오늘의 학습 요약 */
-      .summary-stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        margin-bottom: 20px;
-      }
-
-      .stat-item {
-        text-align: center;
-        padding: 20px;
-        background: #f8f9fa;
-        border-radius: 12px;
-      }
-
-      .stat-value {
-        font-size: 32px;
-        font-weight: 700;
-        color: #f96c50;
-        margin-bottom: 4px;
-      }
-
-      .stat-label {
-        font-size: 14px;
-        color: #666;
-      }
-
-      .progress-bar {
-        width: 100%;
-        height: 8px;
-        background: #e8ddd4;
-        border-radius: 4px;
-        overflow: hidden;
-        margin: 16px 0;
-      }
-
-      .progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #f96c50, #ff8a75);
-        width: 0%;
-        border-radius: 4px;
-        transition: width 0.5s ease;
-      }
-
-      .comparison-text {
-        background: #e8f5e8;
-        padding: 12px 16px;
-        border-radius: 8px;
-        color: #2d7a2d;
-        font-size: 14px;
-        border-left: 4px solid #4caf50;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      /* 오늘의 공부 목록 */
-      .study-list {
-        list-style: none;
-      }
-
-      .study-item {
-        display: flex;
-        align-items: center;
-        padding: 16px 0;
-        border-bottom: 1px solid #f0f0f0;
-      }
-
-      .study-item:last-child {
-        border-bottom: none;
-      }
-
-      .study-checkbox {
-        width: 20px;
-        height: 20px;
-        border: 2px solid #f96c50;
-        border-radius: 4px;
-        margin-right: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #f96c50;
-        color: white;
-        font-size: 12px;
-      }
-
-      .study-text {
-        font-size: 16px;
-        color: #333;
-      }
-
-      /* 오늘의 피드백 */
-      .feedback-card {
-        background: linear-gradient(135deg, #fff5f3, #fff8f7);
-        border-left: 4px solid #f96c50;
-      }
-
-      .feedback-text {
-        font-size: 16px;
-        line-height: 1.8;
-        color: #444;
-        padding: 16px;
-        background: rgba(255, 255, 255, 0.7);
-        border-radius: 8px;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-
-      /* 주간 학습 변화 */
-      .chart-container {
-        display: flex;
-        align-items: center;
-        gap: 24px;
-      }
-
-      .chart-visual {
-        flex-shrink: 0;
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        background: conic-gradient(#f96c50 0deg 252deg, #e8ddd4 252deg 360deg);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-      }
-
-      .chart-visual::before {
-        content: "";
-        width: 80px;
-        height: 80px;
-        background: white;
-        border-radius: 50%;
-        position: absolute;
-      }
-
-      .chart-value {
-        position: relative;
-        z-index: 1;
-        font-size: 24px;
-        font-weight: 700;
-        color: #f96c50;
-      }
-
-      .chart-info h3 {
-        font-size: 18px;
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 8px;
-      }
-
-      .chart-info p {
-        font-size: 14px;
-        color: #666;
-        margin-bottom: 12px;
-      }
-
-      .trend-positive {
-        background: #e8f5e8;
-        color: #2d7a2d;
-        padding: 8px 12px;
-        border-radius: 6px;
-        font-size: 14px;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-
-      /* 상호작용 버튼 */
-      .action-buttons {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        margin-top: 32px;
-      }
-
-      .btn-primary {
-        background: #f96c50;
-        color: white;
-        border: none;
-        padding: 16px 24px;
-        border-radius: 12px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-      }
-
-      .btn-primary:hover {
-        background: #e85a3f;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(249, 108, 80, 0.3);
-      }
-
-      .btn-secondary {
-        background: linear-gradient(135deg, #ffe5e0, #fff0ed);
-        color: #f96c50;
-        border: 2px solid #f96c50;
-        padding: 16px 24px;
-        border-radius: 12px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-      }
-
-      .btn-secondary:hover {
-        background: #f96c50;
-        color: white;
-        transform: translateY(-2px);
-      }
-
-      .encouragement-section {
-        text-align: center;
-        padding: 32px 24px;
-        background: linear-gradient(135deg, #fff8f7, #fff5f3);
-        border-radius: 16px;
-        margin: 32px 0;
-      }
-
-      .encouragement-text {
-        font-size: 24px;
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 16px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .encouragement-subtitle {
-        font-size: 16px;
-        color: #666;
-        margin-bottom: 24px;
-      }
-
-      /* 하단 푸터 */
-      .footer {
-        background: #faf5f1;
-        padding: 32px 20px;
-        text-align: center;
-        margin-top: 60px;
-        border-top: 1px solid #e8ddd4;
-      }
-
-      .footer-content {
-        max-width: 800px;
-        margin: 0 auto;
-      }
-
-      .footer-links {
-        display: flex;
-        justify-content: center;
-        gap: 24px;
-        margin-bottom: 16px;
-      }
-
-      .footer-links a {
-        color: #666;
-        text-decoration: none;
-        font-size: 14px;
-        transition: color 0.3s ease;
-      }
-
-      .footer-links a:hover {
-        color: #f96c50;
-      }
-
-      .footer-text {
-        font-size: 12px;
-        color: #999;
-      }
-
-      /* 모달 스타일 */
-      .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 2000;
-        animation: fadeIn 0.3s ease;
-      }
-
-      .modal-content {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: white;
-        padding: 32px;
-        border-radius: 16px;
-        max-width: 500px;
-        width: 90%;
-        animation: slideUp 0.3s ease;
-      }
-
-      .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-      }
-
-      .modal-title {
-        font-size: 20px;
-        font-weight: 600;
-        color: #333;
-      }
-
-      .close-btn {
-        background: none;
-        border: none;
-        font-size: 24px;
-        color: #666;
-        cursor: pointer;
-      }
-
-      /* 반응형 디자인 */
-      @media (max-width: 768px) {
-        .main-container {
-          padding: 16px;
-        }
-
-        .card {
-          padding: 20px;
-        }
-
-        .summary-stats {
-          grid-template-columns: 1fr;
-          gap: 16px;
-        }
-
-        .chart-container {
-          flex-direction: column;
-          text-align: center;
-        }
-
-        .page-title h1 {
-          font-size: 24px;
-        }
-
-        .header {
-          padding: 12px 16px;
-        }
-
-        .footer-links {
-          flex-direction: column;
-          gap: 12px;
-        }
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-
-        to {
-          opacity: 1;
-        }
-      }
-
-      @keyframes slideUp {
-        from {
-          opacity: 0;
-          transform: translate(-50%, -40%);
-        }
-
-        to {
-          opacity: 1;
-          transform: translate(-50%, -50%);
-        }
-      }
-
-      #emoji-rating span {
-        transition: all 0.2s;
-        border-radius: 50%;
-        padding: 2px 4px;
-      }
-
-      #emoji-rating span.selected {
-        transform: scale(1.3);
-        filter: none;
-        background: #fff0ed;
-      }
-
-      #emoji-rating span.unselected {
-        filter: grayscale(1);
-        opacity: 0.5;
-        transform: scale(1);
-        background: none;
-      }
-
-      #satisfaction-text {
-        resize: none;
-        overflow: hidden;
-        transition: height 0.2s;
-        box-sizing: border-box;
-        width: 90%;
-        max-width: 400px;
-        display: none;
-        margin-bottom: 12px;
-        border-radius: 8px;
-        border: 1px solid #e8ddd4;
-        padding: 8px;
-      }
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    }
+
+    body {
+    font-family: "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #fdf8f4;
+    color: #333;
+    line-height: 1.6;
+    }
+
+    /* 상단 네비게이션 바 */
+    .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #fdf8f4;
+    padding: 12px 20px;
+    border-bottom: 1px solid #e8ddd4;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    }
+
+    .logo {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: #f96c50;
+    }
+
+    .logo i {
+    margin-right: 8px;
+    font-size: 24px;
+    }
+
+    .header-actions {
+    display: flex;
+    gap: 16px;
+    }
+
+    .header-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #666;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    }
+
+    .header-btn:hover {
+    color: #f96c50;
+    }
+
+    /* 메인 컨테이너 */
+    .main-container {
+    margin-top: 80px;
+    padding: 20px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    }
+
+    /* 페이지 타이틀 */
+    .page-title {
+    text-align: center;
+    margin-bottom: 30px;
+    }
+
+    .page-title h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 8px;
+    }
+
+    .page-title p {
+    font-size: 16px;
+    color: #666;
+    }
+
+    /* 카드 공통 스타일 */
+    .card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f0f0f0;
+    }
+
+    .card-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    }
+
+    .card-title i {
+    margin-right: 8px;
+    color: #f96c50;
+    }
+
+    /* 오늘의 학습 요약 */
+    .summary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+    }
+
+    .stat-item {
+    text-align: center;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    }
+
+    .stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #f96c50;
+    margin-bottom: 4px;
+    }
+
+    .stat-label {
+    font-size: 14px;
+    color: #666;
+    }
+
+    .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e8ddd4;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 16px 0;
+    }
+
+    .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f96c50, #ff8a75);
+    width: 0%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+    }
+
+    .comparison-text {
+    background: #e8f5e8;
+    padding: 12px 16px;
+    border-radius: 8px;
+    color: #2d7a2d;
+    font-size: 14px;
+    border-left: 4px solid #4caf50;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    }
+
+    /* 오늘의 공부 목록 */
+    .study-list {
+    list-style: none;
+    }
+
+    .study-item {
+    display: flex;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid #f0f0f0;
+    }
+
+    .study-item:last-child {
+    border-bottom: none;
+    }
+
+    .study-checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f96c50;
+    border-radius: 4px;
+    margin-right: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f96c50;
+    color: white;
+    font-size: 12px;
+    }
+
+    .study-text {
+    font-size: 16px;
+    color: #333;
+    }
+
+    /* 오늘의 피드백 */
+    .feedback-card {
+    background: linear-gradient(135deg, #fff5f3, #fff8f7);
+    border-left: 4px solid #f96c50;
+    }
+
+    .feedback-text {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #444;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    }
+
+    /* 상호작용 버튼 */
+    .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 32px;
+    }
+
+    .btn-primary {
+    background: #f96c50;
+    color: white;
+    border: none;
+    padding: 16px 24px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    }
+
+    .btn-primary:hover {
+    background: #e85a3f;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(249, 108, 80, 0.3);
+    }
+
+    .btn-secondary {
+    background: linear-gradient(135deg, #ffe5e0, #fff0ed);
+    color: #f96c50;
+    border: 2px solid #f96c50;
+    padding: 16px 24px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+    background: #f96c50;
+    color: white;
+    transform: translateY(-2px);
+    }
+
+    .encouragement-section {
+    text-align: center;
+    padding: 32px 24px;
+    background: linear-gradient(135deg, #fff8f7, #fff5f3);
+    border-radius: 16px;
+    margin: 32px 0;
+    }
+
+    .encouragement-text {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    }
+
+    .encouragement-subtitle {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 24px;
+    }
+
+    /* 하단 푸터 */
+    .footer {
+    background: #faf5f1;
+    padding: 32px 20px;
+    text-align: center;
+    margin-top: 60px;
+    border-top: 1px solid #e8ddd4;
+    }
+
+    .footer-content {
+    max-width: 800px;
+    margin: 0 auto;
+    }
+
+    .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 16px;
+    }
+
+    .footer-links a {
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s ease;
+    }
+
+    .footer-links a:hover {
+    color: #f96c50;
+    }
+
+    .footer-text {
+    font-size: 12px;
+    color: #999;
+    }
+
+    /* 모달 스타일 */
+    /* Note: Modal HTML is commented out, but styles are kept */
+    .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    animation: fadeIn 0.3s ease;
+    }
+
+    .modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 32px;
+    border-radius: 16px;
+    max-width: 500px;
+    width: 90%;
+    animation: slideUp 0.3s ease;
+    }
+
+    .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    }
+
+    .modal-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    }
+
+    .close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #666;
+    cursor: pointer;
+    }
+
+    /* 반응형 디자인 */
+    @media (max-width: 768px) {
+    .main-container {
+    padding: 16px;
+    }
+
+    .card {
+    padding: 20px;
+    }
+
+    .summary-stats {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    }
+
+    .page-title h1 {
+    font-size: 24px;
+    }
+
+    .header {
+    padding: 12px 16px;
+    }
+
+    .footer-links {
+    flex-direction: column;
+    gap: 12px;
+    }
+    }
+
+    @keyframes fadeIn {
+    from {
+    opacity: 0;
+    }
+
+    to {
+    opacity: 1;
+    }
+    }
+
+    @keyframes slideUp {
+    from {
+    opacity: 0;
+    transform: translate(-50%, -40%);
+    }
+
+    to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+    }
+    }
+
+    #emoji-rating span {
+    transition: all 0.2s;
+    border-radius: 50%;
+    padding: 2px 4px;
+    }
+
+    #emoji-rating span.selected {
+    transform: scale(1.3);
+    filter: none;
+    background: #fff0ed;
+    }
+
+    #emoji-rating span.unselected {
+    filter: grayscale(1);
+    opacity: 0.5;
+    transform: scale(1);
+    background: none;
+    }
+
+    /* satisfaction-text styling from original CSS is refined slightly for React */
+    #satisfaction-text {
+    resize: vertical; /* Allow vertical resize */
+    overflow: auto; /* Show scrollbar if needed */
+    box-sizing: border-box;
+    width: 100%; /* Make it responsive */
+    max-width: 400px; /* Keep max width */
+    /* display handled by React state */
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border: 1px solid #e8ddd4;
+    padding: 8px;
+    min-height: 40px; /* Prevent shrinking too much */
+    }
     </style>
+
+    <!-- React and Babel CDNs -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   </head>
-
   <body>
-    <!-- 상단 네비게이션 바 -->
-    <header class="header">
-      <div class="logo">
-        <i class="fas fa-graduation-cap"></i>
-        MyStudy
-      </div>
-      <div class="header-actions">
-        <button class="header-btn" title="프로필">
-          <i class="fas fa-user"></i>
-        </button>
-        <button class="header-btn" title="설정">
-          <i class="fas fa-cog"></i>
-        </button>
-      </div>
-    </header>
-
-    <div class="main-container">
-      <!-- 페이지 타이틀 -->
-      <div class="page-title">
-        <h1>오늘의 학습 피드백 📅</h1>
-        <p id="feedback-date">— — — — — 학습 결과를 확인해보세요</p>
-      </div>
-
-      <!-- 오늘의 학습 요약 -->
-      <div class="card">
-        <h2 class="card-title">
-          <i class="fas fa-chart-line"></i>
-          오늘의 학습 요약
-        </h2>
-
-        <div class="summary-stats">
-          <div class="stat-item">
-            <div id="stat-achievement" class="stat-value">--%</div>
-            <div class="stat-label">목표 달성률</div>
-            <div class="progress-bar">
-              <div id="progress-fill" class="progress-fill"></div>
-            </div>
-          </div>
-          <div class="stat-item">
-            <div id="stat-time" class="stat-value">--시간 --분</div>
-            <div class="stat-label">총 학습 시간</div>
-          </div>
-        </div>
-
-        <div id="comparison-text" class="comparison-text" style="display: none">
-          <i class="fas fa-arrow-up"></i>
-          <!-- 전주 대비 학습 시간 증감 메시지 -->
-          지난주 오늘보다 --분 더 공부했어요
-        </div>
-      </div>
-
-      <!-- 오늘의 공부 목록 -->
-      <div class="card">
-        <h2 class="card-title">
-          <i class="fas fa-book"></i>
-          오늘의 공부 목록
-        </h2>
-
-        <ul id="study-list" class="study-list">
-          <!-- API 에서 받아온 학습 리스트가 여기에 렌더링됩니다. -->
-          <!-- 예시 추가:
-                <li class="study-item">
-                    <span class="study-checkbox"><i class="fas fa-check"></i></span>
-                    <span class="study-text">영어 수행평가: 문제집 131-133쪽</span>
-                </li>
-                -->
-        </ul>
-      </div>
-
-      <!-- 오늘의 피드백 -->
-      <div class="card feedback-card">
-        <h2 class="card-title">
-          <i class="fas fa-comment-dots"></i>
-          오늘의 피드백
-        </h2>
-
-        <div id="feedback-text" class="feedback-text">
-          <!-- API 에서 받아온 피드백 텍스트가 여기에 렌더링됩니다. -->
-        </div>
-      </div>
-
-      <!-- 만족도 입력 섹션 -->
-      <div
-        class="card"
-        id="satisfaction-section"
-        style="text-align: center; margin-bottom: 32px"
-      >
-        <h3 style="margin-bottom: 12px">오늘 계획 생성에 대한 만족도!</h3>
-        <div
-          id="emoji-rating"
-          style="
-            font-size: 2rem;
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            margin-bottom: 12px;
-          "
-        >
-          <span data-value="1" title="매우 불만족" style="cursor: pointer"
-            >😡</span
-          >
-          <span data-value="2" title="불만족" style="cursor: pointer">😕</span>
-          <span data-value="3" title="보통" style="cursor: pointer">😐</span>
-          <span data-value="4" title="만족" style="cursor: pointer">🙂</span>
-          <span data-value="5" title="매우 만족" style="cursor: pointer"
-            >😍</span
-          >
-        </div>
-        <div
-          id="selected-rating"
-          style="margin-bottom: 12px; color: #f96c50; font-weight: 600"
-        ></div>
-        <textarea
-          id="satisfaction-text"
-          rows="2"
-          placeholder="오늘 계획에 대해 한줄평을 남겨주세요!"
-          style="
-            width: 100%;
-            max-width: 100%;
-            display: none;
-            margin-bottom: 12px;
-            border-radius: 8px;
-            border: 1px solid #e8ddd4;
-            padding: 8px;
-            box-sizing: border-box;
-          "
-        ></textarea>
-        <br />
-        <button
-          id="satisfaction-submit"
-          class="btn-secondary"
-          style="display: none"
-        >
-          제출하기
-        </button>
-        <div
-          id="satisfaction-result"
-          style="margin-top: 10px; color: #2d7a2d; font-weight: 500"
-        ></div>
-      </div>
-      <!-- 오늘 하루도 수고했어요 -->
-      <div class="encouragement-section">
-        <div class="encouragement-text">오늘 하루도 수고했어요! 🎉</div>
-        <div class="encouragement-subtitle" id="encouragement-subtitle">
-          꾸준한 노력이 큰 성과를 만들어냅니다
-        </div>
-        <button id="encourage-btn" class="btn-secondary">
-          내일도 화이팅! 💪
-        </button>
-      </div>
+    <div id="root">
+      <!-- React app will be mounted here -->
     </div>
 
-    <!-- 하단 푸터 -->
-    <footer class="footer">
-      <div class="footer-content">
-        <div class="footer-links">
-          <a href="#team">팀 소개</a>
-          <a href="#contact">문의하기</a>
-          <a href="#privacy">개인정보처리방침</a>
-          <a href="#terms">이용약관</a>
-        </div>
-        <div class="footer-text">© 2024 HCI Team 6. All rights reserved.</div>
-      </div>
-    </footer>
+    <script type="text/babel">
+    const { useState, useEffect } = React;
+    const root = ReactDOM.createRoot(document.getElementById('root'));
 
-    <!-- 피드백 상세 모달 -->
-    <!-- <div id="feedbackModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">상세 피드백 📝</h3>
-                <button class="close-btn" onclick="closeFeedbackModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body" id="modal-body">
-                AI에게 오늘의 학습에 대한 피드백을 요청한 후,
-                AI가 제공한 상세 피드백 내용을 여기에 렌더링합니다.
-                (약간 학생들에게 어떤 부분이 어려웠는지 확인을 받는 것도 괜찮을 듯?)
-                예시:
-                <h4>오늘의 학습 분석</h4>
-                <p>곱셈 공식 부분에서 약간의 어려움을 겪으셨네요. 이는 새로운 개념을 학습할 때 자연스러운 과정입니다.</p>
-                <h4>개선 제안</h4>
-                <ul>
-                    <li>곱셈 공식을 단계별로 나눠서 복습해보세요</li>
-                    <li>예제 문제를 더 풀어보시는 것을 추천합니다</li>
-                    <li>내일 10분 정도 간단한 복습 시간을 가져보세요</li>
-                </ul>
-                <h4>격려 메시지</h4>
-                <p>오늘도 목표의 70%를 달성하셨습니다. 꾸준한 노력이 실력 향상으로 이어질 것입니다!</p>
-            </div>
-        </div>
-    </div> -->
+    // Simulated API call function (from original script)
+    const myfetch = function(url, options) {
+      if (url === "/api/feedback/daily") {
+        const feedbacks = [
+          {
+            "analysis": "오늘 이차함수 개념 복습을 60분에 100% 완료해 개념 이해가 탄탄해졌습니다. 반면 스스로 확인하기 문제는 45분에 70% 풀어 정확도와 실전 적용 연습이 더 필요합니다.",
+            "suggestion": "내일은 실제 시험처럼 30분 동안 이차함수 문제 10문제를 풀어보세요. 목표는 최소 8문제 맞히기, 틀린 문제는 오답 노트에 핵심 풀이 과정을 2~3줄로 정리해두면 효율적으로 점수를 올릴 수 있습니다.",
+            "encouragement": "작은 성취가 모여 큰 점수 차이를 만듭니다. 꾸준히 연습하며 한 걸음씩 나아가요!"
+          },
+          {
+            "analysis": "오늘 이차함수 개념 복습은 100% 완벽히 마쳤고 60분을 투자해 기초를 다졌습니다. 문제 풀이(45분)는 70% 정확도로, 특히 꼭짓점 좌표와 대칭축 문제에서 오답이 있었습니다. 꾸준한 복습은 강점이지만 문제 정확도를 높일 여지가 보입니다.",
+            "suggestion": "내일은 오늘 틀린 3~5문제를 골라 풀이 과정을 필기하며 오답 노트를 만들고, 유사 문제 5개를 30분 타이머를 켜고 풀어 즉시 채점 후 오답 원인을 정리해보세요.",
+            "encouragement": "작은 노력들이 모여 높은 점수로 이어집니다. 오늘도 잘했어요, 내일도 파이팅!"
+          },
+          {
+            "analysis": "오늘 이차함수 복습에서 개념 이해를 100% 달성해 탄탄한 기초를 다졌습니다. 그러나 실전 문제 풀이는 70% 수준으로, 특히 응용 문제에서 시간이 부족하거나 풀이 절차가 헷갈린 것으로 보입니다.",
+            "suggestion": "내일은 시험 직전처럼 30분 안에 이차함수 문제 10문제를 풀고, 틀리거나 시간이 오래 걸린 문제는 즉시 오답 노트에 정리해 보세요.",
+            "encouragement": "지금처럼 기초를 다지고 실전 연습을 늘리면 곧 점수 향상이 눈에 보일 거예요!"
+          },
+          {
+            "analysis": "오늘 이차함수 핵심 개념 복습을 100% 완료하며 그래프 개형 이해가 탄탄해졌습니다. 하지만 스스로 확인하기 문제는 70%만 맞춰 시험 대비가 부족한 부분이 남아 있습니다.",
+            "suggestion": "내일은 틀린 문제 위주로 오답노트를 만들어 핵심 공식과 풀이 과정을 정리한 뒤, 30분 동안 타이머를 켜고 10문제를 풀어보세요. 스스로 채점해 목표 맞힌 개수를 기록하면 성취감을 느끼기 좋습니다.",
+            "encouragement": "지금처럼 꾸준히 해나가면 점점 시험 성적에 자신감이 생길 거예요. 화이팅!"
+          },
+          {
+            "analysis": "오늘 이차함수 핵심 개념 복습을 100% 완료하며 기초를 탄탄히 다졌습니다. 하지만 문제 풀이에서는 70%의 정답률을 보여, 특히 꼭짓점 좌표와 이차식 변형 문제에서 실수가 있었습니다.",
+            "suggestion": "내일은 오답 노트에 틀린 문제를 유형별로 정리한 뒤, 비슷한 문제 3개를 각각 제한시간 10분 안에 풀어 보세요. 시험 실전 감각과 문제 해결 속도를 동시에 높일 수 있습니다.",
+            "encouragement": "작은 성취들이 쌓이면 점수가 크게 오릅니다. 꾸준히 해 나가면 원하는 목표에 꼭 도달할 거예요!"
+          },
+        ];
+        const feedback = feedbacks[Math.floor(Math.random() * feedbacks.length)];
 
-    <!-- JavaScript -->
-    <script src="js/common.js"></script>
-    <script>
-      // 페이지가 로드되면 API를 통해 오늘의 피드백 데이터를 가져와서
-      // UI 요소에 렌더링합니다.
-      const generateFeedback = function() {
-          const feedbacks = [
-            {
-                "analysis": "오늘 이차함수 개념 복습을 60분에 100% 완료해 개념 이해가 탄탄해졌습니다. 반면 스스로 확인하기 문제는 45분에 70% 풀어 정확도와 실전 적용 연습이 더 필요합니다.",
-                "suggestion": "내일은 실제 시험처럼 30분 동안 이차함수 문제 10문제를 풀어보세요. 목표는 최소 8문제 맞히기, 틀린 문제는 오답 노트에 핵심 풀이 과정을 2~3줄로 정리해두면 효율적으로 점수를 올릴 수 있습니다.",
-                "encouragement": "작은 성취가 모여 큰 점수 차이를 만듭니다. 꾸준히 연습하며 한 걸음씩 나아가요!"
-            },
-            {
-                "analysis": "오늘 이차함수 개념 복습은 100% 완벽히 마쳤고 60분을 투자해 기초를 다졌습니다. 문제 풀이(45분)는 70% 정확도로, 특히 꼭짓점 좌표와 대칭축 문제에서 오답이 있었습니다. 꾸준한 복습은 강점이지만 문제 정확도를 높일 여지가 보입니다.",
-                "suggestion": "내일은 오늘 틀린 3~5문제를 골라 풀이 과정을 필기하며 오답 노트를 만들고, 유사 문제 5개를 30분 타이머를 켜고 풀어 즉시 채점 후 오답 원인을 정리해보세요.",
-                "encouragement": "작은 노력들이 모여 높은 점수로 이어집니다. 오늘도 잘했어요, 내일도 파이팅!"
-            },
-            {
-                "analysis": "오늘 이차함수 복습에서 개념 이해를 100% 달성해 탄탄한 기초를 다졌습니다. 그러나 실전 문제 풀이는 70% 수준으로, 특히 응용 문제에서 시간이 부족하거나 풀이 절차가 헷갈린 것으로 보입니다.",
-                "suggestion": "내일은 시험 직전처럼 30분 안에 이차함수 문제 10문제를 풀고, 틀리거나 시간이 오래 걸린 문제는 즉시 오답 노트에 정리해 보세요.",
-                "encouragement": "지금처럼 기초를 다지고 실전 연습을 늘리면 곧 점수 향상이 눈에 보일 거예요!"
-            },
-            {
-                "analysis": "오늘 이차함수 핵심 개념 복습을 100% 완료하며 그래프 개형 이해가 탄탄해졌습니다. 하지만 스스로 확인하기 문제는 70%만 맞춰 시험 대비가 부족한 부분이 남아 있습니다.",
-                "suggestion": "내일은 틀린 문제 위주로 오답노트를 만들어 핵심 공식과 풀이 과정을 정리한 뒤, 30분 동안 타이머를 켜고 10문제를 풀어보세요. 스스로 채점해 목표 맞힌 개수를 기록하면 성취감을 느끼기 좋습니다.",
-                "encouragement": "지금처럼 꾸준히 해나가면 점점 시험 성적에 자신감이 생길 거예요. 화이팅!"
-            },
-            {
-                "analysis": "오늘 이차함수 핵심 개념 복습을 100% 완료하며 기초를 탄탄히 다졌습니다. 하지만 문제 풀이에서는 70%의 정답률을 보여, 특히 꼭짓점 좌표와 이차식 변형 문제에서 실수가 있었습니다.",
-                "suggestion": "내일은 오답 노트에 틀린 문제를 유형별로 정리한 뒤, 비슷한 문제 3개를 각각 제한시간 10분 안에 풀어 보세요. 시험 실전 감각과 문제 해결 속도를 동시에 높일 수 있습니다.",
-                "encouragement": "작은 성취들이 쌓이면 점수가 크게 오릅니다. 꾸준히 해 나가면 원하는 목표에 꼭 도달할 거예요!"
-            },
-          ];
-
-          const feedback = feedbacks[Math.floor(Math.random() * feedbacks.length)];
-
-          return [`<b>🔍 학습 분석</b>${feedback.analysis}<b>💬 제안</b>${feedback.suggestion}`, feedback.encouragement];
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({
+            date: (new Date()).toLocaleString("ko-KR", {
+              year: "numeric",
+              day: "numeric",
+              month: "numeric",
+              weekday: "long",
+            }),
+            achievement: 87,
+            totalTime: 105, // in minutes
+            comparisonText: "지난주 오늘보다 15분 더 공부했어요", // Example comparison text
+            studyItems: [
+              "이차함수 복습: 핵심 개념 및 ax^2 그래프 개형(pp.118-129)",
+              "이차함수 문제: 스스로 확인하기 풀기(p.121, p.128, p.133)",
+            ],
+            feedback: feedback,
+          })
+        });
       }
-      const myfetch = function(url, options) {
-          if (url === "/api/feedback/daily") {
-              return Promise.resolve({
-                  ok: true,
-                  status: 200,
-                  json: () => Promise.resolve({
-                      date: (new Date()).toLocaleString("default", {
-                          year: "numeric",
-                          day: "numeric",
-                          month: "numeric",
-                          weekday: "long",
-                      }),
-                      achievement: 87,
-                      totalTime: 105,
-                      studyItems: [
-                        "이차함수 복습: 핵심 개념 및 ax^2 그래프 개형(pp.118-129)",
-                        "이차함수 문제: 스스로 확인하기 풀기(p.121, p.128, p.133)",
-                      ],
-                  })
-              });
-          }
 
-          return Promise.resolve({
-              ok: false,
-              status: 404,
-              json: () => Promise.resolve({ error: "Not found" })
-          });
+      return Promise.resolve({
+        ok: false,
+        status: 404,
+        json: () => Promise.resolve({ error: "Not found" })
+      });
+    };
+
+    // Component for the Header
+    const Header = () => (
+      <header className="header">
+        <div className="logo">
+          <i className="fas fa-graduation-cap"></i>
+          MyStudy
+        </div>
+        <div className="header-actions">
+          <button className="header-btn" title="프로필">
+            <i className="fas fa-user"></i>
+          </button>
+          <button className="header-btn" title="설정">
+            <i className="fas fa-cog"></i>
+          </button>
+        </div>
+      </header>
+    );
+
+    // Component for the Footer
+    const Footer = () => (
+      <footer className="footer">
+        <div className="footer-content">
+          <div className="footer-links">
+            <a href="#team">팀 소개</a>
+            <a href="#contact">문의하기</a>
+            <a href="#privacy">개인정보처리방침</a>
+            <a href="#terms">이용약관</a>
+          </div>
+          <div className="footer-text">© 2024 HCI Team 6. All rights reserved.</div>
+        </div>
+      </footer>
+    );
+
+    // Component for the Satisfaction Section
+    const SatisfactionSection = () => {
+      const [rating, setRating] = useState(0);
+      const [satisfactionText, setSatisfactionText] = useState("");
+      const [showInput, setShowInput] = useState(false);
+      const [resultMessage, setResultMessage] = useState("");
+
+      const emojiLabels = [
+        "매우 불만족",
+        "불만족",
+        "보통",
+        "만족",
+        "매우 만족",
+      ];
+      const emojis = ["😡", "😕", "😐", "🙂", "😍"];
+
+      const handleEmojiClick = (value) => {
+        setRating(value);
+        setShowInput(true);
+        setResultMessage(""); // Clear previous result message
       };
 
-      document.addEventListener("DOMContentLoaded", function () {
-        // 예시 엔드포인트: '/api/today-feedback'
+      const handleSubmit = () => {
+        if (!rating) {
+          setResultMessage("만족도를 선택해주세요!");
+          return;
+        }
+
+        const today = new Date();
+        const y = today.getFullYear();
+        const m = String(today.getMonth() + 1).padStart(2, "0");
+        const d = String(today.getDate()).padStart(2, "0");
+        const dateStr = `${y}년${m}월${d}일 계획 생성에 대한 피드백`;
+
+        const feedback = {
+          date: dateStr,
+          rating: rating,
+          text: satisfactionText.trim(),
+        };
+
+        // Save to localStorage
+        let arr = JSON.parse(localStorage.getItem("planSatisfaction") || "[]");
+        arr.push(feedback);
+        localStorage.setItem("planSatisfaction", JSON.stringify(arr));
+
+        setResultMessage("피드백이 저장되었습니다. 감사합니다!");
+        setRating(0); // Reset rating
+        setSatisfactionText(""); // Clear text
+        setShowInput(false); // Hide input
+        setTimeout(() => {
+          setResultMessage(""); // Clear message after a delay
+        }, 2500);
+      };
+
+      return (
+        <div
+          className="card"
+          style={{ textAlign: "center", marginBottom: "32px" }}
+        >
+          <h3 style={{ marginBottom: "12px" }}>오늘 계획 생성에 대한 만족도!</h3>
+          <div
+            id="emoji-rating"
+            style={{
+              fontSize: "2rem",
+              display: "flex",
+              justifyContent: "center",
+              gap: "16px",
+              marginBottom: "12px",
+            }}
+          >
+            {emojis.map((emoji, index) => (
+              <span
+                key={index}
+                data-value={index + 1}
+                title={emojiLabels[index]}
+                style={{ cursor: "pointer" }}
+                onClick={() => handleEmojiClick(index + 1)}
+                className={
+                  rating === 0 ? "" : rating === index + 1 ? "selected" : "unselected"
+                }
+              >
+                {emoji}
+              </span>
+            ))}
+          </div>
+          {rating > 0 && (
+            <div id="selected-rating" style={{ marginBottom: "12px", color: "#f96c50", fontWeight: "600" }}>
+              {emojiLabels[rating - 1]} {emojis[rating - 1]}
+            </div>
+          )}
+
+          {showInput && (
+            <>
+              <textarea
+                id="satisfaction-text"
+                rows="2"
+                placeholder="오늘 계획에 대해 한줄평을 남겨주세요!"
+                value={satisfactionText}
+                onChange={(e) => setSatisfactionText(e.target.value)}
+                style={{ display: showInput ? "block" : "none" }} // Control display via style
+              ></textarea>
+              <button
+                id="satisfaction-submit"
+                className="btn-secondary"
+                style={{ display: showInput ? "inline-block" : "none", align: "center" }} // Control display
+                onClick={handleSubmit}
+              >
+                제출하기
+              </button>
+            </>
+          )}
+          {resultMessage && (
+            <div
+              id="satisfaction-result"
+              style={{
+                marginTop: "10px",
+                color: resultMessage.includes("감사합니다") ? "#2D7A2D" : "#F96C50",
+                fontWeight: "500"
+              }}
+            >
+              {resultMessage}
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // Component for the Encouragement Section
+    const EncouragementSection = ({ encouragementText }) => {
+      const [buttonText, setButtonText] = useState("내일도 화이팅! 💪");
+      const [buttonStyle, setButtonStyle] = useState({}); // Use state for dynamic style
+
+      const handleEncourageClick = () => {
+        setButtonText('응원해주셔서 감사해요! ❤️');
+        setButtonStyle({
+          background: '#F96C50',
+          color: 'white',
+          border: '2px solid #F96C50'
+        });
+
+        setTimeout(() => {
+          setButtonText("내일도 화이팅! 💪");
+          setButtonStyle({
+            background: 'linear-gradient(135deg, #FFE5E0, #FFF0ED)',
+            color: '#F96C50',
+            border: '2px solid #F96C50'
+          });
+        }, 2000);
+      };
+
+      return (
+        <div className="encouragement-section">
+          <div className="encouragement-text">오늘 하루도 수고했어요! 🎉</div>
+          <div className="encouragement-subtitle">{encouragementText}</div>
+          <button
+            id="encourage-btn"
+            className="btn-secondary"
+            onClick={handleEncourageClick}
+            style={buttonStyle} // Apply dynamic style
+          >
+            {buttonText}
+          </button>
+        </div>
+      );
+    };
+
+    // Main App Component
+    function DailyFeedback() {
+      const [feedbackData, setFeedbackData] = useState(null);
+      const [loading, setLoading] = useState(true);
+
+      useEffect(() => {
+        // Fetch main data
         myfetch("/api/feedback/daily")
           .then((response) => response.json())
           .then((data) => {
-            // 날짜 표기
-            const dateElem = document.getElementById("feedback-date");
-            dateElem.textContent =
-              data.date || "— — — — — 학습 결과를 확인해보세요";
-
-            // 오늘의 학습 요약
-            document.getElementById("stat-achievement").textContent =
-              data.achievement + "%";
-            document.getElementById("stat-time").textContent = Math.floor(data.totalTime / 60) + "시간 " + (data.totalTime % 60) + "분";
-            document.getElementById("progress-fill").style.width =
-              data.achievement + "%";
-
-            if (data.comparisonText) {
-              const compText = document.getElementById("comparison-text");
-              compText.style.display = "flex";
-              compText.innerHTML = `<i class="fas fa-arrow-up"></i> ${data.comparisonText}`;
-            }
-
-            // 오늘의 공부 목록
-            const studyList = document.getElementById("study-list");
-            studyList.innerHTML = "";
-            data.studyItems.forEach((item) => {
-              const li = document.createElement("li");
-              li.className = "study-item";
-              li.innerHTML = `
-                            <span class="study-checkbox"><i class="fas fa-check"></i></span>
-                            <span class="study-text">${item}</span>
-                        `;
-              studyList.appendChild(li);
-            });
-
-            const [feedback, encouragement] = generateFeedback();
-
-            // 오늘의 피드백
-            document.getElementById("feedback-text").innerHTML = feedback;
-
-            // 모달 내용
-            // const modalBody = document.getElementById("modal-body");
-            // modalBody.innerHTML = data.detailedFeedbackHTML;
-
-            document.getElementById("encouragement-subtitle").textContent = encouragement;
+            setFeedbackData(data);
           })
           .catch((err) => {
-            console.error("피드백을 가져오는 중 오류 발생:", err);
+            console.error("Failed to fetch feedback data:", err);
+            // Set empty state or error state if needed
+            setFeedbackData({});
+          })
+          .finally(() => {
+            setLoading(false);
           });
+      }, []); // Empty dependency array means this effect runs once on mount
 
-        // 격려 버튼 로직
-        const encourageBtn = document.getElementById("encourage-btn");
-        encourageBtn.addEventListener("click", function () {
-          this.innerHTML =
-            '<i class="fas fa-heart"></i> 응원해주셔서 감사해요! ❤️';
-          this.style.background = "#F96C50";
-          this.style.color = "white";
-          this.style.border = "2px solid #F96C50";
-
-          setTimeout(() => {
-            this.innerHTML = "내일도 화이팅! 💪";
-            this.style.background = "linear-gradient(135deg, #FFE5E0, #FFF0ED)";
-            this.style.color = "#F96C50";
-            this.style.border = "2px solid #F96C50";
-          }, 2000);
-        });
-      });
-
-      // 피드백 모달 열기
-      function openFeedbackModal() {
-        document.getElementById("feedbackModal").style.display = "block";
-        document.body.style.overflow = "hidden";
+      if (loading) {
+        return (
+          <>
+            <Header />
+            <div className="main-container">
+              <div style={{textAlign: 'center', marginTop: '50px'}}>로딩 중...</div>
+            </div>
+            <Footer />
+          </>
+        ); // Or a proper loading spinner
       }
 
-      // 피드백 모달 닫기
-      function closeFeedbackModal() {
-        document.getElementById("feedbackModal").style.display = "none";
-        document.body.style.overflow = "auto";
-      }
+      const encouragementSubtitle = feedbackData ?
+        feedbackData.feedback.encouragement
+        : '데이터 로딩에 실패했어요.';
 
-      // 모달 외부 클릭 시 닫기
-      window.onclick = function (event) {
-        const modal = document.getElementById("feedbackModal");
-        if (event.target === modal) {
-          closeFeedbackModal();
-        }
-      };
+      return (
+        <>
+          <Header />
+          <div className="main-container">
+            <div className="page-title">
+              <h1>오늘의 학습 피드백 📅</h1>
+              <p>{feedbackData?.date || "— — — — — 학습 결과를 확인해보세요"}</p>
+            </div>
 
-      // 만족도 입력 로직
-      document.addEventListener("DOMContentLoaded", function () {
-        // 만족도 이모티콘 선택
-        const emojiRating = document.getElementById("emoji-rating");
-        const selectedRating = document.getElementById("selected-rating");
-        const satisfactionText = document.getElementById("satisfaction-text");
-        const submitBtn = document.getElementById("satisfaction-submit");
-        const resultDiv = document.getElementById("satisfaction-result");
-        let ratingValue = 0;
+            <div className="card">
+              <h2 className="card-title">
+                <i className="fas fa-chart-line"></i>
+                오늘의 학습 요약
+              </h2>
 
-        emojiRating.querySelectorAll("span").forEach((span) => {
-          span.addEventListener("click", function () {
-            ratingValue = this.getAttribute("data-value");
-            emojiRating.querySelectorAll("span").forEach((s) => {
-              s.classList.remove("selected", "unselected");
-              if (s === this) {
-                s.classList.add("selected");
-              } else {
-                s.classList.add("unselected");
-              }
-            });
-            // 안내문구
-            const label = [
-              "매우 불만족",
-              "불만족",
-              "보통",
-              "만족",
-              "매우 만족",
-            ][ratingValue - 1];
-            selectedRating.textContent = `${label} (${this.textContent})`;
-            satisfactionText.style.display = "block";
-            submitBtn.style.display = "inline-block";
-            resultDiv.textContent = "";
-          });
-        });
+              <div className="summary-stats">
+                <div className="stat-item">
+                  <div className="stat-value">{feedbackData?.achievement != null ? feedbackData.achievement + "%" : "--%"}</div>
+                  <div className="stat-label">목표 달성률</div>
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: `${feedbackData?.achievement || 0}%` }}></div>
+                  </div>
+                </div>
+                <div className="stat-item">
+                  <div className="stat-value">
+                    {feedbackData?.totalTime != null ? `${Math.floor(feedbackData.totalTime / 60)}시간 ${(feedbackData.totalTime % 60)}분` : "--시간 --분"}
+                  </div>
+                  <div className="stat-label">총 학습 시간</div>
+                </div>
+              </div>
 
-        // textarea 자동 높이 조절
-        satisfactionText.addEventListener("input", function () {
-          this.style.height = "auto";
-          this.style.height = this.scrollHeight + "px";
-        });
+              {feedbackData?.comparisonText && (
+                <div className="comparison-text">
+                  <i className="fas fa-arrow-up"></i>
+                  {feedbackData.comparisonText}
+                </div>
+              )}
+              {!feedbackData?.comparisonText && (
+                <div className="comparison-text" style={{display: 'none'}}></div>
+              )}
+            </div>
 
-        // 제출 버튼
-        submitBtn.addEventListener("click", function () {
-          if (!ratingValue) {
-            resultDiv.style.color = "#F96C50";
-            resultDiv.textContent = "만족도를 선택해주세요!";
-            return;
-          }
-          const text = satisfactionText.value.trim();
-          const today = new Date();
-          const y = today.getFullYear();
-          const m = String(today.getMonth() + 1).padStart(2, "0");
-          const d = String(today.getDate()).padStart(2, "0");
-          const dateStr = `${y}년${m}월${d}일 계획 생성에 대한 피드백`;
-          const feedback = {
-            date: dateStr,
-            rating: ratingValue,
-            text: text,
-          };
-          // 저장 (localStorage에 피드백 저장해둠)
-          let arr = JSON.parse(
-            localStorage.getItem("planSatisfaction") || "[]"
-          );
-          arr.push(feedback);
-          localStorage.setItem("planSatisfaction", JSON.stringify(arr));
-          resultDiv.style.color = "#2D7A2D";
-          resultDiv.textContent = "피드백이 저장되었습니다. 감사합니다!";
-          // 초기화
-          satisfactionText.value = "";
-          selectedRating.textContent = "";
-          emojiRating
-            .querySelectorAll("span")
-            .forEach((s) => s.classList.remove("selected", "unselected"));
-          satisfactionText.style.display = "none";
-          submitBtn.style.display = "none";
-          setTimeout(() => {
-            resultDiv.textContent = "";
-          }, 2500);
-        });
-      });
+            <div className="card">
+              <h2 className="card-title">
+                <i className="fas fa-book"></i>
+                오늘의 공부 목록
+              </h2>
+
+              <ul className="study-list">
+                {feedbackData?.studyItems?.length > 0 ? (
+                  feedbackData.studyItems.map((item, index) => (
+                    <li key={index} className="study-item">
+                      <span className="study-checkbox"><i className="fas fa-check"></i></span>
+                      <span className="study-text">{item}</span>
+                    </li>
+                  ))
+                ) : (
+                    <li className="study-item"><span className="study-text">학습 목록이 없습니다.</span></li>
+                  )}
+              </ul>
+            </div>
+
+            <div className="card feedback-card">
+              <h2 className="card-title">
+                <i className="fas fa-comment-dots"></i>
+                오늘의 피드백
+              </h2>
+
+              <div className="feedback-text">
+                {feedbackData?.feedback ? 
+                  <>
+                    <h3>🔍 학습 분석</h3>{feedbackData.feedback.analysis}<h3>💬 제안</h3>{feedbackData.feedback.suggestion}
+                  </> : (
+                    "피드백을 불러오지 못했습니다."
+                  )}
+              </div>
+            </div>
+
+            <SatisfactionSection />
+
+            <EncouragementSection encouragementText={encouragementSubtitle} />
+
+          </div>
+          <Footer />
+        </>
+      );
+    };
+
+    // Render the DailyFeedback component into the root div
+    root.render(<DailyFeedback />);
+
+    // Note: Original satisfaction text area height auto-adjust logic is often handled
+    // differently in React (e.g., using CSS resize or a dedicated library).
+    // The display logic is now handled by React state `showInput`.
     </script>
   </body>
 </html>
