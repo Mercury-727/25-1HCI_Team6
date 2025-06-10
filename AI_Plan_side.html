@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -63,6 +64,44 @@
         end: '22:00',
         emoji: '📚'
       });
+
+      useEffect(() => {
+
+
+        const saved = localStorage.getItem("userPlans");
+
+
+        if (saved) {
+
+
+          try {
+
+
+            setUserPlans(JSON.parse(saved));
+
+
+          } catch (e) {
+
+
+            console.error("저장된 일정 데이터를 불러오지 못했습니다.", e);
+
+
+          }
+
+
+        }
+
+
+      }, []);
+
+
+      useEffect(() => {
+
+
+        localStorage.setItem("userPlans", JSON.stringify(userPlans));
+
+
+      }, [userPlans]);
 
       useEffect(() => {
         lucide.createIcons();
@@ -409,8 +448,7 @@
                 return (
                   <div
                     key={plan.id}
-                    className="absolute left-16 right-4 bg-white border-2 border-orange-500 rounded-xl shadow-md hover:shadow-lg overflow-hidden cursor-pointer"
-                    style={{
+                    className={`absolute left-16 right-4 border-2 ${plan.done ? "border-green-300 bg-green-50" : "border-orange-500 bg-white"} rounded-xl shadow-md hover:shadow-lg overflow-hidden cursor-pointer`} style={{
                       top: `${topPx}px`,
                       height: `${heightPx}px`
                     }}
@@ -634,4 +672,5 @@
     ReactDOM.render(<StudyPlannerApp />, document.getElementById('root'));
   </script>
 </body>
+
 </html>
