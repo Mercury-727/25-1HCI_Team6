@@ -382,7 +382,7 @@
 
       // =============== 렌더링 ===============
       return (
-        <div className="max-w-md mx-auto bg-white min-h-screen relative overflow-hidden">
+        <div className="max-w-md mx-auto bg-white min-h-screen">
           {/* ─────────── 헤더 ─────────── */}
           <header className="bg-orange-50 p-3 border-b border-orange-100 sticky top-0 z-10 flex justify-between items-center">
             <h1 className="text-xl font-bold text-gray-800">My Plan</h1>
@@ -412,7 +412,7 @@
           </header>
 
           {/* ─────────── 메인 콘텐츠 ─────────── */}
-          <div className="flex h-full">
+          <div className="flex h-full relative overflow-hidden">
             {/* ◼ 스케줄 뷰 */}
             <div className={`w-full relative transition-transform duration-300 ${currentView === 'ai' ? '-translate-x-full' : 'translate-x-0'}`}>
               {/* ─ 시간 슬롯 그리드 (30분 단위만 렌더링) ─ */}
