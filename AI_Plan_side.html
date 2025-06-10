@@ -94,6 +94,11 @@
 
       }, []);
 
+      useEffect(() => {
+        if (currentView === 'ai') {
+          window.scrollTo({ top: 0 });
+        }
+      }, [currentView]);
 
       useEffect(() => {
 
