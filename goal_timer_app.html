@@ -171,8 +171,10 @@
     function App() {
       const [seconds, setSeconds] = useState(0);
       const [isRunning, setIsRunning] = useState(false);
-      const [phase, setPhase] = useState('timer'); // 'timer', 'confirm', 'achievement', 'feedback'
+      const [phase, setPhase] = useState('timer');
       const [achievement, setAchievement] = useState(50);
+      const [showResumeModal, setShowResumeModal] = useState(false);
+      const [resumeValue, setResumeValue] = useState(0);
 
       const planID = Number(localStorage.getItem("currentPlanID"));
       const plans = JSON.parse(localStorage.getItem("userPlans")) || [];
@@ -183,13 +185,16 @@
         start: "08:00",
         end: "09:00",
         id: 0,
-        done: false
+        done: false,
+        duration: 0,
+        achievement: 0
       };
       const [sh, sm] = plan.start.split(':').map(Number);
       const [eh, em] = plan.end.split(':').map(Number);
       const targetMinutes = (eh * 60 + em) - (sh * 60 + sm);
       const timerRef = useRef(null);
 
+      // 타이머 시작/중지
       useEffect(() => {
         if (isRunning) {
           timerRef.current = setInterval(() => setSeconds(prev => prev + 1), 1000);
@@ -198,6 +203,41 @@
         }
         return () => clearInterval(timerRef.current);
       }, [isRunning]);
+
+      // seconds가 바뀔 때마다 plans의 duration도 업데이트
+      useEffect(() => {
+        if (!plan || !plan.id) return;
+        const updatedPlans = plans.map(p =>
+          p.id === plan.id ? { ...p, duration: seconds } : p
+        );
+        localStorage.setItem("userPlans", JSON.stringify(updatedPlans));
+      }, [seconds, plan.id]);
+
+      // 페이지 로드 시 저장된 duration 불러오기 + resume modal
+      useEffect(() => {
+        if (!plan || !plan.id) return;
+        const saved = Number(plan.duration || 0);
+        if (!isNaN(saved) && saved > 0) {
+          setResumeValue(saved);
+          setShowResumeModal(true);
+        } else {
+          setSeconds(0);
+        }
+      }, [plan.id]);
+
+      const handleResume = (resume) => {
+        setShowResumeModal(false);
+        if (resume) {
+          setSeconds(resumeValue);
+        } else {
+          setSeconds(0);
+          // duration도 0으로 초기화
+          const updatedPlans = plans.map(p =>
+            p.id === plan.id ? { ...p, duration: 0 } : p
+          );
+          localStorage.setItem("userPlans", JSON.stringify(updatedPlans));
+        }
+      };
 
       const resetAll = () => {
         setSeconds(0);
@@ -209,7 +249,24 @@
       return (
         <div className="container">
           <GoalCard plan={plan}/>
-          {phase === 'timer' && (
+          {showResumeModal && (
+            <div style={{
+              position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
+              background: "rgba(0,0,0,0.3)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000
+            }}>
+              <div style={{
+                background: "#fff", borderRadius: 16, padding: 32, minWidth: 260, textAlign: "center", boxShadow: "0 4px 16px rgba(0,0,0,0.08)"
+              }}>
+                <h3>저장된 타이머가 있습니다</h3>
+                <p>이전에 저장된 시간 <b>{formatTime(resumeValue)}</b>부터 이어서 시작할까요?</p>
+                <div style={{marginTop: 20, display: "flex", gap: 12, justifyContent: "center"}}>
+                  <button className="btn start" onClick={() => handleResume(true)}>예</button>
+                  <button className="btn reset" onClick={() => handleResume(false)}>아니오</button>
+                </div>
+              </div>
+            </div>
+          )}
+          {!showResumeModal && phase === 'timer' && (
             <Timer
               seconds={seconds}
               isRunning={isRunning}
@@ -219,7 +276,7 @@
               targetMinutes={targetMinutes}
             />
           )}
-          {phase === 'confirm' && (
+          {!showResumeModal && phase === 'confirm' && (
             <div className="timer">
               <h3>실제로 종료하겠습니까?</h3>
               <div className="buttons">
@@ -228,10 +285,10 @@
               </div>
             </div>
           )}
-          {phase === 'achievement' && (
+          {!showResumeModal && phase === 'achievement' && (
             <AchievementInput onSubmit={(val) => { setAchievement(val); setPhase('feedback'); }} />
           )}
-          {phase === 'feedback' && (
+          {!showResumeModal && phase === 'feedback' && (
             <FeedbackCard plan={plan} seconds={seconds} achievement={achievement} />
           )}
         </div>
