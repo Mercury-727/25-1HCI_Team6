@@ -20,473 +20,466 @@
     <!-- Keep the inline styles as they are global -->
     <style>
     * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
 
     body {
-    font-family: "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: #fdf8f4;
-    color: #333;
-    line-height: 1.6;
+        font-family: "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
+        background-color: #fdf8f4;
+        max-width: 390px; /* Target max-width */
+        margin: 0 auto;
+        color: #333;
+        line-height: 1.6;
+        min-height: 100vh; /* Ensure body fills viewport height */
+        display: flex; /* Use flex to push footer down */
+        flex-direction: column; /* Arrange children vertically */
     }
 
     /* 상단 네비게이션 바 */
     .header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background-color: #fdf8f4;
-    padding: 12px 20px;
-    border-bottom: 1px solid #e8ddd4;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 1000;
+        position: sticky;
+        top: 0;
+        left: 0;
+        right: 0;
+        background-color: #fdf8f4;
+        padding: 12px 16px; /* Reduced horizontal padding */
+        border-bottom: 1px solid #e8ddd4;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 1000;
     }
 
     .logo {
-    display: flex;
-    align-items: center;
-    font-size: 18px;
-    font-weight: 700;
-    color: #f96c50;
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        font-weight: 700;
+        color: #f96c50;
     }
 
     .logo i {
-    margin-right: 8px;
-    font-size: 24px;
+        margin-right: 8px;
+        font-size: 22px; /* Slightly smaller icon */
     }
 
     .header-actions {
-    display: flex;
-    gap: 16px;
+        display: flex;
+        gap: 12px; /* Reduced gap */
     }
 
     .header-btn {
-    background: none;
-    border: none;
-    font-size: 20px;
-    color: #666;
-    cursor: pointer;
-    transition: color 0.3s ease;
+        background: none;
+        border: none;
+        padding: 8px;
+        border-radius: 8px;
+        color: #DD6B20;
+        cursor: pointer;
+        transition: all 0.2s ease;
     }
 
     .header-btn:hover {
-    color: #f96c50;
+        background: #FFF3E0;
+        transform: scale(1.05);
     }
 
     /* 메인 컨테이너 */
     .main-container {
-    margin-top: 80px;
-    padding: 20px;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
+        margin-top: 60px; /* Adjusted margin-top */
+        padding: 16px; /* Reduced padding */
+        width: 100%; /* Ensure it fills the body width */
+        flex-grow: 1; /* Allow main content to grow */
     }
 
     /* 페이지 타이틀 */
     .page-title {
-    text-align: center;
-    margin-bottom: 30px;
+        text-align: center;
+        margin-bottom: 24px; /* Adjusted margin */
     }
 
     .page-title h1 {
-    font-size: 28px;
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 8px;
+        font-size: 24px; /* Reduced font size */
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 4px; /* Reduced margin */
     }
 
     .page-title p {
-    font-size: 16px;
-    color: #666;
+        font-size: 14px; /* Reduced font size */
+        color: #666;
     }
 
     /* 카드 공통 스타일 */
     .card {
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    border: 1px solid #f0f0f0;
+        background: white;
+        border-radius: 12px; /* Slightly smaller border-radius */
+        padding: 16px; /* Reduced padding */
+        margin-bottom: 16px; /* Reduced margin-bottom */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Slightly softer shadow */
+        border: 1px solid #f0f0f0;
     }
 
     .card-title {
-    font-size: 20px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
+        font-size: 18px; /* Reduced font size */
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 12px; /* Reduced margin */
+        display: flex;
+        align-items: center;
     }
 
     .card-title i {
-    margin-right: 8px;
-    color: #f96c50;
+        margin-right: 8px;
+        color: #f96c50;
+        font-size: 1.1em; /* Relative size */
     }
 
     /* 오늘의 학습 요약 */
     .summary-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    margin-bottom: 20px;
+        display: grid;
+        /* minmax(200px, 1fr) would likely cause overflow on 390px - padding */
+        /* Let grid handle it naturally, or explicitly set to 1fr on small screens */
+        /* As per previous logic, the media query handles this better,
+           but let's make the base definition reasonable too */
+         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Adjusted minmax */
+        gap: 16px; /* Reduced gap */
+        margin-bottom: 16px; /* Reduced margin */
     }
 
     .stat-item {
-    text-align: center;
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 12px;
+        text-align: center;
+        padding: 16px; /* Reduced padding */
+        background: #f8f9fa;
+        border-radius: 10px; /* Slightly smaller border-radius */
     }
 
     .stat-value {
-    font-size: 32px;
-    font-weight: 700;
-    color: #f96c50;
-    margin-bottom: 4px;
+        font-size: 24px; /* Reduced font size */
+        font-weight: 700;
+        color: #f96c50;
+        margin-bottom: 4px;
     }
 
     .stat-label {
-    font-size: 14px;
-    color: #666;
+        font-size: 13px; /* Slightly smaller font size */
+        color: #666;
     }
 
     .progress-bar {
-    width: 100%;
-    height: 8px;
-    background: #e8ddd4;
-    border-radius: 4px;
-    overflow: hidden;
-    margin: 16px 0;
+        width: 100%;
+        height: 6px; /* Reduced height */
+        background: #e8ddd4;
+        border-radius: 3px; /* Reduced border-radius */
+        overflow: hidden;
+        margin: 10px 0; /* Reduced margin */
     }
 
     .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #f96c50, #ff8a75);
-    width: 0%;
-    border-radius: 4px;
-    transition: width 0.5s ease;
+        height: 100%;
+        background: linear-gradient(90deg, #f96c50, #ff8a75);
+        width: 0%; /* Initial width */
+        border-radius: 3px; /* Match parent */
+        transition: width 0.5s ease;
     }
 
     .comparison-text {
-    background: #e8f5e8;
-    padding: 12px 16px;
-    border-radius: 8px;
-    color: #2d7a2d;
-    font-size: 14px;
-    border-left: 4px solid #4caf50;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+        background: #e8f5e8;
+        padding: 10px 12px; /* Reduced padding */
+        border-radius: 6px; /* Reduced border-radius */
+        color: #2d7a2d;
+        font-size: 13px; /* Reduced font size */
+        border-left: 3px solid #4caf50; /* Reduced border width */
+        display: flex;
+        align-items: center;
+        gap: 6px; /* Reduced gap */
     }
 
     /* 오늘의 공부 목록 */
     .study-list {
-    list-style: none;
+        list-style: none;
     }
 
     .study-item {
-    display: flex;
-    align-items: center;
-    padding: 16px 0;
-    border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        align-items: flex-start; /* Align items to start in case text wraps */
+        padding: 12px 0; /* Reduced padding */
+        border-bottom: 1px solid #f0f0f0;
     }
 
     .study-item:last-child {
-    border-bottom: none;
+        border-bottom: none;
     }
 
     .study-checkbox {
-    width: 20px;
-    height: 20px;
-    border: 2px solid #f96c50;
-    border-radius: 4px;
-    margin-right: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f96c50;
-    color: white;
-    font-size: 12px;
+        min-width: 18px; /* Reduced width */
+        width: 18px; /* Reduced width */
+        height: 18px; /* Reduced height */
+        border: 2px solid #f96c50;
+        border-radius: 4px;
+        margin-right: 12px; /* Reduced margin */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f96c50;
+        color: white;
+        font-size: 10px; /* Reduced font size */
+        flex-shrink: 0; /* Prevent shrinking */
+        margin-top: 2px; /* Adjust vertical alignment */
     }
 
     .study-text {
-    font-size: 16px;
-    color: #333;
+        font-size: 15px; /* Slightly reduced font size */
+        color: #333;
+        word-break: break-word; /* Ensure long words break */
     }
 
     /* 오늘의 피드백 */
     .feedback-card {
-    background: linear-gradient(135deg, #fff5f3, #fff8f7);
-    border-left: 4px solid #f96c50;
+        background: linear-gradient(135deg, #fff5f3, #fff8f7);
+        border-left: 3px solid #f96c50; /* Reduced border width */
     }
 
     .feedback-text {
-    font-size: 16px;
-    line-height: 1.8;
-    color: #444;
-    padding: 16px;
-    background: rgba(255, 255, 255, 0.7);
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+        font-size: 15px; /* Slightly reduced font size */
+        line-height: 1.7; /* Slightly adjusted line height */
+        color: #444;
+        padding: 12px; /* Reduced padding */
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
     }
+     .feedback-text h3 {
+         font-size: 16px; /* Ensure heading inside feedback text is readable */
+         margin-bottom: 4px; /* Space below heading */
+         color: #E14A2E; /* Match header/logo color */
+     }
+
 
     /* 상호작용 버튼 */
     .action-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin-top: 32px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px; /* Reduced gap */
+        margin-top: 24px; /* Reduced margin */
     }
 
-    .btn-primary {
-    background: #f96c50;
-    color: white;
-    border: none;
-    padding: 16px 24px;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    .btn-primary, .btn-secondary {
+        width: 100%; /* Make buttons full width on small screens */
+        padding: 14px 20px; /* Adjusted padding */
+        border-radius: 10px; /* Adjusted border-radius */
+        font-size: 15px; /* Adjusted font size */
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none; /* Ensure buttons used as links look correct */
     }
+
 
     .btn-primary:hover {
-    background: #e85a3f;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(249, 108, 80, 0.3);
+        background: #e85a3f;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(249, 108, 80, 0.25); /* Adjusted shadow */
     }
 
     .btn-secondary {
-    background: linear-gradient(135deg, #ffe5e0, #fff0ed);
-    color: #f96c50;
-    border: 2px solid #f96c50;
-    padding: 16px 24px;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
+        background: linear-gradient(135deg, #ffe5e0, #fff0ed);
+        color: #f96c50;
+        border: 2px solid #f96c50;
     }
 
     .btn-secondary:hover {
-    background: #f96c50;
-    color: white;
-    transform: translateY(-2px);
+        background: #f96c50;
+        color: white;
+        transform: translateY(-2px);
     }
 
+
     .encouragement-section {
-    text-align: center;
-    padding: 32px 24px;
-    background: linear-gradient(135deg, #fff8f7, #fff5f3);
-    border-radius: 16px;
-    margin: 32px 0;
+        text-align: center;
+        padding: 24px 16px; /* Reduced padding */
+        background: linear-gradient(135deg, #fff8f7, #fff5f3);
+        border-radius: 12px; /* Adjusted border-radius */
+        margin: 24px 0; /* Reduced margin */
     }
 
     .encouragement-text {
-    font-size: 24px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+        font-size: 20px; /* Reduced font size */
+        font-weight: 600;
+        color: #333;
+        margin: 12px auto; /* Adjusted margin */
+        align-items: center;
+        gap: 8px;
+        word-break: break-word;
     }
 
     .encouragement-subtitle {
-    font-size: 16px;
-    color: #666;
-    margin-bottom: 24px;
+        font-size: 14px; /* Reduced font size */
+        color: #666;
+        margin-bottom: 20px; /* Adjusted margin */
+        word-break: break-word;
     }
 
     /* 하단 푸터 */
     .footer {
-    background: #faf5f1;
-    padding: 32px 20px;
-    text-align: center;
-    margin-top: 60px;
-    border-top: 1px solid #e8ddd4;
+        background: #faf5f1;
+        padding: 24px 16px; /* Reduced padding */
+        text-align: center;
+        margin-top: auto; /* Push footer to the bottom */
+        border-top: 1px solid #e8ddd4;
     }
 
     .footer-content {
-    max-width: 800px;
-    margin: 0 auto;
+        max-width: 800px; /* This is fine, limited by body */
+        margin: 0 auto;
     }
 
     .footer-links {
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    margin-bottom: 16px;
+        display: flex;
+        flex-direction: column; /* Stack links on small screens */
+        gap: 12px; /* Reduced gap */
+        margin-bottom: 16px;
     }
 
     .footer-links a {
-    color: #666;
-    text-decoration: none;
-    font-size: 14px;
-    transition: color 0.3s ease;
+        color: #666;
+        text-decoration: none;
+        font-size: 13px; /* Reduced font size */
+        transition: color 0.3s ease;
     }
 
     .footer-links a:hover {
-    color: #f96c50;
+        color: #f96c50;
     }
 
     .footer-text {
-    font-size: 12px;
-    color: #999;
+        font-size: 11px; /* Reduced font size */
+        color: #999;
     }
 
     /* 모달 스타일 */
-    /* Note: Modal HTML is commented out, but styles are kept */
     .modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 2000;
-    animation: fadeIn 0.3s ease;
+        display: none; /* Controlled by JS */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 2000;
+        animation: fadeIn 0.3s ease;
     }
 
     .modal-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 32px;
-    border-radius: 16px;
-    max-width: 500px;
-    width: 90%;
-    animation: slideUp 0.3s ease;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 24px; /* Reduced padding */
+        border-radius: 12px; /* Reduced border-radius */
+        max-width: 360px; /* Adjusted max-width to fit within body */
+        width: calc(100% - 32px); /* Account for body padding if needed, or just use 90% */
+        width: 90%; /* Ensure it's 90% of viewport width */
+        animation: slideUp 0.3s ease;
     }
 
     .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px; /* Reduced margin */
     }
 
     .modal-title {
-    font-size: 20px;
-    font-weight: 600;
-    color: #333;
+        font-size: 18px; /* Reduced font size */
+        font-weight: 600;
+        color: #333;
     }
 
     .close-btn {
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: #666;
-    cursor: pointer;
+        background: none;
+        border: none;
+        font-size: 22px; /* Reduced font size */
+        color: #666;
+        cursor: pointer;
     }
 
-    /* 반응형 디자인 */
-    @media (max-width: 768px) {
-    .main-container {
-    padding: 16px;
-    }
-
-    .card {
-    padding: 20px;
-    }
-
-    .summary-stats {
-    grid-template-columns: 1fr;
-    gap: 16px;
-    }
-
-    .page-title h1 {
-    font-size: 24px;
-    }
-
-    .header {
-    padding: 12px 16px;
-    }
-
-    .footer-links {
-    flex-direction: column;
-    gap: 12px;
-    }
-    }
-
-    @keyframes fadeIn {
-    from {
-    opacity: 0;
-    }
-
-    to {
-    opacity: 1;
-    }
-    }
-
-    @keyframes slideUp {
-    from {
-    opacity: 0;
-    transform: translate(-50%, -40%);
-    }
-
-    to {
-    opacity: 1;
-    transform: translate(-50%, -50%);
-    }
-    }
-
+    /* Emoji rating styling */
     #emoji-rating span {
-    transition: all 0.2s;
-    border-radius: 50%;
-    padding: 2px 4px;
+        transition: all 0.2s;
+        border-radius: 50%;
+        padding: 2px 4px;
+        filter: grayscale(1); /* Start with grayscale */
+        opacity: 0.6; /* Start with reduced opacity */
+        transform: scale(1);
     }
+
+    #emoji-rating span:hover {
+         filter: grayscale(0); /* Remove grayscale on hover */
+         opacity: 1; /* Full opacity on hover */
+         transform: scale(1.1); /* Slight scale on hover */
+    }
+
 
     #emoji-rating span.selected {
-    transform: scale(1.3);
-    filter: none;
-    background: #fff0ed;
+        transform: scale(1.2); /* Slightly less scale when selected */
+        filter: none; /* Remove grayscale */
+        background: #fff0ed;
+        opacity: 1; /* Full opacity */
     }
 
     #emoji-rating span.unselected {
-    filter: grayscale(1);
-    opacity: 0.5;
-    transform: scale(1);
-    background: none;
+        filter: grayscale(1);
+        opacity: 0.5; /* More opacity for unselected */
+        transform: scale(1);
+        background: none;
     }
 
-    /* satisfaction-text styling from original CSS is refined slightly for React */
+    /* Satisfaction textarea */
     #satisfaction-text {
-    resize: vertical; /* Allow vertical resize */
-    overflow: auto; /* Show scrollbar if needed */
-    box-sizing: border-box;
-    width: 100%; /* Make it responsive */
-    max-width: 400px; /* Keep max width */
-    /* display handled by React state */
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 12px;
-    border-radius: 8px;
-    border: 1px solid #e8ddd4;
-    padding: 8px;
-    min-height: 40px; /* Prevent shrinking too much */
+        resize: vertical; /* Allow vertical resize */
+        overflow: auto; /* Show scrollbar if needed */
+        box-sizing: border-box;
+        width: 100%; /* Make it responsive */
+        /* max-width: 400px; Removed as body max-width handles this */
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 12px;
+        border-radius: 8px;
+        border: 1px solid #e8ddd4;
+        padding: 8px;
+        min-height: 60px; /* Increased min-height */
+        font-size: 14px; /* Consistent font size */
     }
+
+    /* Animation Keyframes */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from { transform: translate(-50%, -40%); opacity: 0; }
+        to { transform: translate(-50%, -50%); opacity: 1; }
+    }
+
+    /* Removed the redundant @media (max-width: 768px) block
+       as styles are adjusted for 390px directly or handled by flex/grid */
     </style>
 
     <!-- React and Babel CDNs -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
   </head>
   <body>
     <div id="root">
@@ -566,11 +559,17 @@
           MyStudy
         </div>
         <div className="header-actions">
-          <button className="header-btn" title="프로필">
-            <i className="fas fa-user"></i>
+          <button
+            onClick={(e) => {e.stopPropagation(); window.location.href = 'study_planner_home_(ver. REACT).html';}}
+            className="header-btn"
+          >
+            <i data-lucide="home" className="lucide" style={{ width: 20, height: 20 }} />
           </button>
-          <button className="header-btn" title="설정">
-            <i className="fas fa-cog"></i>
+          <button
+            onClick={() => window.location.reload() }
+            className="header-btn"
+          >
+            <i data-lucide="refresh-cw" className="lucide" style={{ width: 20, height: 20 }} />
           </button>
         </div>
       </header>
@@ -779,6 +778,12 @@
           });
       }, []); // Empty dependency array means this effect runs once on mount
 
+      useEffect(() => {
+        if (!loading) {
+          lucide.createIcons();
+        }
+      }, [loading]);
+
       if (loading) {
         return (
           <>
@@ -807,7 +812,7 @@
             <div className="card">
               <h2 className="card-title">
                 <i className="fas fa-chart-line"></i>
-                오늘의 학습 요약
+                학습 요약
               </h2>
 
               <div className="summary-stats">
@@ -840,7 +845,7 @@
             <div className="card">
               <h2 className="card-title">
                 <i className="fas fa-book"></i>
-                오늘의 공부 목록
+                학습 기록
               </h2>
 
               <ul className="study-list">
@@ -860,7 +865,7 @@
             <div className="card feedback-card">
               <h2 className="card-title">
                 <i className="fas fa-comment-dots"></i>
-                오늘의 피드백
+                피드백
               </h2>
 
               <div className="feedback-text">
@@ -883,12 +888,7 @@
       );
     };
 
-    // Render the DailyFeedback component into the root div
     root.render(<DailyFeedback />);
-
-    // Note: Original satisfaction text area height auto-adjust logic is often handled
-    // differently in React (e.g., using CSS resize or a dedicated library).
-    // The display logic is now handled by React state `showInput`.
     </script>
   </body>
 </html>

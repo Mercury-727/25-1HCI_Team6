@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>스터디 플래너 홈</title>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     /* --- 전체 CSS (원본과 동일) --- */
@@ -50,15 +51,15 @@
     .header-btn {
       background: none;
       border: none;
-      font-size: 18px;
       padding: 8px;
       border-radius: 8px;
+      color: #DD6B20;
       cursor: pointer;
       transition: all 0.2s ease;
     }
 
     .header-btn:hover {
-      background: rgba(249, 108, 80, 0.1);
+      background: #FFF3E0;
       transform: scale(1.05);
     }
 
@@ -86,7 +87,6 @@
       text-align: center;
       position: relative;
       overflow: hidden;
-      cursor: pointer;
     }
 
     @keyframes shine {
@@ -151,6 +151,33 @@
     width: 0%;
     border-radius: 3px; /* Adjusted for height */
     transition: width 0.5s ease;
+    }
+
+    .summary-feedback-btn {
+      background: none;
+      border: 1px solid #F96C50;
+      color: #F96C50;
+      padding: 8px 15px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 16px;
+      display: block;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .summary-feedback-btn:hover {
+      background: #F96C50;
+      color: white;
+      transform: scale(1.02);
+    }
+
+    .summary-feedback-btn:active {
+      transform: scale(0.98);
     }
 
     .ai-plan-card {
@@ -452,10 +479,10 @@
                 [0, 0]
             );
         const totalHours = Math.floor(totalDuration / 3600);
-        const totalMinutes = Math.floor(totalDuration / 60);
+        const totalMinutes = Math.floor(totalDuration / 60) % 60;
 
-        return (
-            <section className="card daily-summary" onClick={e => { e.stopPropagation(); window.location.href = "daily_Feedback.html"; }}>
+        return totalDuration > 0 ? (
+            <section className="card daily-summary">
                 <h3>오늘의 학습 요약</h3>
                 <div className="summary-stats">
                     <div className="stat-item">
@@ -472,8 +499,14 @@
                         <div className="stat-label">총 학습 시간</div>
                     </div>
                 </div>
+                <button
+                    className="summary-feedback-btn"
+                    onClick={() => { window.location.href = "daily_Feedback.html"; }}
+                >
+                    오늘의 피드백 보기
+                </button>
             </section>
-        );
+        ) : (<></>);
     }
 
     function StudyPlannerHome() {
@@ -545,6 +578,10 @@
         }
       }, []);
 
+      useEffect(() => {
+        lucide.createIcons();
+      }, []);
+
       const alertMsg = msg => alert(msg + ' 기능이 실행됩니다!');
 
       return (
@@ -554,24 +591,9 @@
             <div className="header-buttons">
               <button
                 className="header-btn"
-                onClick={() => {
-                  window.location.href = "setting.html";
-                }}
+                onClick={() => window.location.reload()}
               >
-                ⚙️
-              </button>
-              <button
-                className="header-btn"
-                onClick={() => {
-                  const btn = document.querySelector('.header-btn:last-child');
-                  btn.style.transform = 'rotate(360deg)';
-                  setTimeout(() => {
-                    btn.style.transform = 'rotate(0deg)';
-                    alertMsg('페이지가 새로고침되었습니다');
-                  }, 500);
-                }}
-              >
-                🔄
+                <i data-lucide="refresh-cw" className="lucide" style={{ width: 20, height: 20 }} />
               </button>
             </div>
           </header>
