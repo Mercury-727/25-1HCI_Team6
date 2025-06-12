@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>스터디 플래너 홈</title>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     /* --- 전체 CSS (원본과 동일) --- */
@@ -50,15 +51,15 @@
     .header-btn {
       background: none;
       border: none;
-      font-size: 18px;
       padding: 8px;
       border-radius: 8px;
+      color: #DD6B20;
       cursor: pointer;
       transition: all 0.2s ease;
     }
 
     .header-btn:hover {
-      background: rgba(249, 108, 80, 0.1);
+      background: #FFF3E0;
       transform: scale(1.05);
     }
 
@@ -577,6 +578,10 @@
         }
       }, []);
 
+      useEffect(() => {
+        lucide.createIcons();
+      }, []);
+
       const alertMsg = msg => alert(msg + ' 기능이 실행됩니다!');
 
       return (
@@ -586,24 +591,9 @@
             <div className="header-buttons">
               <button
                 className="header-btn"
-                onClick={() => {
-                  window.location.href = "setting.html";
-                }}
+                onClick={() => window.location.reload()}
               >
-                ⚙️
-              </button>
-              <button
-                className="header-btn"
-                onClick={() => {
-                  const btn = document.querySelector('.header-btn:last-child');
-                  btn.style.transform = 'rotate(360deg)';
-                  setTimeout(() => {
-                    btn.style.transform = 'rotate(0deg)';
-                    alertMsg('페이지가 새로고침되었습니다');
-                  }, 500);
-                }}
-              >
-                🔄
+                <i data-lucide="refresh-cw" className="lucide" style={{ width: 20, height: 20 }} />
               </button>
             </div>
           </header>
