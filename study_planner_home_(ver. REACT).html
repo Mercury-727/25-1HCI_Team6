@@ -593,7 +593,15 @@
 
             <section className="card recommended-activities">
               <h3>📚 추천 학습 활동</h3>
-              <div className="activity-scroll">
+              <div className="activity-scroll"onWheel={e => {
+                    // 마우스 해당 칸에 올려두면 세로 스크롤을 가로 스크롤로 변환
+                    if (e.deltaY !== 0) {
+                      e.preventDefault();
+                      e.currentTarget.scrollLeft += e.deltaY;
+                    }
+                  }}
+                  style={{ cursor: "grab" }} // UX 개선
+              >  
                 {
                   userPlans
                     .filter(p => !p.done) // 1. 완료 안 된 것만
