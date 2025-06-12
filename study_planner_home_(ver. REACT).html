@@ -86,7 +86,6 @@
       text-align: center;
       position: relative;
       overflow: hidden;
-      cursor: pointer;
     }
 
     @keyframes shine {
@@ -151,6 +150,33 @@
     width: 0%;
     border-radius: 3px; /* Adjusted for height */
     transition: width 0.5s ease;
+    }
+
+    .summary-feedback-btn {
+      background: none;
+      border: 1px solid #F96C50;
+      color: #F96C50;
+      padding: 8px 15px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 16px;
+      display: block;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .summary-feedback-btn:hover {
+      background: #F96C50;
+      color: white;
+      transform: scale(1.02);
+    }
+
+    .summary-feedback-btn:active {
+      transform: scale(0.98);
     }
 
     .ai-plan-card {
@@ -452,10 +478,10 @@
                 [0, 0]
             );
         const totalHours = Math.floor(totalDuration / 3600);
-        const totalMinutes = Math.floor(totalDuration / 60);
+        const totalMinutes = Math.floor(totalDuration / 60) % 60;
 
-        return (
-            <section className="card daily-summary" onClick={e => { e.stopPropagation(); window.location.href = "daily_Feedback.html"; }}>
+        return totalDuration > 0 ? (
+            <section className="card daily-summary">
                 <h3>오늘의 학습 요약</h3>
                 <div className="summary-stats">
                     <div className="stat-item">
@@ -472,8 +498,14 @@
                         <div className="stat-label">총 학습 시간</div>
                     </div>
                 </div>
+                <button
+                    className="summary-feedback-btn"
+                    onClick={() => { window.location.href = "daily_Feedback.html"; }}
+                >
+                    오늘의 피드백 보기
+                </button>
             </section>
-        );
+        ) : (<></>);
     }
 
     function StudyPlannerHome() {
