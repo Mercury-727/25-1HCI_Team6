@@ -757,6 +757,51 @@
       );
     };
 
+    // DailySummary 컴포넌트 추가
+    function DailySummary() {
+      // localStorage에서 userPlans 불러오기
+      const userPlans = JSON.parse(localStorage.getItem("userPlans") || "[]");
+
+      // 완료된 계획만 필터
+      const donePlans = userPlans.filter(p => p.done);
+
+      // 목표 달성률(가중평균)과 총 학습 시간(초)
+      const [averageAchievement, totalDuration] = donePlans.reduce(
+        ([avg, weight], plan) => [
+          Math.floor((avg * weight + plan.achievement * plan.duration) / (weight + plan.duration)),
+          weight + plan.duration
+        ],
+        [0, 0]
+      );
+
+      const totalHours = Math.floor(totalDuration / 3600);
+      const totalMinutes = Math.floor((totalDuration % 3600) / 60);
+
+      return (
+        <section className="card daily-summary">
+          <h2 className="card-title">
+            <i className="fas fa-chart-line"></i>
+            오늘의 학습 요약
+          </h2>
+          <div className="summary-stats">
+            <div className="stat-item">
+              <div className="stat-value">{averageAchievement}%</div>
+              <div className="stat-label">목표 달성률</div>
+              <div className="progress-bar">
+                <div className="progress-fill" style={{ width: `${averageAchievement}%` }}></div>
+              </div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-value">
+                {totalHours}시간 {totalMinutes}분
+              </div>
+              <div className="stat-label">총 학습 시간</div>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
     // Main App Component
     function DailyFeedback() {
       const [feedbackData, setFeedbackData] = useState(null);
@@ -771,13 +816,12 @@
           })
           .catch((err) => {
             console.error("Failed to fetch feedback data:", err);
-            // Set empty state or error state if needed
             setFeedbackData({});
           })
           .finally(() => {
             setLoading(false);
           });
-      }, []); // Empty dependency array means this effect runs once on mount
+      }, []);
 
       if (loading) {
         return (
@@ -788,7 +832,7 @@
             </div>
             <Footer />
           </>
-        ); // Or a proper loading spinner
+        );
       }
 
       const encouragementSubtitle = feedbackData ?
@@ -804,38 +848,8 @@
               <p>{feedbackData?.date || "— — — — — 학습 결과를 확인해보세요"}</p>
             </div>
 
-            <div className="card">
-              <h2 className="card-title">
-                <i className="fas fa-chart-line"></i>
-                오늘의 학습 요약
-              </h2>
-
-              <div className="summary-stats">
-                <div className="stat-item">
-                  <div className="stat-value">{feedbackData?.achievement != null ? feedbackData.achievement + "%" : "--%"}</div>
-                  <div className="stat-label">목표 달성률</div>
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: `${feedbackData?.achievement || 0}%` }}></div>
-                  </div>
-                </div>
-                <div className="stat-item">
-                  <div className="stat-value">
-                    {feedbackData?.totalTime != null ? `${Math.floor(feedbackData.totalTime / 60)}시간 ${(feedbackData.totalTime % 60)}분` : "--시간 --분"}
-                  </div>
-                  <div className="stat-label">총 학습 시간</div>
-                </div>
-              </div>
-
-              {feedbackData?.comparisonText && (
-                <div className="comparison-text">
-                  <i className="fas fa-arrow-up"></i>
-                  {feedbackData.comparisonText}
-                </div>
-              )}
-              {!feedbackData?.comparisonText && (
-                <div className="comparison-text" style={{display: 'none'}}></div>
-              )}
-            </div>
+            {/* 기존 요약 카드 대신 DailySummary 사용 */}
+            <DailySummary />
 
             <div className="card">
               <h2 className="card-title">
