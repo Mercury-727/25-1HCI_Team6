@@ -2,28 +2,83 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>목표 달성 타이머</title>
+  <title>학습 활동</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     body {
-      font-family: 'Noto Sans KR', sans-serif;
-      background: #fdf8f4;
-      padding: 20px;
+      font-family: 'Noto Sans KR', 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #FDF8F4;
+      color: #333;
+      line-height: 1.5;
+      max-width: 390px;
+      margin: 0 auto;
+      min-height: 100vh;
     }
+
+    .header {
+        position: sticky;
+        top: 0;
+        left: 0;
+        right: 0;
+        background-color: #fdf8f4;
+        padding: 12px 16px; /* Reduced horizontal padding */
+        border-bottom: 1px solid #e8ddd4;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        font-weight: 700;
+        color: #f96c50;
+    }
+
+    .logo i {
+        margin-right: 8px;
+        font-size: 22px; /* Slightly smaller icon */
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px; /* Reduced gap */
+    }
+
+    .header-btn {
+        background: none;
+        border: none;
+        padding: 8px;
+        border-radius: 8px;
+        color: #DD6B20;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .header-btn:hover {
+        transform: scale(1.05);
+    }
+
     .container {
-      max-width: 400px;
+      max-width: 390px;
       margin: auto;
       text-align: center;
     }
+
     .goal-card {
-      background: linear-gradient(135deg, #e8e2f7, #f3f0ff);
+      background: linear-gradient(135deg, #FEE6DD 0%, #FFF3F0 100%);
       border-radius: 25px;
       padding: 20px;
-      margin-bottom: 20px;
+      margin: 20px auto;
     }
+
     .timer {
       background: white;
       border-radius: 30px;
@@ -36,7 +91,7 @@
       height: 200px;
       margin: auto;
     }
-    svg {
+    .svg-container svg {
       transform: rotate(-90deg);
     }
     .timer-text {
@@ -76,6 +131,30 @@
       const m = Math.floor(total / 60).toString().padStart(2, '0');
       const s = (total % 60).toString().padStart(2, '0');
       return `${m}:${s}`;
+    }
+
+    function Header() {
+        return (
+          <header className="header">
+            <div className="logo">My Study</div>
+            <div className="header-buttons">
+              <button
+                className="header-btn"
+                onClick={() => {
+                  window.location.href = "./home.html";
+                }}
+              >
+                <i data-lucide="home" className="lucide" style={{ width: 20, height: 20 }} />
+              </button>
+              <button
+                className="header-btn"
+                onClick={() => window.location.reload()}
+              >
+                <i data-lucide="refresh-cw" className="lucide" style={{ width: 20, height: 20 }} />
+              </button>
+            </div>
+          </header>
+        );
     }
 
     const GoalCard = ({ plan }) => (
@@ -162,7 +241,7 @@
             // reset currentPlanID
             localStorage.setItem("currentPlanID", JSON.stringify({}));
             // jump to home
-            window.location.href = "./study_planner_home_(ver. REACT).html";
+            window.location.href = "home.html";
           }}>확인</button>
         </div>
       );
@@ -199,6 +278,10 @@
         return () => clearInterval(timerRef.current);
       }, [isRunning]);
 
+      useEffect(() => {
+        lucide.createIcons();
+      }, []);
+
       const resetAll = () => {
         setSeconds(0);
         setIsRunning(false);
@@ -206,7 +289,8 @@
         setPhase('timer');
       };
 
-      return (
+      return (<>
+        <Header />
         <div className="container">
           <GoalCard plan={plan}/>
           {phase === 'timer' && (
@@ -221,7 +305,7 @@
           )}
           {phase === 'confirm' && (
             <div className="timer">
-              <h3>실제로 종료하겠습니까?</h3>
+              <h3>정말로 학습을 종료하시겠어요?</h3>
               <div className="buttons">
                 <button className="btn stop" onClick={() => setPhase('achievement')}>YES</button>
                 <button className="btn reset" onClick={() => setPhase('timer')}>NO</button>
@@ -235,7 +319,7 @@
             <FeedbackCard plan={plan} seconds={seconds} achievement={achievement} />
           )}
         </div>
-      );
+      </>);
     }
 
     const root = ReactDOM.createRoot(document.getElementById('root'));

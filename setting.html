@@ -11,6 +11,7 @@
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <!-- FontAwesome CDN 추가 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 
@@ -35,6 +36,27 @@
             display: flex;
             flex-direction: column;
             padding: 20px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px; /* Reduced gap */
+            justify-content: flex-end;
+        }
+
+        .header-btn {
+            background: none;
+            border: none;
+            padding: 8px;
+            border-radius: 8px;
+            color: #DD6B20;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .header-btn:hover {
+            background: none;
+            transform: scale(1.05);
         }
 
         .header {
@@ -437,6 +459,10 @@
                 }
             }, []);
 
+            useEffect(() => {
+                lucide.createIcons();
+            }, []);
+
             const hourOptions = Array.from({ length: 13 }, (_, i) => i); // 0~12시간
             const minuteOptions = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
 
@@ -472,6 +498,8 @@
                 }
 
                 alert('회원정보가 저장되었습니다.');
+
+                window.location.href = "./home.html";
             };
 
             // When grade changes, reset units
@@ -488,25 +516,28 @@
 
             return (
                 <div className="container">
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 8 }}>
+                    <div className="header-actions">
                         <button
-                            onClick={(e) => { e.stopPropagation(); window.location.href = 'study_planner_home_(ver. REACT).html'; }}
+                            onClick={(e) => { e.stopPropagation(); window.location.href = 'home.html'; }}
                             aria-label="메인화면"
+                            className="header-btn"
                             style={{
-                                border: 'none',
-                                background: 'none',
-                                cursor: 'pointer',
-                                color: '#E85A1F', // 회원정보 확인 및 수정의 색상
-                                fontSize: 20,
-                                padding: 0
+                                width: 20,
+                                height: 20
                             }}
                         >
-                            <i className="fas fa-home"></i>
+                            <i data-lucide="home" className="lucide" style={{ width: 20, height: 20 }} />
+                        </button>
+                        <button
+                            onClick={() => window.location.reload() }
+                            className="header-btn"
+                        >
+                            <i data-lucide="refresh-cw" className="lucide" style={{ width: 20, height: 20 }} />
                         </button>
                     </div>
                     <div className="header">
                         <h1>회원정보 확인 및 수정</h1>
-                        <p>기존 정보가 로드되었습니다. 필요한 부분을 수정 후 저장하세요.</p>
+                        <p>필요한 부분을 수정 후 저장해주세요.</p>
                     </div>
 
                     <div className="field-group">

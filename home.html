@@ -26,41 +26,49 @@
     }
 
     .header {
-      background: #FFF3F0;
-      padding: 12px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      backdrop-filter: blur(10px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+        position: sticky;
+        top: 0;
+        left: 0;
+        right: 0;
+        background-color: #fdf8f4;
+        padding: 12px 16px; /* Reduced horizontal padding */
+        border-bottom: 1px solid #e8ddd4;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 1000;
     }
 
     .logo {
-      font-size: 20px;
-      font-weight: 700;
-      color: #F96C50;
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        font-weight: 700;
+        color: #f96c50;
     }
 
-    .header-buttons {
-      display: flex;
-      gap: 8px;
+    .logo i {
+        margin-right: 8px;
+        font-size: 22px; /* Slightly smaller icon */
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px; /* Reduced gap */
     }
 
     .header-btn {
-      background: none;
-      border: none;
-      padding: 8px;
-      border-radius: 8px;
-      color: #DD6B20;
-      cursor: pointer;
-      transition: all 0.2s ease;
+        background: none;
+        border: none;
+        padding: 8px;
+        border-radius: 8px;
+        color: #DD6B20;
+        cursor: pointer;
+        transition: all 0.2s ease;
     }
 
     .header-btn:hover {
-      background: #FFF3E0;
-      transform: scale(1.05);
+        transform: scale(1.05);
     }
 
     .main-container {
@@ -467,13 +475,36 @@
 
       const currentPlanID = plan.id;
       localStorage.setItem("currentPlanID", JSON.stringify(currentPlanID));
-      window.location.href = "goal_timer_app.html";
+      window.location.href = "./timer.html";
+    }
+
+    function Header() {
+        return (
+          <header className="header">
+            <div className="logo">My Study</div>
+            <div className="header-buttons">
+              <button
+                className="header-btn"
+                onClick={() => {
+                  window.location.href = "./setting.html";
+                }}
+              >
+                <i data-lucide="settings" className="lucide" style={{ width: 20, height: 20 }} />
+              </button>
+              <button
+                className="header-btn"
+                onClick={() => window.location.reload()}
+              >
+                <i data-lucide="refresh-cw" className="lucide" style={{ width: 20, height: 20 }} />
+              </button>
+            </div>
+          </header>
+        );
     }
 
     function DailySummary({ userPlans }) {
-        console.log(userPlans);
-        const [averageAchievement, totalDuration] = userPlans
-            .filter(p => p.done)
+        const completedPlans = userPlans.filter(p => p.done);
+        const [averageAchievement, totalDuration] = completedPlans
             .reduce(
                 ([avg, weight], plan) => [Math.floor((avg * weight + plan.achievement * plan.duration) / (weight + plan.duration)), weight + plan.duration],
                 [0, 0]
@@ -481,7 +512,7 @@
         const totalHours = Math.floor(totalDuration / 3600);
         const totalMinutes = Math.floor(totalDuration / 60) % 60;
 
-        return totalDuration > 0 ? (
+        return (completedPlans.length > 0) ? (
             <section className="card daily-summary">
                 <h3>오늘의 학습 요약</h3>
                 <div className="summary-stats">
@@ -501,7 +532,7 @@
                 </div>
                 <button
                     className="summary-feedback-btn"
-                    onClick={() => { window.location.href = "daily_Feedback.html"; }}
+                    onClick={() => { window.location.href = "./feedback.html"; }}
                 >
                     오늘의 피드백 보기
                 </button>
@@ -586,25 +617,7 @@
 
       return (
         <>
-          <header className="header">
-            <div className="logo">My Study</div>
-            <div className="header-buttons">
-              <button
-                className="header-btn"
-                onClick={() => {
-                  window.location.href = "setting.html";
-                }}
-              >
-                ⚙️
-              </button>
-              <button
-                className="header-btn"
-                onClick={() => window.location.reload()}
-              >
-                <i data-lucide="refresh-cw" className="lucide" style={{ width: 20, height: 20 }} />
-              </button>
-            </div>
-          </header>
+          <Header />
 
           <main className="main-container">
             <DailySummary userPlans={userPlans} />
@@ -616,8 +629,7 @@
               <div className="ai-plan-text">🤖 AI가 오늘의 학습 계획을 짜드릴게요! 🗓️</div>
               <button className="ai-plan-btn" onClick={e => {
                 e.stopPropagation();
-                alertMsg('AI 학습 플랜 생성 페이지로 이동합니다! 🤖');
-                window.location.href = "./AI_Plan_side.html";
+                window.location.href = "./plan.html";
               }}>플랜 짜러 가기</button>
             </section>
 
@@ -784,7 +796,7 @@
           </main>
 
           {showFloating && (
-            <button className="floating-ai-btn" onClick={() => alertMsg('AI 학습 플랜 생성 페이지로 이동합니다! 🤖')}>
+            <button className="floating-ai-btn" onClick={() => window.location.href = "./plan.html" }>
               {showTooltip && <span className="tooltip show">학습 계획이 필요하신가요?</span>}
               🤖 AI 플랜 생성하기
             </button>
