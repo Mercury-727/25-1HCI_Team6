@@ -308,6 +308,8 @@
         const { useState } = React;
 
         const SignupApp = () => {
+            const totalSteps = 6;
+
             const [currentStep, setCurrentStep] = useState(1);
             const [selectedGrade, setSelectedGrade] = useState('');
             const [selectedMajorUnit, setSelectedMajorUnit] = useState('');
@@ -316,6 +318,11 @@
             const [weekdayMinute, setWeekdayMinute] = useState('');
             const [weekendHour, setWeekendHour] = useState('');
             const [weekendMinute, setWeekendMinute] = useState('');
+
+            const [schoolHour, setSchoolHour] = useState('');
+            const [schoolMinute, setSchoolMinute] = useState('');
+            const [bedHour, setBedHour] = useState('');
+            const [bedMinute, setBedMinute] = useState('');
 
             // EDT 검사용 상태
             const [forced1, setForced1] = useState('');
@@ -500,27 +507,19 @@
             };
 
             const hourOptions = Array.from({ length: 13 }, (_, i) => i);
+            const hourOptions24 = Array.from({ length: 24 }, (_, i) => i);
             const minuteOptions = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
 
-            const getProgress = () => {
-                return (currentStep / 5) * 100;
-            };
+            const getProgress = () => (currentStep / totalSteps) * 100;
 
             const canProceedToNextStep = () => {
                 switch (currentStep) {
-                    case 1:
-                        return selectedGrade !== '';
-                    case 2:
-                        return selectedMajorUnit !== '' && selectedMinorUnit !== '';
-                    case 3:
-                        return (
-                            weekdayHour !== '' && weekdayMinute !== '' &&
-                            weekendHour !== '' && weekendMinute !== ''
-                        );
-                    case 4:
-                        return forced1 && forced2 && forced3 && likert1 !== null && likert2 !== null && likert3 !== null;
-                    default:
-                        return false;
+                    case 1: return selectedGrade !== '';
+                    case 2: return selectedMajorUnit !== '' && selectedMinorUnit !== '';
+                    case 3: return weekdayHour !== '' && weekdayMinute !== '' && weekendHour !== '' && weekendMinute !== '';
+                    case 4: return schoolHour !== '' && schoolMinute !== '' && bedHour !== '' && bedMinute !== '';
+                    case 5: return forced1 && forced2 && forced3 && likert1 !== null && likert2 !== null && likert3 !== null;
+                    default: return false;
                 }
             };
 
@@ -584,31 +583,26 @@
             };
 
             const handleNext = () => {
-                if (canProceedToNextStep()) {
-                    if (currentStep === 4) {
-                        const typeInfo = calculateType();
-                        setResultType(typeInfo);
-                        // 가입 정보와 함께 학습 유형까지 localStorage에 저장
-                        const signupInfo = {
-                            grade: selectedGrade,
-                            majorUnit: selectedMajorUnit,
-                            minorUnit: selectedMinorUnit,
-                            weekdayHour,
-                            weekdayMinute,
-                            weekendHour,
-                            weekendMinute,
-                            forced1,
-                            forced2,
-                            forced3,
-                            likert1,
-                            likert2,
-                            likert3,
-                            learningType: typeInfo // 계산된 학습 유형
-                        };
-                        localStorage.setItem('signupInfo', JSON.stringify(signupInfo));
-                    }
-                    setCurrentStep(prev => Math.min(prev + 1, 5));
+                if (!canProceedToNextStep()) return;
+                if (currentStep === 5) {          // EDT 검사 완료 시
+                    const typeInfo = calculateType();
+                    setResultType(typeInfo);
+
+                    const signupInfo = {
+                        grade: selectedGrade,
+                        majorUnit: selectedMajorUnit,
+                        minorUnit: selectedMinorUnit,
+                        weekdayHour, weekdayMinute,
+                        weekendHour, weekendMinute,
+                        schoolHour, schoolMinute,
+                        bedHour, bedMinute,
+                        forced1, forced2, forced3,
+                        likert1, likert2, likert3,
+                        learningType: typeInfo
+                    };
+                    localStorage.setItem('signupInfo', JSON.stringify(signupInfo));
                 }
+                setCurrentStep(p => Math.min(p + 1, totalSteps));
             };
 
             const handlePrevious = () => {
@@ -745,15 +739,53 @@
                 </div>
             );
 
-            // STEP 4: EDT 학습 유형 검사
             const renderStep4 = () => (
                 <div>
+                    <div className="step-header"><div className="step-number">4</div><div className="step-title">등교·취침 시간 설정</div></div>
+
+                    {/* 등교 시간 */}
+                    <div style={{ marginBottom: "24px" }}>
+                        <label style={{ fontSize: "16px", fontWeight: 500, color: "#333" }}><span style={{ color: "#E85A1F" }}>등교</span> 시간</label>
+                        <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
+                            <select className="dropdown" style={{ width: "100px" }} value={schoolHour} onChange={e => setSchoolHour(e.target.value)}>
+                                <option value="">시간</option>
+                                {hourOptions24.map(h => <option key={h} value={h}>{h}시</option>)}
+                            </select>
+                            <span style={{ alignSelf: "center" }}>시</span>
+                            <select className="dropdown" style={{ width: "100px" }} value={schoolMinute} onChange={e => setSchoolMinute(e.target.value)}>
+                                <option value="">분</option>
+                                {minuteOptions.map(m => <option key={m} value={m}>{m}분</option>)}
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* 취침 시간 */}
+                    <div>
+                        <label style={{ fontSize: "16px", fontWeight: 500, color: "#333" }}><span style={{ color: "#E85A1F" }}>취침</span> 시간</label>
+                        <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
+                            <select className="dropdown" style={{ width: "100px" }} value={bedHour} onChange={e => setBedHour(e.target.value)}>
+                                <option value="">시간</option>
+                                {hourOptions24.map(h => <option key={h} value={h}>{h}시</option>)}
+                            </select>
+                            <span style={{ alignSelf: "center" }}>시</span>
+                            <select className="dropdown" style={{ width: "100px" }} value={bedMinute} onChange={e => setBedMinute(e.target.value)}>
+                                <option value="">분</option>
+                                {minuteOptions.map(m => <option key={m} value={m}>{m}분</option>)}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // STEP 5: EDT 학습 유형 검사
+            const renderStep5 = () => (
+                <div>
                     <div className="step-header">
-                        <div className="step-number">4</div>
+                        <div className="step-number">5</div>
                         <div className="step-title">EDT 학습유형 검사</div>
                     </div>
                     {/* 1. 공부를 하는 과정에서 내가 보다 중요하게 생각하는 것은? */}
-                    <h3 style={{margin: "24px 0 8px 0", color: "#E85A1F", fontSize: "17px"}}>1. 공부를 하는 과정에서 내가 보다 중요하게 생각하는 것은?</h3>
+                    <h3 style={{ margin: "24px 0 8px 0", color: "#E85A1F", fontSize: "17px" }}>1. 공부를 하는 과정에서 내가 보다 중요하게 생각하는 것은?</h3>
                     <div className="quiz-container">
                         {/* 강제선택 문항 */}
                         <div className={`quiz-item ${forced1 ? 'answered' : ''}`}>
@@ -806,7 +838,7 @@
                         </div>
                     </div>
                     {/* 2. 평소 공부하는 모습과 가까운 것은? */}
-                    <h3 style={{margin: "32px 0 8px 0", color: "#E85A1F", fontSize: "17px"}}>2. 평소 공부하는 모습과 가까운 것은?</h3>
+                    <h3 style={{ margin: "32px 0 8px 0", color: "#E85A1F", fontSize: "17px" }}>2. 평소 공부하는 모습과 가까운 것은?</h3>
                     <div className="quiz-container">
                         {/* Likert 척도 문항 */}
                         <div className={`quiz-item ${likert1 !== null ? 'answered' : ''}`}>
@@ -820,7 +852,7 @@
                                     >
                                         {val === 4 ? '매우 그렇다' :
                                             val === 3 ? '그렇다' :
-                                            val === 2 ? '아니다' : '전혀 아니다'}
+                                                val === 2 ? '아니다' : '전혀 아니다'}
                                     </div>
                                 ))}
                             </div>
@@ -837,7 +869,7 @@
                                     >
                                         {val === 4 ? '매우 그렇다' :
                                             val === 3 ? '그렇다' :
-                                            val === 2 ? '아니다' : '전혀 아니다'}
+                                                val === 2 ? '아니다' : '전혀 아니다'}
                                     </div>
                                 ))}
                             </div>
@@ -854,7 +886,7 @@
                                     >
                                         {val === 4 ? '매우 그렇다' :
                                             val === 3 ? '그렇다' :
-                                            val === 2 ? '아니다' : '전혀 아니다'}
+                                                val === 2 ? '아니다' : '전혀 아니다'}
                                     </div>
                                 ))}
                             </div>
@@ -863,33 +895,23 @@
                 </div>
             );
 
-            const renderStep5 = () => (
+            const renderStep6 = () => (
                 <div className="completion-message">
                     <h2>회원가입이 완료되었습니다!</h2>
                     <p>선택하신 정보를 바탕으로 맞춤형 학습을 시작해보세요.</p>
-                    <div style={{ marginTop: '24px', padding: '20px', background: 'white', borderRadius: '12px', textAlign: 'left' }}>
+                    <div style={{ marginTop: '24px', padding: '20px', background: '#fff', borderRadius: '12px', textAlign: 'left' }}>
                         <h3 style={{ color: '#E85A1F', marginBottom: '16px' }}>설정 정보</h3>
                         <p><strong>학년:</strong> {selectedGrade}</p>
                         <p><strong>대단원:</strong> {selectedMajorUnit}</p>
                         <p><strong>소단원:</strong> {selectedMinorUnit}</p>
-                        <p>
-                            <strong>평일 공부시간:</strong> {weekdayHour ? `${weekdayHour}시간` : ''}{weekdayMinute ? ` ${weekdayMinute}분` : ''}
-                            <br />
-                            <strong>주말 공부시간:</strong> {weekendHour ? `${weekendHour}시간` : ''}{weekendMinute ? ` ${weekendMinute}분` : ''}
-                        </p>
-                        <p>
-                            <strong>학습유형:</strong> {resultType ? resultType.name : '알 수 없음'}
-                        </p>
+                        <p><strong>평일 공부시간:</strong> {weekdayHour ? `${weekdayHour}시간` : ''}{weekdayMinute ? ` ${weekdayMinute}분` : ''}</p>
+                        <p><strong>주말 공부시간:</strong> {weekendHour ? `${weekendHour}시간` : ''}{weekendMinute ? ` ${weekendMinute}분` : ''}</p>
+                        <p><strong>등교 시간:</strong> {schoolHour !== '' ? `${schoolHour}시 ${schoolMinute}분` : ''}</p>
+                        <p><strong>취침 시간:</strong> {bedHour !== '' ? `${bedHour}시 ${bedMinute}분` : ''}</p>
+                        <p><strong>학습유형:</strong> {resultType ? resultType.name : '알 수 없음'}</p>
                     </div>
                     <div className="button-container">
-                        <button
-                            className="btn btn-secondary"
-                            onClick={() => {
-                                window.location.href = "home.html";
-                            }}
-                        >
-                            확인
-                        </button>
+                        <button className="btn btn-secondary" onClick={() => window.location.href = "home.html"}>확인</button>
                     </div>
                 </div>
             );
@@ -901,7 +923,7 @@
                         <p>단계별로 정보를 입력해주세요</p>
                     </div>
 
-                    {currentStep < 5 && (
+                    {currentStep < 6 && (
                         <div className="progress-bar">
                             <div className="progress-fill" style={{ width: `${getProgress()}%` }}></div>
                         </div>
@@ -913,8 +935,9 @@
                         {currentStep === 3 && renderStep3()}
                         {currentStep === 4 && renderStep4()}
                         {currentStep === 5 && renderStep5()}
+                        {currentStep === 6 && renderStep6()}
 
-                        {currentStep < 5 && (
+                        {currentStep < 6 && (
                             <div className="button-container">
                                 {currentStep > 1 && (
                                     <button
@@ -929,7 +952,7 @@
                                     onClick={handleNext}
                                     disabled={!canProceedToNextStep()}
                                 >
-                                    {currentStep === 4 ? '완료' : '다음'}
+                                    {currentStep === 5 ? '완료' : '다음'}
                                 </button>
                             </div>
                         )}
