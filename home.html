@@ -315,12 +315,6 @@
       gap: 12px;
       overflow-x: auto;
       padding-bottom: 8px;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-    }
-
-    .activity-scroll::-webkit-scrollbar {
-      display: none;
     }
 
     .activity-card {
@@ -624,7 +618,7 @@
 
             <section className="card ai-plan-card" onClick={() => {
               setShowFloating(f => !f);
-              alertMsg(f ? '상단 카드 버튼을 사용해보세요!' : '하단 플로팅 버튼이 활성화되었습니다!');
+              alertMsg(showFloating ? '상단 카드 버튼을 사용해보세요!' : '하단 플로팅 버튼이 활성화되었습니다!');
             }}>
               <div className="ai-plan-text">🤖 AI가 오늘의 학습 계획을 짜드릴게요! 🗓️</div>
               <button className="ai-plan-btn" onClick={e => {
