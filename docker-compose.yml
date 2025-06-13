@@ -1,0 +1,37 @@
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "22080:80"
+      - "22443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/letsencrypt:/etc/letsencrypt
+    depends_on:
+      - backend
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/letsencrypt:/etc/letsencrypt
+
+  backend:
+    build:
+      context: .
+    container_name: backend
+    expose:
+      - "8000"
+    secrets:
+      - openai_api_key
+    environment:
+      - OPENAI_API_KEY_FILE=/run/secrets/openai_api_key
+    entrypoint:
+      ["/root/dozi-api/entrypoint.sh", "poetry", "run", "gunicorn", "--bind", "0.0.0.0:8000", "--chdir", "backend", "--timeout", "60", "app:app"]
+
+secrets:
+  openai_api_key:
+    file: ./.openai-api-key
