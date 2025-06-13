@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>회원정보 확인 및 수정</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+        rel="stylesheet" />
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- FontAwesome CDN 추가 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+            background-color: #FDF8F4;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 40px;
+        }
+
+        .header h1 {
+            color: #E85A1F;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .field-group {
+            margin-bottom: 24px;
+        }
+
+        .field-label {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #333;
+            display: block;
+        }
+
+        .dropdown {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            background: white;
+            font-size: 16px;
+            font-family: inherit;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown:focus {
+            outline: none;
+            border-color: #E85A1F;
+        }
+
+        .dropdown:disabled {
+            background: #f8f8f8;
+            cursor: not-allowed;
+            color: #999;
+        }
+
+        .slider-container {
+            margin: 16px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #f0f0f0;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #E85A1F;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #E85A1F;
+            cursor: pointer;
+            border: none;
+        }
+
+        .time-selectors {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .file-info {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .button-container {
+            margin-top: auto;
+            padding: 20px 0;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #E85A1F;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #d14a17;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #E85A1F;
+            border: 2px solid #E85A1F;
+            margin-bottom: 12px;
+        }
+
+        .btn-secondary:hover {
+            background: #fff5f0;
+        }
+
+        .info-box {
+            background: white;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .info-item {
+            margin-bottom: 12px;
+        }
+
+        .info-label {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            color: #333;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 16px;
+            }
+
+            .header {
+                padding-top: 20px;
+                margin-bottom: 32px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const ProfileApp = () => {
+            // grade, unit selections, slider, times, and file states
+            const [selectedGrade, setSelectedGrade] = useState('');
+            const [selectedMajorUnit, setSelectedMajorUnit] = useState('');
+            const [selectedMinorUnit, setSelectedMinorUnit] = useState('');
+            const [positionValue, setPositionValue] = useState(50);
+            const [weekdayHour, setWeekdayHour] = useState('');
+            const [weekdayMinute, setWeekdayMinute] = useState('');
+            const [weekendHour, setWeekendHour] = useState('');
+            const [weekendMinute, setWeekendMinute] = useState('');
+            const [fileName, setFileName] = useState('');
+            const [fileData, setFileData] = useState('');
+
+            const grades = [
+                '1학년 1학기',
+                '1학년 2학기',
+                '2학년 1학기',
+                '2학년 2학기',
+                '3학년 1학기',
+                '3학년 2학기'
+            ];
+
+            const curriculum = {
+                '1학년 1학기': {
+                    "소인수분해": [
+                        "소수, 합성수",
+                        "거듭제곱, 밑, 지수",
+                        "소인수분해",
+                        "약수, 배수",
+                        "공약수, 최대공약수",
+                        "공배수, 최소공배수"
+                    ],
+                    "정수와 유리수": [
+                        "양수, 음수",
+                        "정수, 유리수",
+                        "절댓값",
+                        "유리수의 크기 비교",
+                        "정수와 유리수의 사칙연산",
+                        "정수와 유리수의 혼합계산"
+                    ],
+                    "문자와 식": [
+                        "문자, 식의 값 구하기",
+                        "단항식, 다항식",
+                        "일차식, 일차식의 연산",
+                        "등식, 방정식, 항등식, 해",
+                        "등식의 성질",
+                        "일차방정식"
+                    ],
+                    "좌표평면과 그래프": [
+                        "좌표, 순서쌍",
+                        "좌표평면, 사분면",
+                        "점의 좌표",
+                        "그래프의 해석",
+                        "정비례, 반비례",
+                        "정비례, 반비례 그래프"
+                    ]
+                },
+                '1학년 2학기': {
+                    "기본도형": [
+                        "점, 선, 면, 각",
+                        "거리, 맞꼭지각",
+                        "직교, 수선, 평행선",
+                        "직각",
+                        "합동, 삼각형의 합동 조건"
+                    ],
+                    "평면도형": [
+                        "다각형, 정다각형",
+                        "다각형의 성질",
+                        "대각선, 내각, 외각",
+                        "정다각형의 내각과 외각",
+                        "원, 부채꼴",
+                        "호, 현"
+                    ],
+                    "입체도형": [
+                        "다면체, 정다면체",
+                        "정다면체 전개도",
+                        "회전체",
+                        "원기둥, 원뿔, 구의 겉넓이",
+                        "원기둥, 원뿔, 구의 부피"
+                    ],
+                    "통계": [
+                        "줄기와 잎",
+                        "도수분포표",
+                        "히스토그램",
+                        "도수분포다각형",
+                        "상대도수",
+                        "상대도수분포표"
+                    ]
+                },
+                '2학년 1학기': {
+                    '수와 식(유리수와 소수 + 식의 계산)': [
+                        '유리수를 소수로 나타내기',
+                        '유한소수, 무한소수, 순환소수',
+                        '순환소수와 분수',
+                        '지수법칙',
+                        '단항식의 계산',
+                        '다항식의 계산'
+                    ],
+                    '부등식과 방정식': [
+                        '부등식',
+                        '부등식의 성질, 부등식의 성질',
+                        '일차부등식',
+                        '연립일차방정식',
+                        '연립일차방정식의 풀이'
+                    ],
+                    '함수': [
+                        '함수의 개념',
+                        '일차함수',
+                        '일차함수의 그래프, 절편',
+                        '일차함수의 활용',
+                        '연립일차방정식과 일차함수'
+                    ]
+                },
+
+                '2학년 2학기': {
+                    '도형의 성질': [
+                        '이동변삼각형의 성질, 조건',
+                        '직각삼각형의 합동 조건',
+                        '내심, 외심',
+                        '내심의 성질, 외심의 성질',
+                        '평행사변형의 성질, 조건',
+                        '여러 가지 사각형의 성질, 조건'
+                    ],
+                    '도형의 활용 + 피타고라스 정리': [
+                        '합동의 의미, 특징',
+                        '삼각형의 합동 조건',
+                        '닮은 도형의 성질, 닮음',
+                        '삼각형의 유사(닮음)',
+                        '닮은 도형의 길이, 넓이, 부피 구하기',
+                        '피타고라스 정리'
+                    ],
+                    '확률': [
+                        '경우의 수',
+                        '사건',
+                        '확률의 의미와 성질',
+                        '확률 구하기'
+                    ]
+                },
+                '3학년 1학기': {
+                    '제곱근과 실수': [
+                        '제곱근, 근호(√)',
+                        '제곱근의 크기 비교',
+                        '무리수, 실수',
+                        '실수의 크기 비교',
+                        '근호가 포함된 사칙연산',
+                        '분모의 유리화'
+                    ],
+                    '다항식의 곱셈과 인수분해': [
+                        '다항식의 곱셈, 식의 전개',
+                        '곱셈 공식',
+                        '인수분해'
+                    ],
+                    '이차방정식': [
+                        '이차방정식의 의미',
+                        '이차방정식의 풀이',
+                        '완전제곱식, 근의 공식'
+                    ],
+                    '이차함수': [
+                        '이차함수의 의미',
+                        '이차함수의 그래프',
+                        '완전제곱식이 포함된 이차함수',
+                        '이차식으로 나타낸 이차함수'
+                    ]
+                },
+
+                '3학년 2학기': {
+                    '삼각비': [
+                        '삼각비의 의미, 삼각비의 종류',
+                        '삼각비의 값 구하기',
+                        '삼각비 표',
+                        '삼각비를 이용해 길이 구하기',
+                        '삼각비를 이용해 넓이 구하기',
+                        '삼각형의 넓이 공식'
+                    ],
+                    '원의 성질': [
+                        '현의 의미, 현의 성질',
+                        '접선의 의미, 접선의 성질',
+                        '원주각, 호의 의미',
+                        '원주각의 성질'
+                    ],
+                    '통계': [
+                        '대표값, 평균, 중앙값, 최빈값',
+                        '산포도의 의미',
+                        '편차, 분산, 표준편차',
+                        '상대표준, 상관관계'
+                    ]
+                }
+            };
+
+            // Initialize from localStorage when component mounts
+            useEffect(() => {
+                const saved = localStorage.getItem('signupInfo');
+                if (saved) {
+                    try {
+                        const info = JSON.parse(saved);
+                        setSelectedGrade(info.grade || '');
+                        setSelectedMajorUnit(info.majorUnit || '');
+                        setSelectedMinorUnit(info.minorUnit || '');
+                        setPositionValue(info.positionValue ?? 50);
+                        setWeekdayHour(info.weekdayHour || '');
+                        setWeekdayMinute(info.weekdayMinute || '');
+                        setWeekendHour(info.weekendHour || '');
+                        setWeekendMinute(info.weekendMinute || '');
+                    } catch (e) {
+                        console.error('signupInfo 파싱 에러:', e);
+                    }
+                }
+                const savedFile = localStorage.getItem('testResult');
+                if (savedFile) {
+                    try {
+                        const { name, data } = JSON.parse(savedFile);
+                        setFileName(name);
+                        setFileData(data);
+                    } catch (e) {
+                        console.error('testResult 파싱 에러:', e);
+                    }
+                }
+            }, []);
+
+            const hourOptions = Array.from({ length: 13 }, (_, i) => i); // 0~12시간
+            const minuteOptions = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
+
+            // Handle file selection & convert to base64
+            const handleFileChange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    setFileName(file.name);
+                    setFileData(reader.result);
+                };
+                reader.readAsDataURL(file);
+            };
+
+            // Save all data back into localStorage
+            const handleSave = () => {
+                const signupInfo = {
+                    grade: selectedGrade,
+                    majorUnit: selectedMajorUnit,
+                    minorUnit: selectedMinorUnit,
+                    positionValue,
+                    weekdayHour,
+                    weekdayMinute,
+                    weekendHour,
+                    weekendMinute
+                };
+                localStorage.setItem('signupInfo', JSON.stringify(signupInfo));
+
+                if (fileName && fileData) {
+                    const toStore = { name: fileName, data: fileData };
+                    localStorage.setItem('testResult', JSON.stringify(toStore));
+                }
+
+                alert('회원정보가 저장되었습니다.');
+            };
+
+            // When grade changes, reset units
+            const handleGradeChange = (e) => {
+                setSelectedGrade(e.target.value);
+                setSelectedMajorUnit('');
+                setSelectedMinorUnit('');
+            };
+
+            const handleMajorChange = (e) => {
+                setSelectedMajorUnit(e.target.value);
+                setSelectedMinorUnit('');
+            };
+
+            return (
+                <div className="container">
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 8 }}>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); window.location.href = 'study_planner_home_(ver. REACT).html'; }}
+                            aria-label="메인화면"
+                            style={{
+                                border: 'none',
+                                background: 'none',
+                                cursor: 'pointer',
+                                color: '#E85A1F', // 회원정보 확인 및 수정의 색상
+                                fontSize: 20,
+                                padding: 0
+                            }}
+                        >
+                            <i className="fas fa-home"></i>
+                        </button>
+                    </div>
+                    <div className="header">
+                        <h1>회원정보 확인 및 수정</h1>
+                        <p>기존 정보가 로드되었습니다. 필요한 부분을 수정 후 저장하세요.</p>
+                    </div>
+
+                    <div className="field-group">
+                        <label className="field-label">학년</label>
+                        <select
+                            className="dropdown"
+                            value={selectedGrade}
+                            onChange={handleGradeChange}
+                        >
+                            <option value="">학년을 선택하세요</option>
+                            {grades.map((g, idx) => (
+                                <option key={idx} value={g}>{g}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="field-group">
+                        <label className="field-label">대단원</label>
+                        <select
+                            className="dropdown"
+                            value={selectedMajorUnit}
+                            onChange={handleMajorChange}
+                            disabled={!selectedGrade}
+                        >
+                            <option value="">대단원을 선택하세요</option>
+                            {selectedGrade &&
+                                Object.keys(curriculum[selectedGrade] || {}).map((unit, idx) => (
+                                    <option key={idx} value={unit}>{unit}</option>
+                                ))}
+                        </select>
+                    </div>
+
+                    <div className="field-group">
+                        <label className="field-label">소단원</label>
+                        <select
+                            className="dropdown"
+                            value={selectedMinorUnit}
+                            onChange={(e) => setSelectedMinorUnit(e.target.value)}
+                            disabled={!selectedMajorUnit}
+                        >
+                            <option value="">소단원을 선택하세요</option>
+                            {selectedMajorUnit &&
+                                (curriculum[selectedGrade]?.[selectedMajorUnit] || []).map((m, idx) => (
+                                    <option key={idx} value={m}>{m}</option>
+                                ))}
+                        </select>
+                    </div>
+
+                    <div className="field-group">
+                        <label className="field-label">학습 수준 ({positionValue}%)</label>
+                        <div className="slider-container">
+                            <input
+                                type="range"
+                                className="slider"
+                                min="0"
+                                max="100"
+                                step="1"
+                                value={positionValue}
+                                onChange={(e) => setPositionValue(parseInt(e.target.value))}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="field-group">
+                        <label className="field-label">
+                            <span style={{ color: '#E85A1F' }}>평일</span> 하루 평균 공부시간
+                        </label>
+                        <div className="time-selectors">
+                            <select
+                                className="dropdown"
+                                style={{ width: '100px' }}
+                                value={weekdayHour}
+                                onChange={(e) => setWeekdayHour(e.target.value)}
+                            >
+                                <option value="">시간</option>
+                                {hourOptions.map((h) => (
+                                    <option key={h} value={h}>{h}시간</option>
+                                ))}
+                            </select>
+                            <select
+                                className="dropdown"
+                                style={{ width: '100px' }}
+                                value={weekdayMinute}
+                                onChange={(e) => setWeekdayMinute(e.target.value)}
+                            >
+                                <option value="">분</option>
+                                {minuteOptions.map((m) => (
+                                    <option key={m} value={m}>{m}분</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="field-group">
+                        <label className="field-label">
+                            <span style={{ color: '#E85A1F' }}>주말</span> 하루 평균 공부시간
+                        </label>
+                        <div className="time-selectors">
+                            <select
+                                className="dropdown"
+                                style={{ width: '100px' }}
+                                value={weekendHour}
+                                onChange={(e) => setWeekendHour(e.target.value)}
+                            >
+                                <option value="">시간</option>
+                                {hourOptions.map((h) => (
+                                    <option key={h} value={h}>{h}시간</option>
+                                ))}
+                            </select>
+                            <select
+                                className="dropdown"
+                                style={{ width: '100px' }}
+                                value={weekendMinute}
+                                onChange={(e) => setWeekendMinute(e.target.value)}
+                            >
+                                <option value="">분</option>
+                                {minuteOptions.map((m) => (
+                                    <option key={m} value={m}>{m}분</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="field-group">
+                        <label className="field-label">NEO/심리검사 결과지 업로드</label>
+                        <input
+                            type="file"
+                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                            onChange={handleFileChange}
+                        />
+                        {fileName && (
+                            <div className="file-info">
+                                선택된 파일: <strong>{fileName}</strong>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="button-container">
+                        <button className="btn btn-primary" onClick={handleSave}>
+                            저장하기
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<ProfileApp />, document.getElementById('root'));
+    </script>
+</body>
+
+</html>
