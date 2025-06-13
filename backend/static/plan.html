@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>학습 계획</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React & ReactDOM -->
+  <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+  <!-- Babel for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Lucide Icons UMD -->
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      /* Prevent text selection during drag */
+      user-select: none;
+      -webkit-user-select: none; /* Safari */
+      -ms-user-select: none; /* IE 10+ */
+      -webkit-touch-callout: none; /* Prevent callout menu on iOS */
+      -webkit-tap-highlight-color: transparent; /* Prevent tap highlight */
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #FDF8F4;
+      color: #333;
+      line-height: 1.5;
+      max-width: 390px; /* Constrain body width */
+      margin: 0 auto; /* Center body */
+      min-height: 100vh;
+      position: relative; /* Needed for absolute positioning within body */
+       /* Default overflow */
+      overflow-y: auto;
+      overflow-x: hidden; /* Prevent horizontal scroll */
+    }
+
+    /* Class to disable scrolling */
+    body.no-scroll {
+        overflow-y: hidden;
+         /* Optional: prevent iOS rubber banding */
+         overscroll-behavior-y: contain;
+    }
+
+    /* Custom style for the main container to include padding for fixed elements */
+     .main-container {
+         /* padding-bottom will be added to the last time slot element instead */
+     }
+
+
+    /* REMOVE the custom .header rule to rely on Tailwind classes */
+    /*
+    .header {
+        position: sticky;
+        top: 0;
+        width: 100%;
+        background-color: #fdf8f4;
+        padding: 12px 16px;
+        border-bottom: 1px solid #e8ddd4;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 1000;
+        transition: filter 0.3s ease;
+    }
+    */
+
+    .header.blurred {
+      filter: blur(3px); /* Apply blur effect */
+      pointer-events: none; /* Prevent clicks when blurred */
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        font-weight: 700;
+        color: #f96c50;
+    }
+
+    .logo i {
+        margin-right: 8px;
+        font-size: 22px;
+    }
+
+    /* header-actions not used, but keeping for reference */
+    /*
+    .header-actions {
+        display: flex;
+        gap: 12px;
+    }
+    */
+
+    .header-btn {
+        background: none;
+        border: none;
+        padding: 8px;
+        border-radius: 8px;
+        color: #DD6B20;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .header-btn:hover {
+        transform: scale(1.05);
+    }
+
+    /* Custom style for fixed bottom bar to be centered and max-width */
+    .fixed-bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%; /* Position left edge at 50% of viewport width */
+      transform: translateX(-50%); /* Shift left by half its width */
+      width: 100%; /* Allow it to take full width up to max-width */
+      max-width: 390px; /* Constrain its width */
+      padding: 16px; /* Equivalent to p-4 */
+      background-color: white;
+      border-top: 1px solid #e8ddd4;
+      z-index: 40; /* Below modal, above main content */
+      box-sizing: border-box; /* Include padding in width */
+    }
+
+     /* Style for the add button now positioned relative to the body */
+    .add-plan-button {
+      position: absolute; /* Changed from fixed */
+      bottom: 96px; /* Equivalent to bottom-24 */
+      right: 16px; /* Equivalent to right-4, positioned relative to body's right edge */
+      background-color: #F96C50; /* bg-orange-500 */
+      color: white;
+      width: 56px; /* w-14 */
+      height: 56px; /* h-14 */
+      border-radius: 9999px; /* rounded-full */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 30; /* Below fixed bar */
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Add shadow */
+      cursor: pointer;
+    }
+
+     /* Prevent touch highlighting on plan cards - added to * */
+     /* .plan-card { } */
+
+
+     /* Style for resize handles */
+     .resize-handle {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 8px; /* Increased touch area */
+        cursor: ns-resize;
+        z-index: 20; /* Below buttons/icons, above card content */
+     }
+
+     .resize-handle.top {
+        top: -4px; /* Position outside the card border for better touch */
+     }
+
+     .resize-handle.bottom {
+        bottom: -4px; /* Position outside the card border for better touch */
+     }
+
+
+  </style>
+</head>
+
+<body className={`bg-gray-100 ${isDraggingOrResizing ? 'no-scroll' : ''}`}>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // Pass showModal prop to header
+    function Header({ showModal }) {
+        // Use Tailwind classes directly on the header element
+        // Removed the custom .header CSS rule and rely on these classes + the .header.blurred rule
+        return (
+          <header className={`w-full bg-orange-50 p-3 border-b border-orange-100 sticky top-0 z-10 flex justify-between items-center ${showModal ? 'blurred' : ''}`}>
+            <div className="logo">My Study</div>
+            <div className="header-buttons"> {/* Renamed from header-actions */}
+              <button
+                className="header-btn"
+                onClick={(e) => { e.stopPropagation(); window.location.href = "./home.html"; }}
+                aria-label="메인화면"
+              >
+                <i data-lucide="home" className="lucide" style={{ width: 20, height: 20, pointerEvents: 'none' }} /> {/* Add pointer-events: none */}
+              </button>
+              <button
+                className="header-btn"
+                onClick={(e) => { e.stopPropagation(); window.location.reload(); }}
+                aria-label="새로고침"
+              >
+                <i data-lucide="refresh-cw" className="lucide" style={{ width: 20, height: 20, pointerEvents: 'none' }} /> {/* Add pointer-events: none */}
+              </button>
+            </div>
+          </header>
+        );
+    }
+
+    function StudyPlannerApp() {
+      // =============== 상수 정의 ===============
+      const startHour = 8;
+      const endHour = 24;
+      const slotHeight30 = 84;
+      const slotHeight5 = slotHeight30 / 6;
+      const total30Slots = (endHour - startHour) * 2;
+      // Include the final endHour time for positioning the very last possible slot
+      const timeSlots = Array.from({ length: total30Slots + 1 }, (_, i) => {
+        const totalMinutes = startHour * 60 + i * 30;
+        const hh = String(Math.floor(totalMinutes / 60)).padStart(2, '0');
+        const mm = String(totalMinutes % 60).padStart(2, '0');
+        return `${hh}:${mm}`;
+      });
+
+      // =============== 상태 정의 ===============
+      const [currentView, setCurrentView] = useState('schedule');
+      const [userPlans, setUserPlans] = useState([
+        // 초기 예시 플랜들 (이 부분은 localStorage에서 불러온 후 덮어쓰여집니다)
+         { id: 1, title: '예시 플랜 1', memo: '새 단어 20개', start: '09:00', end: '10:00', emoji: '📚', done: false, duration: 0, achievement: 0 },
+         { id: 2, title: '예시 플랜 2', memo: '기출문제 5개', start: '10:30', end: '11:30', emoji: '📐', done: false, duration: 0, achievement: 0 }
+      ]);
+      const [aiPlans, setAiPlans] = useState([]);
+      const [isDraggingOrResizing, setIsDraggingOrResizing] = useState(false); // New state
+
+      // 카드 이동/리사이징용 ref
+      const resizeDataRef = useRef(null);
+      const dragDataRef = useRef(null);
+
+      // 겹침/원복용 ref & Double Tap ref
+      const originalPlanTimeRef = useRef({});
+      const lastTapTimeRef = useRef({}); // Stores timestamp of the last touchstart per plan ID
+
+
+      // 모달 관련 상태
+      const [showModal, setShowModal] = useState(false);
+      const [editingPlan, setEditingPlan] = useState(null);
+      const [newPlan, setNewPlan] = useState({
+        title: '',
+        memo: '',
+        start: '21:00', // Default new plan start time
+        end: '22:00',   // Default new plan end time
+        emoji: '📚'
+      });
+
+      // =============== 초기 로딩 & 상태 저장 ===============
+      useEffect(() => {
+        const saved = localStorage.getItem("userPlans");
+        if (saved) {
+          try {
+            const loadedPlans = JSON.parse(saved);
+            if (Array.isArray(loadedPlans)) {
+               // Basic validation: ensure plans have required properties
+               const validPlans = loadedPlans.filter(p =>
+                   typeof p.id === 'number' &&
+                   typeof p.title === 'string' &&
+                   typeof p.start === 'string' &&
+                   typeof p.end === 'string' &&
+                   typeof p.emoji === 'string'
+                   // Add other checks as needed
+               );
+               setUserPlans(validPlans);
+               if (validPlans.length !== loadedPlans.length) {
+                   console.warn("일부 저장된 플랜 데이터가 유효하지 않아 제외되었습니다.");
+               }
+            } else {
+               console.error("저장된 일정 데이터 형식이 올바르지 않습니다. 초기화합니다.");
+               setUserPlans([]); // Reset if data is corrupt
+            }
+          } catch (e) {
+            console.error("저장된 일정 데이터를 불러오지 못했습니다. 초기화합니다.", e);
+            setUserPlans([]); // Reset if data is corrupt
+          }
+        }
+        // If no saved data or data reset, initial state from useState is used.
+      }, []); // Run only once on mount
+
+      useEffect(() => {
+         // Only save if userPlans has been loaded or changed from its initial state.
+         // A simple check might be to see if the effect has run after initial mount.
+         // Using a ref or checking a flag could be more precise.
+         // For now, saving any time userPlans changes after initial load seems okay.
+         localStorage.setItem("userPlans", JSON.stringify(userPlans));
+        // Re-create lucide icons whenever plans change (because cards might be re-rendered)
+        // Consider debouncing this if performance is an issue with many rapid plan changes
+        lucide.createIcons();
+      }, [userPlans]); // Save whenever userPlans changes
+
+       // Re-create lucide icons initially and when view changes (AI view might have different icons)
+       useEffect(() => {
+         lucide.createIcons();
+       }, [currentView]);
+
+
+      useEffect(() => {
+        if (currentView === 'ai') {
+          // Consider scrolling to the top if AI view is entered
+           // window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }, [currentView]);
+
+
+      // =============== 시간 겹침 검사 ===============
+      function isTimeOverlap(newPlan, plans, editingId = null) {
+         // Ensure start time is before end time
+        const [s2h, s2m] = newPlan.start.split(':').map(Number);
+        const [e2h, e2m] = newPlan.end.split(':').map(Number);
+        const s2TotalMins = s2h * 60 + s2m;
+        const e2TotalMins = e2h * 60 + e2m;
+
+        if (s2TotalMins >= e2TotalMins) {
+            return true; // Overlap if start is same as or after end (or duration is zero/negative)
+        }
+         // Ensure times are within the valid range (startHour to endHour inclusive of start, exclusive of endHour:00 if it exists)
+         // A plan ending at 24:00 is valid if startHour is 8 and endHour is 24.
+         // The range is [startHour*60, endHour*60)
+         if (s2TotalMins < startHour * 60 || e2TotalMins > endHour * 60) {
+             console.warn(`Plan time out of range: ${newPlan.start} - ${newPlan.end}`);
+             return true; // Treat out of range as overlap for simplicity
+         }
+
+
+        return plans.some(p => {
+          if (editingId && p.id === editingId) return false; // Ignore the plan being edited
+          const [s1h, s1m] = p.start.split(':').map(Number);
+          const [e1h, e1m] = p.end.split(':').map(Number);
+          const s1TotalMins = s1h * 60 + s1m;
+          const e1TotalMins = e1h * 60 + e1m;
+
+          // Check for overlap: [s1, e1) and [s2, e2) overlap if max(s1, s2) < min(e1, e2)
+          // Example: [10:00, 11:00) and [11:00, 12:00) do NOT overlap.
+          // Example: [10:30, 11:30) and [11:00, 12:00) DO overlap.
+          return Math.max(s1TotalMins, s2TotalMins) < Math.min(e1TotalMins, e2TotalMins);
+        });
+      }
+
+      // =============== 플랜 삭제 & 편집 ===============
+      const deletePlan = id => {
+         // Prevent deletion if currently dragging/resizing
+         if (isDraggingOrResizing) return;
+         if (window.confirm("정말로 이 플랜을 삭제하시겠습니까?")) {
+            setUserPlans(plans => plans.filter(x => x.id !== id));
+         }
+      };
+      const onEdit = plan => {
+         // Prevent editing if currently dragging/resizing
+         if (isDraggingOrResizing) return;
+        setEditingPlan(plan);
+        setNewPlan({
+          title: plan.title,
+          memo: plan.memo,
+          start: plan.start,
+          end: plan.end,
+          emoji: plan.emoji
+        });
+        setShowModal(true);
+      };
+
+      // =============== AI 제안 생성 (랜덤 더미) ===============
+      const generateAiSuggestions = () => {
+         // Clear previous suggestions
+         setAiPlans([]);
+
+        const suggestions = [
+          { title: '물리 공식 정리', emoji: '⚛️' },
+          { title: '역사 연표 암기', emoji: '📜' },
+          { title: '생물 세포 구조', emoji: '🔬' },
+          { title: '문학 작품 분석', emoji: '📖' },
+          { title: '화학 반응식', emoji: '🧪' },
+          { title: '코딩 알고리즘', emoji: '💻'},
+          { title: '미술사 개론', emoji: '🎨'},
+          { title: '음악 이론', emoji: '🎶'},
+           { title: '영어 듣기 연습', emoji: '🎧'},
+           { title: '중국어 회화', emoji: '🗣️'},
+           { title: '운동/스트레칭', emoji: '💪'},
+           { title: '휴식 시간', emoji: '🛀'},
+        ];
+        // Generate 3 random suggestions
+        const pick = suggestions.sort(() => 0.5 - Math.random()).slice(0, 3);
+
+        // Find available time slots (simple check, could be more sophisticated)
+        const availableSlots = [];
+        const totalMinsInRange = (endHour - startHour) * 60;
+        const minDuration = 30; // Minimum duration for an AI task (in minutes)
+        const maxDuration = 90; // Maximum duration for an AI task (in minutes)
+        const interval = 5; // Check every 5 minutes
+
+
+         // Check for contiguous free slots of at least minDuration
+         for (let i = 0; i <= totalMinsInRange - minDuration; i += interval) {
+             const startTimeMins = startHour * 60 + i;
+             const potentialEndTimeMins = startTimeMins + minDuration;
+
+             const potentialPlan = {
+                 start: `${String(Math.floor(startTimeMins / 60)).padStart(2, '0')}:${String(startTimeMins % 60).padStart(2, '0')}`,
+                 end: `${String(Math.floor(potentialEndTimeMins / 60)).padStart(2, '0')}:${String(potentialEndTimeMins % 60).padStart(2, '0')}`
+             };
+
+             // Check if this potential minDuration slot overlaps with existing user plans
+             if (!isTimeOverlap(potentialPlan, userPlans)) {
+                 // Found a free spot for at least minDuration
+                 availableSlots.push(potentialPlan.start); // Store the start time of the free slot
+             }
+         }
+
+
+         if (availableSlots.length < pick.length) {
+            // Not enough places found to fit minDuration tasks
+             alert("현재 비어있는 시간이 충분하지 않습니다. 다른 시간을 선택해보세요.");
+             return; // Don't generate AI plans
+         }
+
+        // Assign random available *start* times to picked suggestions
+        const randomStartTimes = availableSlots.sort(() => 0.5 - Math.random()).slice(0, pick.length);
+
+        const newAi = pick.map((it, index) => {
+            const startTime = randomStartTimes[index];
+            const slotStartMins = startTime.split(':').map(Number).reduce((h, m) => h * 60 + m);
+
+             // Determine a random duration for this plan, respecting max duration and end time
+             const maxPossibleEndMins = endHour * 60;
+             let actualMaxDurationMins = maxPossibleEndMins - slotStartMins;
+
+             // Clamp the random duration range [minDuration, maxDuration]
+             let effectiveMinDuration = minDuration;
+             let effectiveMaxDuration = Math.min(maxDuration, actualMaxDurationMins);
+
+             // Ensure we can actually fit at least the minDuration
+             if (effectiveMaxDuration < effectiveMinDuration) {
+                 effectiveMinDuration = effectiveMaxDuration; // Fallback to max possible duration rounded down
+             }
+
+             let suggestedDurationMins = effectiveMinDuration; // Start with minimum
+             if (effectiveMaxDuration > effectiveMinDuration) {
+                  // Choose a random duration in 5-minute increments within the allowed range
+                 const durationRange = effectiveMaxDuration - effectiveMinDuration;
+                 const numIncrements = Math.floor(durationRange / 5);
+                 suggestedDurationMins = effectiveMinDuration + Math.floor(Math.random() * (numIncrements + 1)) * 5;
+             }
+
+             // Ensure the duration is at least 5 minutes if times are valid
+             if (suggestedDurationMins < 5 && actualMaxDurationMins >= 5) suggestedDurationMins = 5;
+             if (suggestedDurationMins < 5 && actualMaxDurationMins < 5 && actualMaxDurationMins > 0) suggestedDurationMins = Math.floor(actualMaxDurationMins / 5) * 5 || 5; // Smallest valid duration
+
+            const suggestedEndMins = slotStartMins + suggestedDurationMins;
+             const suggestedEndTime = `${String(Math.floor(suggestedEndMins / 60)).padStart(2, '0')}:${String(suggestedEndMins % 60).padStart(2, '0')}`;
+
+            return {
+                id: `ai-${Date.now()}-${index}`, // Unique ID for AI plans (prefix to distinguish)
+                title: it.title,
+                memo: '', // AI doesn't generate memo
+                start: startTime,
+                end: suggestedEndTime, // Use calculated end time
+                emoji: it.emoji
+            };
+        });
+
+         // Final overlap check among the generated AI plans themselves
+        const finalAiPlans = [];
+        for(const aiPlan of newAi) {
+             // Check overlap against user plans AND already accepted AI plans
+             if (!isTimeOverlap(aiPlan, userPlans.concat(finalAiPlans))) {
+                 finalAiPlans.push(aiPlan);
+             }
+        }
+
+         if(finalAiPlans.length === 0 && newAi.length > 0) {
+             alert("AI 플랜을 생성했지만, 서로 시간이 겹쳐 적용할 수 없습니다. 다시 시도해주세요.");
+             return; // Don't show suggestions if all overlapped internally
+         }
+
+
+        setAiPlans(finalAiPlans);
+        setCurrentView('ai'); // Switch to AI view after generation
+      };
+
+      const applyAiPlans = () => {
+        // Perform a final overlap check before applying
+        const potentialNewPlans = aiPlans.map(pl => ({ ...pl, id: Date.now() + Math.random(), done: false, duration: 0, achievement: 0 }));
+        let hasOverlap = false;
+        for(const newPlan of potentialNewPlans) {
+             // Check overlap against current user plans AND other new plans being added
+            if (isTimeOverlap(newPlan, userPlans.concat(potentialNewPlans.filter(p => p.id !== newPlan.id)))) {
+                hasOverlap = true;
+                break;
+            }
+        }
+
+        if (hasOverlap) {
+             alert("선택한 AI 플랜 중 일부가 현재 플래너와 겹칩니다. 다시 생성하거나 직접 조정해주세요.");
+             return; // Don't apply if there's an overlap
+        }
+
+        setUserPlans(plans => [...plans, ...potentialNewPlans]);
+        setAiPlans([]); // Clear AI suggestions after applying
+        setCurrentView('schedule'); // Switch back to schedule view
+      };
+
+
+      // =============== 신규/수정 저장(겹침 검사) ===============
+      const savePlan = () => {
+        if (!newPlan.title || !newPlan.start || !newPlan.end) {
+             alert("할 일, 시작 시간, 종료 시간을 모두 입력해주세요.");
+             return;
+         }
+
+        const overlap = isTimeOverlap(newPlan, userPlans, editingPlan?.id);
+        if (overlap) {
+          alert("입력하신 시간이 다른 플랜과 겹치거나 시작 시간이 종료 시간보다 늦습니다.");
+          return;
+        }
+        if (editingPlan) {
+          setUserPlans(plans =>
+            plans.map(x =>
+              x.id === editingPlan.id ? { ...editingPlan, ...newPlan } : x
+            )
+          );
+        } else {
+          // Assign a new unique ID (use Date.now() + random number for better uniqueness)
+          setUserPlans(plans => [...plans, { ...newPlan, id: Date.now() + Math.random(), done: false, duration: 0, achievement: 0 }]);
+        }
+        setEditingPlan(null); // Clear editing state
+        setNewPlan({ title: '', memo: '', start: '21:00', end: '22:00', emoji: '📚' }); // Reset new plan form
+        setShowModal(false); // Close modal
+      };
+
+      // =============== 카드 리사이즈/이동 로직 (5분 단위) ===============
+
+      // Helper to get coordinates and scroll position from mouse or touch event
+      const getCoordsAndScroll = (e) => {
+         if (e.touches && e.touches[0]) {
+             // Touch event
+             return {
+                 clientX: e.touches[0].clientX,
+                 clientY: e.touches[0].clientY,
+                 scrollY: window.scrollY || document.documentElement.scrollTop
+             };
+         } else if (e.clientX !== undefined) {
+             // Mouse event
+             return {
+                 clientX: e.clientX,
+                 clientY: e.clientY,
+                 scrollY: window.scrollY || document.documentElement.scrollTop
+             };
+         }
+         return null; // Should not happen
+      };
+
+
+      const startResizing = (e, planId, edge) => {
+         // Prevent default touch behavior like scrolling/zooming
+         if (e.cancelable) e.preventDefault();
+         e.stopPropagation(); // Stop propagation to prevent triggering drag
+
+         dragDataRef.current = null; // Ensure drag is not active
+
+         const plan = userPlans.find(p => p.id === planId);
+         if (!plan) return;
+
+         const coords = getCoordsAndScroll(e);
+         if (!coords) return;
+
+         // Store original time for potential revert
+         originalPlanTimeRef.current[planId] = { start: plan.start, end: plan.end };
+
+         const [sh, sm] = plan.start.split(':').map(Number);
+         const totalStartMins = sh * 60 + sm;
+         const startIdx5 = (totalStartMins - startHour * 60) / 5;
+
+         const [eh, em] = plan.end.split(':').map(Number);
+         const totalEndMins = eh * 60 + em;
+         const endIdx5 = (totalEndMins - startHour * 60) / 5;
+
+         // Check if the plan has zero or negative duration before allowing resize
+         if (endIdx5 <= startIdx5) {
+             console.warn("Cannot resize a plan with zero or negative duration.");
+             return;
+         }
+
+
+         resizeDataRef.current = {
+           planId,
+           edge,
+           initialClientY: coords.clientY, // Store clientY from event
+           initialScrollY: coords.scrollY, // Store initial scroll position
+           initialStartIdx5: startIdx5,
+           initialEndIdx5: endIdx5
+         };
+
+         setIsDraggingOrResizing(true); // Set dragging/resizing state to true
+       };
+
+
+       const startDragging = (e, planId) => {
+          // Prevent default touch behavior like scrolling/zooming
+          if (e.cancelable) e.preventDefault();
+          e.stopPropagation(); // Stop propagation to prevent triggering resize handles
+
+          resizeDataRef.current = null; // Ensure resize is not active
+
+          const plan = userPlans.find(p => p.id === planId);
+          if (!plan) return;
+
+          const coords = getCoordsAndScroll(e);
+          if (!coords) return;
+
+
+          // Store original time for potential revert
+          originalPlanTimeRef.current[planId] = { start: plan.start, end: plan.end };
+
+          const [sh, sm] = plan.start.split(':').map(Number);
+          const startIdx5 = ((sh * 60 + sm) - startHour * 60) / 5;
+
+          const [eh, em] = plan.end.split(':').map(Number);
+          const endIdx5 = ((eh * 60 + em) - startHour * 60) / 5;
+
+          const durationSlots5 = endIdx5 - startIdx5;
+          // Do not start dragging if the plan has zero or negative duration (shouldn't happen with isTimeOverlap check, but safety)
+          if (durationSlots5 <= 0) {
+              console.warn("Cannot drag a plan with zero or negative duration.");
+              return;
+          }
+
+
+          dragDataRef.current = {
+            planId,
+            initialClientY: coords.clientY, // Store clientY from event
+            initialScrollY: coords.scrollY, // Store initial scroll position
+            initialStartIdx5: startIdx5,
+            durationSlots5
+          };
+
+          setIsDraggingOrResizing(true); // Set dragging/resizing state to true
+       };
+
+
+      const onMove = e => {
+         // Only proceed if there's an active drag or resize
+         if (!dragDataRef.current && !resizeDataRef.current) {
+             return;
+         }
+
+          // Prevent default scroll behavior if dragging or resizing is active
+         if (e.cancelable) e.preventDefault();
+         e.stopPropagation();
+
+         const coords = getCoordsAndScroll(e);
+         if (!coords) return;
+
+         // Calculate delta Y relative to initial *page* position, accounting for scroll
+         const initialClientY = resizeDataRef.current?.initialClientY || dragDataRef.current?.initialClientY;
+         const initialScrollY = resizeDataRef.current?.initialScrollY || dragDataRef.current?.initialScrollY;
+
+         // Only proceed if initial coords were captured (should always be if refs are set)
+         if (initialClientY === undefined || initialScrollY === undefined) return;
+
+
+         const deltaY = (coords.clientY + coords.scrollY) - (initialClientY + initialScrollY);
+         const deltaSlots5 = Math.round(deltaY / slotHeight5);
+
+         // --- 리사이즈 중일 때 ---
+         if (resizeDataRef.current) {
+           const { planId, edge, initialStartIdx5, initialEndIdx5 } = resizeDataRef.current;
+
+           let newStartIdx5 = initialStartIdx5;
+           let newEndIdx5 = initialEndIdx5;
+
+           if (edge === 'top') {
+             newStartIdx5 = initialStartIdx5 + deltaSlots5;
+             // Clamp new start index: min 0, max (initialEndIdx5 - 1)
+             if (newStartIdx5 < 0) newStartIdx5 = 0;
+             if (newStartIdx5 >= initialEndIdx5) newStartIdx5 = initialEndIdx5 - 1; // Ensure min duration of 5 mins
+           } else if (edge === 'bottom') {
+             newEndIdx5 = initialEndIdx5 + deltaSlots5;
+             // Clamp new end index: min (initialStartIdx5 + 1), max total slots
+             const total5Slots = ((endHour - startHour) * 60) / 5;
+             if (newEndIdx5 <= initialStartIdx5) newEndIdx5 = initialStartIdx5 + 1; // Ensure min duration of 5 mins
+             if (newEndIdx5 > total5Slots) newEndIdx5 = total5Slots;
+           }
+
+           // Convert indices back to times
+           const newStartMins = startHour * 60 + newStartIdx5 * 5;
+           const updatedStart = `${String(Math.floor(newStartMins / 60)).padStart(2, '0')}:${String(newStartMins % 60).padStart(2, '0')}`;
+
+           const newEndMins = startHour * 60 + newEndIdx5 * 5;
+           const updatedEnd = `${String(Math.floor(newEndMins / 60)).padStart(2, '0')}:${String(newEndMins % 60).padStart(2, '0')}`;
+
+           // Update state immutably only if times actually changed
+           setUserPlans(plans => {
+              const currentPlan = plans.find(p => p.id === planId);
+              if (currentPlan && (currentPlan.start !== updatedStart || currentPlan.end !== updatedEnd)) {
+                 return plans.map(x =>
+                   x.id === planId ? { ...x, start: updatedStart, end: updatedEnd } : x
+                 );
+              }
+              return plans; // No change needed
+           });
+           // return; // Stop processing if resizing - Handled by the initial if check
+         }
+
+         // --- 이동 중일 때 ---
+         if (dragDataRef.current) {
+           const { planId, initialStartIdx5, durationSlots5 } = dragDataRef.current;
+
+           let newStartIdx5 = initialStartIdx5 + deltaSlots5;
+           const total5Slots = ((endHour - startHour) * 60) / 5;
+
+           // Clamp new start index for dragging
+           if (newStartIdx5 < 0) newStartIdx5 = 0;
+           if (newStartIdx5 + durationSlots5 > total5Slots) newStartIdx5 = total5Slots - durationSlots5;
+
+           const newEndIdx5 = newStartIdx5 + durationSlots5;
+
+           // Convert indices back to times
+           const newStartMins = startHour * 60 + newStartIdx5 * 5;
+           const updatedStart = `${String(Math.floor(newStartMins / 60)).padStart(2, '0')}:${String(newStartMins % 60).padStart(2, '0')}`;
+
+           const newEndMins = startHour * 60 + newEndIdx5 * 5;
+           const updatedEnd = `${String(Math.floor(newEndMins / 60)).padStart(2, '0')}:${String(newEndMins % 60).padStart(2, '0')}`;
+
+            // Update state immutably only if start time actually changed
+            setUserPlans(plans => {
+               const currentPlan = plans.find(p => p.id === planId);
+               if (currentPlan && currentPlan.start !== updatedStart) {
+                   return plans.map(x =>
+                     x.id === planId ? { ...x, start: updatedStart, end: updatedEnd } : x
+                   );
+               }
+               return plans; // No change needed
+            });
+           // return; // Stop processing if dragging - Handled by the initial if check
+         }
+      };
+
+      // =============== 드래그/리사이즈 종료 시 겹침 검사 및 원복 ===============
+      const handleEnd = () => {
+          let activeRef = null;
+          if(dragDataRef.current) activeRef = dragDataRef.current;
+          if(resizeDataRef.current) activeRef = resizeDataRef.current;
+
+          if (activeRef) {
+              const { planId } = activeRef;
+              const changedPlan = userPlans.find(p => p.id === planId);
+              if (changedPlan) {
+                   // Filter out the plan being moved/resized when checking overlap
+                  const plansToCheckAgainst = userPlans.filter(x => x.id !== planId);
+                  if (isTimeOverlap(changedPlan, plansToCheckAgainst)) {
+                      // 겹치면 원복
+                      const orig = originalPlanTimeRef.current[planId];
+                       // Only revert if original time exists and is different from current
+                      if (orig && (changedPlan.start !== orig.start || changedPlan.end !== orig.end)) {
+                           setUserPlans(plans =>
+                               plans.map(x =>
+                                   x.id === planId
+                                       ? { ...x, start: orig.start, end: orig.end }
+                                       : x
+                               )
+                           );
+                           alert("다른 플랜과 시간이 겹칠 수 없습니다!");
+                       } else if (!orig) {
+                            // This case indicates an issue where original time wasn't stored
+                           console.error(`Original time not stored for plan ${planId}`);
+                       }
+                  }
+              }
+          }
+          // Clear refs regardless of overlap check result
+          dragDataRef.current = null;
+          resizeDataRef.current = null;
+          originalPlanTimeRef.current = {}; // Clear original times
+
+          setIsDraggingOrResizing(false); // Set dragging/resizing state to false
+          // Reset last tap time here in case touch end wasn't part of a double tap
+          // This prevents a subsequent single tap from being mistaken for a double tap's second tap.
+          lastTapTimeRef.current = {};
+      };
+
+
+      useEffect(() => {
+        // Add global mouse and touch event listeners
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', handleEnd);
+        // Use { passive: false } on touchmove to allow preventDefault for stopping scroll
+        window.addEventListener('touchmove', onMove, { passive: false });
+        window.addEventListener('touchend', handleEnd);
+         // Also listen for touchcancel - useful if the touch is interrupted (e.g., multitasking swipe)
+        window.addEventListener('touchcancel', handleEnd);
+
+
+        // Cleanup function to remove listeners
+        return () => {
+          window.removeEventListener('mousemove', onMove);
+          window.removeEventListener('mouseup', handleEnd);
+          window.removeEventListener('touchmove', onMove);
+          window.removeEventListener('touchend', handleEnd);
+           window.removeEventListener('touchcancel', handleEnd);
+        };
+      }, [userPlans]); // Re-run effect if userPlans state changes (needed because handleEnd uses userPlans)
+
+
+      // =============== 렌더링 ===============
+      return (
+        // The outermost div doesn't need max-w-md mx-auto. Body handles centering.
+        // It serves as the main background and container for the whole app UI.
+        <div className="bg-white min-h-screen">
+          {/* ─────────── 헤더 ─────────── */}
+          {/* Header component now contains all necessary styling */}
+          <Header showModal={showModal} />
+
+          {/* ─────────── 메인 콘텐츠 (Scrollable Area) ─────────── */}
+          {/* Added pb-28 to ensure content above the fixed footer is visible */}
+          {/* overflow-hidden is important for the AI view slide transition */}
+          {/* The height of this div combined with the time slots defines the scrollable area */}
+          <div className="flex h-full relative overflow-hidden">
+            {/* ◼ 스케줄 뷰 */}
+            {/* This div slides horizontally */}
+            <div className={`w-full relative transition-transform duration-300 ${currentView === 'ai' ? '-translate-x-full' : 'translate-x-0'}`}>
+              {/* ─ 시간 슬롯 그리드 (30분 단위만 렌더링) ─ */}
+              {/* This div is the actual height driver and scrollable area */}
+              {/* Removed overflow-y-auto from here; Body or a wrapper handles overall scroll */}
+              {/* Added pb-32 to the grid itself to ensure the last slots are visible above the fixed footer */}
+              <div className="h-full bg-orange-50" style={{ paddingBottom: '120px' }}> {/* Added inline padding-bottom */}
+                {timeSlots.map((time, index) => {
+                  const isHour = time.endsWith(':00');
+                  // Don't render the last time slot's border if it's the very end (e.g., 24:00)
+                  const isLastSlot = index === timeSlots.length - 1;
+                   // Add a distinct class or style for the very last slot if needed for padding etc.
+                   const isFinalTimeSlot = index === timeSlots.length - 1 && time.endsWith(':00');
+
+                  return (
+                    <div
+                      key={time}
+                      className={`flex items-start ${!isLastSlot ? 'border-b border-gray-200' : ''}`}
+                      style={{
+                        height: `${slotHeight30}px`,
+                        backgroundColor: isHour ? '#ffffff' : '#f8fafd'
+                        /* No padding-bottom needed here if added to the parent grid div */
+                      }}
+                    >
+                      <div className="w-16 text-center text-gray-600 font-medium pt-2">
+                        {isHour ? time : ''}
+                      </div>
+                      {/* Empty div to push time label left */}
+                      <div className="flex-1 pl-4"></div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* ◼ 일정 카드 오버레이 (5분 단위로 위치/높이 조정) */}
+              {/* Plan cards are absolutely positioned on top of the time grid */}
+              {userPlans.map(plan => {
+                const [sh, sm] = plan.start.split(':').map(Number);
+                // Convert start time to index (minutes from startHour, divided by 5)
+                const startIdx5 = ((sh * 60 + sm) - (startHour * 60)) / 5;
+
+                const [eh, em] = plan.end.split(':').map(Number);
+                 // Convert end time to index
+                const endIdx5 = ((eh * 60 + em) - (startHour * 60)) / 5;
+
+                const spanSlots5 = endIdx5 - startIdx5;
+                // Calculate top position and height in pixels based on 5-minute slots
+                const topPx = startIdx5 * slotHeight5;
+                const heightPx = Math.max(spanSlots5 * slotHeight5, slotHeight5); // Ensure min height of 5 mins
+
+
+                // Double tap handler using ref to track last touchstart time for this specific plan
+                 // Use onTouchStart to record time and initiate drag detection
+                 // Use onTouchEnd to detect double-tap based on time from start
+                 const handlePlanTouchStart = (e) => {
+                      // Check if touch started on a resize handle or button
+                       if (e.target.closest('.resize-handle') || e.target.closest('button') || e.target.closest('.lucide')) {
+                            return; // Let resize/button handlers take over
+                       }
+                       // Prevent default behavior aggressively to try and stop initial scroll
+                        if (e.cancelable) e.preventDefault();
+                        e.stopPropagation();
+
+                       lastTapTimeRef.current[plan.id] = Date.now(); // Record touch start time
+                       startDragging(e, plan.id); // Start drag detection immediately
+                 };
+
+                // Mouse down handler for starting drag
+                 const handlePlanMouseDown = (e) => {
+                     // Check if mouse down happened on resize handle or icon button, if so, do nothing
+                     if (e.target.closest('.resize-handle') || e.target.closest('button') || e.target.closest('.lucide')) {
+                       return; // Let resize/button handlers take over
+                     }
+                     // Prevent default browser drag behavior
+                     if (e.cancelable) e.preventDefault();
+                     e.stopPropagation(); // Stop propagation
+                     startDragging(e, plan.id);
+                 };
+
+
+                return (
+                  <div
+                    key={plan.id}
+                    className={`plan-card absolute left-16 right-4 border-2 ${plan.done ? "border-green-300 bg-green-50" : "border-orange-500 bg-white"} rounded-xl shadow-md hover:shadow-lg overflow-hidden`} style={{ // Added plan-card class
+                      top: `${topPx}px`,
+                      height: `${heightPx}px`,
+                       zIndex: 10 // Ensure plan cards are above time grid
+                    }}
+                    // Use onMouseDown and onTouchStart to initiate drag and double-tap check
+                    onMouseDown={handlePlanMouseDown}
+                    onTouchStart={handlePlanTouchStart}
+                    onDoubleClick={() => onEdit(plan)} // Keep double click for desktop
+                    // onTouchEnd detects double-tap *after* the touch ends
+                    onTouchEnd={(e) => {
+                       // Check if touch ended on a handle/button
+                       if (e.target.closest('.resize-handle') || e.target.closest('button') || e.target.closest('.lucide')) {
+                         // Let global handleEnd clear drag/resize state if they were active
+                         return;
+                       }
+                       const now = Date.now();
+                       const last = lastTapTimeRef.current[plan.id] || 0;
+                       // Check if this touchend is part of a potential double-tap sequence (following a touchstart within 300ms)
+                       // Also ensure it wasn't just a very long press/drag (e.g., check if a drag happened)
+                       if (now - last < 300 && now - last > 10 && !dragDataRef.current) { // Add a small minimum gap and check if drag occurred
+                            // This confirms a double tap (and it wasn't a drag)
+                            onEdit(plan); // Trigger edit modal
+                       }
+                       // Clear the recorded touch start time regardless of double-tap status
+                       lastTapTimeRef.current[plan.id] = 0;
+                    }}
+                  >
+                    {/* ◼ 상단 리사이저 (5분 단위 이동) */}
+                    <div
+                      draggable={false} // Explicitly prevent native HTML drag
+                      className="resize-handle top" // Using custom class
+                      onMouseDown={e => {
+                        if (e.cancelable) e.preventDefault(); e.stopPropagation(); startResizing(e, plan.id, 'top');
+                      }}
+                       onTouchStart={e => {
+                           if(e.cancelable) e.preventDefault(); e.stopPropagation(); startResizing(e.touches[0], plan.id, 'top');
+                       }}
+                    />
+
+                    {/* ◼ 카드 헤더: 이모지, 제목, 편집/삭제 */}
+                    {/* Add pointer-events-none to the container and auto to interactive elements */}
+                    <div className="flex items-center justify-between px-3 py-1 select-none pointer-events-none">
+                      <div className="flex items-center gap-2 pointer-events-auto"> {/* pointer-events-auto here */}
+                        <span className="text-2xl">{plan.emoji}</span>
+                        <span className="font-medium text-sm">{plan.title}</span>
+                      </div>
+                      <div className="flex gap-1 pointer-events-auto"> {/* pointer-events-auto here */}
+                        {/* Add type="button" and pointer-events: none to icons */}
+                        <button onClick={(e) => { e.stopPropagation(); onEdit(plan); }} className="p-1 rounded hover:bg-gray-200" type="button">
+                          <i data-lucide="edit-3" className="lucide" style={{ width: 14, height: 14, pointerEvents: 'none' }} />
+                        </button>
+                        <button onClick={(e) => { e.stopPropagation(); deletePlan(plan.id); }} className="p-1 rounded hover:bg-gray-200" type="button">
+                          <i data-lucide="trash-2" className="lucide" style={{ width: 14, height: 14, pointerEvents: 'none' }} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* ◼ 카드 콘텐츠: 시간표시, 메모 */}
+                     {/* Add pointer-events-none to prevent dragging from here, double-tap/drag starts on the outer div */}
+                    <div className="px-3 pb-2 text-xs text-gray-600 pointer-events-none">
+                      <div className="text-xs text-gray-500">{plan.start} ~ {plan.end}</div>
+                      {plan.memo && <div>메모: {plan.memo}</div>}
+                    </div>
+
+                    {/* ◼ 하단 리사이저 (5분 단위 이동) */}
+                    <div
+                      draggable={false} // Explicitly prevent native HTML drag
+                      className="resize-handle bottom" // Using custom class
+                      onMouseDown={e => {
+                        if (e.cancelable) e.preventDefault(); e.stopPropagation(); startResizing(e, plan.id, 'bottom');
+                      }}
+                      onTouchStart={e => {
+                           if(e.cancelable) e.preventDefault(); e.stopPropagation(); startResizing(e.touches[0], plan.id, 'bottom');
+                       }}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* ───────── AI 뷰 ───────── */}
+            {/* AI view is also constrained by body's max-width */}
+            {/* Added pb-28 for consistency with schedule view scrolling - no, padding applied to inner div now */}
+            <div className={`w-full absolute top-0 transition-transform duration-300 ${currentView === 'ai' ? 'translate-x-0' : 'translate-x-full'}`}>
+              <div className="p-4 h-full overflow-y-auto bg-orange-100" style={{ paddingBottom: '120px' }}> {/* Added inline padding-bottom */}
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-bold flex items-center gap-2">
+                    <span>🤖</span> AI 추천 플랜
+                  </h2>
+                  <button onClick={() => setCurrentView('schedule')} className="text-orange-600 hover:underline" type="button">
+                    ← 돌아가기
+                  </button>
+                </div>
+                <div className="space-y-3">
+                  {aiPlans.length > 0 ? (
+                     aiPlans.map(pl => (
+                       <div key={pl.id} className="p-4 bg-orange-500 text-white rounded-xl shadow-sm">
+                         <div className="flex items-center gap-3">
+                           <span className="text-2xl">{pl.emoji}</span>
+                           <div>
+                             <div className="font-medium">{pl.title}</div>
+                             <div className="text-sm text-orange-100">{pl.start} ~ {pl.end}</div>
+                           </div>
+                         </div>
+                       </div>
+                     ))
+                  ) : (
+                     <div className="text-center py-8 text-gray-600">
+                         <p className="mb-4">🤖 AI에게 오늘의 학습 플랜을 추천받아 보세요!</p>
+                         <button onClick={generateAiSuggestions} className="bg-orange-500 text-white px-6 py-3 rounded-full shadow-md hover:bg-orange-600 transition-all duration-200" type="button">
+                           AI 플랜 생성하기
+                         </button>
+                       </div>
+                  )}
+                </div>
+                {/* Apply button moved to the fixed footer */}
+              </div>
+            </div>
+          </div>
+
+          {/* ───────── 하단 명령 바 ───────── */}
+          {/* Use the custom class for fixed centering */}
+          <div className="fixed-bottom-bar">
+            {/* The inner div is still max-w-md and mx-auto, centering content inside the fixed bar */}
+            <div className="max-w-md mx-auto flex gap-3">
+              {currentView === 'schedule' ? (
+                <button
+                  onClick={() => generateAiSuggestions()} // Trigger generation on button click
+                  className="flex-1 bg-orange-500 text-white py-3 rounded-full font-bold tracking-wide shadow-md hover:bg-orange-600 hover:shadow-lg transform active:scale-95 transition-all duration-200 flex items-center justify-center gap-2"
+                  type="button"
+                >
+                  <span className="text-xl">🤖</span> <span>AI 플랜 생성</span>
+                </button>
+              ) : (
+                 // Input field for AI prompt (optional, currently dummy)
+                <div className="flex-1 flex items-center bg-white border-2 border-orange-500 rounded-full px-3 py-2">
+                  <input
+                    type="text"
+                    placeholder="AI에게 플랜을 요청해보세요 (더미 기능)"
+                    className="flex-1 outline-none bg-transparent text-orange-500 placeholder-orange-300"
+                    onKeyDown={e => {
+                       // Handle potential real AI input later
+                       // if (e.key === 'Enter' && e.target.value.trim() !== '') { /* Call real AI API */ }
+                    }}
+                    disabled={aiPlans.length > 0} // Disable input if suggestions are already shown
+                  />
+                   {/* Optional: button to regenerate/trigger AI */}
+                   {/* aiPlans.length === 0 && (
+                       <button onClick={generateAiSuggestions} className="ml-2 text-2xl p-1 rounded-full hover:bg-orange-100 focus:outline-none" type="button">
+                           🤖
+                       </button>
+                   ) */}
+                </div>
+              )}
+
+              {/* Apply button only shown in AI view if there are plans */}
+              {currentView === 'ai' && aiPlans.length > 0 && (
+                <button
+                   onClick={applyAiPlans}
+                   className="flex-1 bg-orange-500 text-white py-3 rounded-full font-bold tracking-wide shadow-md hover:bg-orange-600 hover:shadow-lg transform active:scale-95 transition-all duration-200"
+                   type="button"
+                >
+                  적용
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* ───────── 새 일정 추가/수정 모달 ───────── */}
+          {/* Modal remains fixed inset-0 but gets a high z-index */}
+          {showModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"> {/* Added z-50 */}
+              <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-lg"> {/* Added shadow-lg */}
+                <h3 className="text-xl font-bold text-center mb-4">
+                  {editingPlan ? '일정 수정' : '새 일정 추가'}
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block mb-1 text-sm font-medium text-gray-700">할 일</label>
+                    <input
+                      type="text"
+                      value={newPlan.title}
+                      onChange={e => setNewPlan(p => ({ ...p, title: e.target.value }))}
+                      className="w-full border border-gray-300 p-2 rounded focus:ring focus:ring-orange-200 focus:border-orange-500 outline-none"
+                      placeholder="예: 영어 단어 암기"
+                      autoFocus // Focus the input when modal opens
+                    />
+                  </div>
+                  <div>
+                    <label className="block mb-1 text-sm font-medium text-gray-700">메모</label>
+                    <input
+                      type="text"
+                      value={newPlan.memo}
+                      onChange={e => setNewPlan(p => ({ ...p, memo: e.target.value }))}
+                      className="w-full border border-gray-300 p-2 rounded focus:ring focus:ring-orange-200 focus:border-orange-500 outline-none"
+                       placeholder="예: 새 단어 20개"
+                    />
+                  </div>
+                  <div>
+                    <label className="block mb-1 text-sm font-medium text-gray-700">시간</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="time"
+                        value={newPlan.start}
+                        onChange={e => setNewPlan(p => ({ ...p, start: e.target.value }))}
+                        className="border border-gray-300 p-2 rounded w-1/2 focus:ring focus:ring-orange-200 focus:border-orange-500 outline-none"
+                      />
+                      <span>~</span>
+                      <input
+                        type="time"
+                        value={newPlan.end}
+                        onChange={e => setNewPlan(p => ({ ...p, end: e.target.value }))}
+                        className="border border-gray-300 p-2 rounded w-1/2 focus:ring focus:ring-orange-200 focus:border-orange-500 outline-none"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block mb-1 text-sm font-medium text-gray-700">이모지</label>
+                    <div className="flex gap-2 flex-wrap"> {/* Allow emojis to wrap */}
+                      {['📚', '✏️', '📐', '🧪', '💡', '💻', '🎨', '🎶', '🎧', '🗣️', '💪', '🛀'].map(em => ( // Added more emojis
+                        <button
+                          key={em}
+                          onClick={() => setNewPlan(p => ({ ...p, emoji: em }))}
+                          className={`p-2 text-2xl rounded ${newPlan.emoji === em ? 'bg-orange-100' : 'hover:bg-gray-100'}`}
+                           type="button" // Prevent form submission
+                        >
+                          {em}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-6 flex gap-3">
+                  <button
+                    onClick={() => {
+                      setShowModal(false);
+                      setEditingPlan(null); // Clear editing state on cancel
+                       setNewPlan({ title: '', memo: '', start: '21:00', end: '22:00', emoji: '📚' }); // Reset new plan state
+                    }}
+                    className="flex-1 border border-gray-300 py-3 rounded hover:bg-gray-100"
+                     type="button"
+                  >
+                    취소
+                  </button>
+                  <button onClick={savePlan} className="flex-1 bg-orange-500 text-white py-3 rounded hover:bg-orange-600" type="button">
+                    {editingPlan ? '수정 완료' : '추가'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ───────── 새 일정 추가 버튼 ───────── */}
+          {/* Use the custom class for absolute positioning within the body */}
+          {/* Button is hidden when modal is shown */}
+          {!showModal && currentView === 'schedule' && (
+            <button
+              onClick={() => {
+                setEditingPlan(null); // Ensure we're adding, not editing
+                 setNewPlan({ title: '', memo: '', start: '21:00', end: '22:00', emoji: '📚' }); // Reset form fields to default
+                setShowModal(true);
+              }}
+              className="add-plan-button"
+              type="button"
+              aria-label="새 일정 추가"
+            >
+              <i data-lucide="plus" className="lucide" style={{ width: 24, height: 24, color: 'white', pointerEvents: 'none' }} /> {/* pointer-events none on icon */}
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    // Use ReactDOM.render as per the original code's React v17 dependency
+    ReactDOM.render(<StudyPlannerApp />, document.getElementById('root'));
+  </script>
+</body>
+
+</html>

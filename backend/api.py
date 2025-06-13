@@ -10,11 +10,11 @@ from prompt import *
 from model import DailyFeedback, UserData, Plan, QuizResult, TaskResult, BookInformation
 from core import DoziFlask
 
-DEBUG = False
+DEBUG = True
 
-bp = Blueprint("main", __name__)
+api_bp = Blueprint("api", __name__, url_prefix="/api")
 
-@bp.route("/me", methods=["GET", "POST"])
+@api_bp.route("/me", methods=["GET", "POST"])
 def me():
     user_id = get_uuid()
 
@@ -39,7 +39,7 @@ def me():
         return ""
 
 
-@bp.route("/me/quiz", methods=["GET", "POST"])
+@api_bp.route("/me/quiz", methods=["GET", "POST"])
 def quiz():
     user_id = get_uuid()
 
@@ -60,7 +60,7 @@ def quiz():
 
     return ""
 
-@bp.route("/me/books", methods=["GET", "POST"])
+@api_bp.route("/me/books", methods=["GET", "POST"])
 def books():
     user_id = get_uuid()
 
@@ -92,12 +92,12 @@ def books():
     return ""
 
 
-@bp.route("/ping")
+@api_bp.route("/ping")
 def ping():
     return "pong"
 
 
-@bp.route("/plan")
+@api_bp.route("/plan")
 def plan():
     user_id = get_uuid()
 
@@ -188,7 +188,7 @@ def plan():
 
     return response.output_parsed.model_dump_json()
 
-@bp.route("/tasks/complete", methods=["GET", "POST"])
+@api_bp.route("/tasks/complete", methods=["GET", "POST"])
 def complete_task():
     user_id = get_uuid()
 
@@ -219,7 +219,7 @@ def complete_task():
 
     return ""
 
-@bp.route("/feedback/daily")
+@api_bp.route("/feedback/daily")
 def daily_feedback():
     user_id = get_uuid()
 

@@ -618,7 +618,6 @@
 
             <section className="card ai-plan-card" onClick={() => {
               setShowFloating(f => !f);
-              alertMsg(showFloating ? '상단 카드 버튼을 사용해보세요!' : '하단 플로팅 버튼이 활성화되었습니다!');
             }}>
               <div className="ai-plan-text">🤖 AI가 오늘의 학습 계획을 짜드릴게요! 🗓️</div>
               <button className="ai-plan-btn" onClick={e => {
@@ -646,7 +645,7 @@
               </div>
             </section>
 
-            <section className="card daily-question" onClick={() => { alertMsg('회고 탭으로 이동합니다!'); window.location.href = "chat.html"; }}>
+            <section className="card daily-question" onClick={() => {  window.location.href = "chat.html"; }}>
               <h3>💭 오늘의 질문</h3>
               <p>"오늘 가장 잘한 일이 무엇인가요?"</p>
               <p>클릭 시 회고 탭으로 이동</p>
