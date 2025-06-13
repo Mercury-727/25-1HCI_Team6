@@ -26,41 +26,49 @@
     }
 
     .header {
-      background: #FFF3F0;
-      padding: 12px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      backdrop-filter: blur(10px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+        position: sticky;
+        top: 0;
+        left: 0;
+        right: 0;
+        background-color: #fdf8f4;
+        padding: 12px 16px; /* Reduced horizontal padding */
+        border-bottom: 1px solid #e8ddd4;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 1000;
     }
 
     .logo {
-      font-size: 20px;
-      font-weight: 700;
-      color: #F96C50;
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        font-weight: 700;
+        color: #f96c50;
     }
 
-    .header-buttons {
-      display: flex;
-      gap: 8px;
+    .logo i {
+        margin-right: 8px;
+        font-size: 22px; /* Slightly smaller icon */
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px; /* Reduced gap */
     }
 
     .header-btn {
-      background: none;
-      border: none;
-      padding: 8px;
-      border-radius: 8px;
-      color: #DD6B20;
-      cursor: pointer;
-      transition: all 0.2s ease;
+        background: none;
+        border: none;
+        padding: 8px;
+        border-radius: 8px;
+        color: #DD6B20;
+        cursor: pointer;
+        transition: all 0.2s ease;
     }
 
     .header-btn:hover {
-      background: #FFF3E0;
-      transform: scale(1.05);
+        transform: scale(1.05);
     }
 
     .main-container {
@@ -470,6 +478,30 @@
       window.location.href = "./timer.html";
     }
 
+    function Header() {
+        return (
+          <header className="header">
+            <div className="logo">My Study</div>
+            <div className="header-buttons">
+              <button
+                className="header-btn"
+                onClick={() => {
+                  window.location.href = "./setting.html";
+                }}
+              >
+                <i data-lucide="settings" className="lucide" style={{ width: 20, height: 20 }} />
+              </button>
+              <button
+                className="header-btn"
+                onClick={() => window.location.reload()}
+              >
+                <i data-lucide="refresh-cw" className="lucide" style={{ width: 20, height: 20 }} />
+              </button>
+            </div>
+          </header>
+        );
+    }
+
     function DailySummary({ userPlans }) {
         const completedPlans = userPlans.filter(p => p.done);
         const [averageAchievement, totalDuration] = completedPlans
@@ -585,25 +617,7 @@
 
       return (
         <>
-          <header className="header">
-            <div className="logo">My Study</div>
-            <div className="header-buttons">
-              <button
-                className="header-btn"
-                onClick={() => {
-                  window.location.href = "./setting.html";
-                }}
-              >
-                <i data-lucide="settings" className="lucide" style={{ width: 20, height: 20 }} />
-              </button>
-              <button
-                className="header-btn"
-                onClick={() => window.location.reload()}
-              >
-                <i data-lucide="refresh-cw" className="lucide" style={{ width: 20, height: 20 }} />
-              </button>
-            </div>
-          </header>
+          <Header />
 
           <main className="main-container">
             <DailySummary userPlans={userPlans} />

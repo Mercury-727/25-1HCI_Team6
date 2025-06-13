@@ -6,8 +6,6 @@
     <title>학습 피드백</title>
 
     <!-- Existing Project CSS and Fonts -->
-    <!-- Make sure css/styles.css exists if you're using it -->
-    <link rel="stylesheet" href="css/styles.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
@@ -17,7 +15,6 @@
       rel="stylesheet"
     />
 
-    <!-- Keep the inline styles as they are global -->
     <style>
     * {
         margin: 0;
@@ -37,7 +34,6 @@
         flex-direction: column; /* Arrange children vertically */
     }
 
-    /* 상단 네비게이션 바 */
     .header {
         position: sticky;
         top: 0;
@@ -81,16 +77,15 @@
     }
 
     .header-btn:hover {
-        background: #FFF3E0;
         transform: scale(1.05);
     }
 
     /* 메인 컨테이너 */
     .main-container {
-        margin-top: 60px; /* Adjusted margin-top */
-        padding: 16px; /* Reduced padding */
-        width: 100%; /* Ensure it fills the body width */
-        flex-grow: 1; /* Allow main content to grow */
+        margin-top: 20px;
+        padding: 16px;
+        width: 100%;
+        flex-grow: 1;
     }
 
     /* 페이지 타이틀 */
@@ -307,7 +302,7 @@
         padding: 24px 16px; /* Reduced padding */
         background: linear-gradient(135deg, #fff8f7, #fff5f3);
         border-radius: 12px; /* Adjusted border-radius */
-        margin: 24px 0; /* Reduced margin */
+        margin: 0;
     }
 
     .encouragement-text {
@@ -327,42 +322,6 @@
         word-break: break-word;
     }
 
-    /* 하단 푸터 */
-    .footer {
-        background: #faf5f1;
-        padding: 24px 16px; /* Reduced padding */
-        text-align: center;
-        margin-top: auto; /* Push footer to the bottom */
-        border-top: 1px solid #e8ddd4;
-    }
-
-    .footer-content {
-        max-width: 800px; /* This is fine, limited by body */
-        margin: 0 auto;
-    }
-
-    .footer-links {
-        display: flex;
-        flex-direction: column; /* Stack links on small screens */
-        gap: 12px; /* Reduced gap */
-        margin-bottom: 16px;
-    }
-
-    .footer-links a {
-        color: #666;
-        text-decoration: none;
-        font-size: 13px; /* Reduced font size */
-        transition: color 0.3s ease;
-    }
-
-    .footer-links a:hover {
-        color: #f96c50;
-    }
-
-    .footer-text {
-        font-size: 11px; /* Reduced font size */
-        color: #999;
-    }
 
     /* 모달 스타일 */
     .modal {
@@ -555,8 +514,7 @@
     const Header = () => (
       <header className="header">
         <div className="logo">
-          <i className="fas fa-graduation-cap"></i>
-          MyStudy
+          My Study
         </div>
         <div className="header-actions">
           <button
@@ -573,21 +531,6 @@
           </button>
         </div>
       </header>
-    );
-
-    // Component for the Footer
-    const Footer = () => (
-      <footer className="footer">
-        <div className="footer-content">
-          <div className="footer-links">
-            <a href="#team">팀 소개</a>
-            <a href="#contact">문의하기</a>
-            <a href="#privacy">개인정보처리방침</a>
-            <a href="#terms">이용약관</a>
-          </div>
-          <div className="footer-text">© 2024 HCI Team 6. All rights reserved.</div>
-        </div>
-      </footer>
     );
 
     // Component for the Satisfaction Section
@@ -647,7 +590,7 @@
       return (
         <div
           className="card"
-          style={{ textAlign: "center", marginBottom: "32px" }}
+          style={{ textAlign: "center" }}
         >
           <h3 style={{ marginBottom: "12px" }}>오늘 계획 생성에 대한 만족도!</h3>
           <div
@@ -791,7 +734,6 @@
             <div className="main-container">
               <div style={{textAlign: 'center', marginTop: '50px'}}>로딩 중...</div>
             </div>
-            <Footer />
           </>
         ); // Or a proper loading spinner
       }
@@ -883,7 +825,6 @@
             <EncouragementSection encouragementText={encouragementSubtitle} />
 
           </div>
-          <Footer />
         </>
       );
     };
