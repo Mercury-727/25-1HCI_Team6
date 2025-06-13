@@ -467,7 +467,7 @@
 
       const currentPlanID = plan.id;
       localStorage.setItem("currentPlanID", JSON.stringify(currentPlanID));
-      window.location.href = "goal_timer_app.html";
+      window.location.href = "./timer.html";
     }
 
     function DailySummary({ userPlans }) {
@@ -501,7 +501,7 @@
                 </div>
                 <button
                     className="summary-feedback-btn"
-                    onClick={() => { window.location.href = "daily_Feedback.html"; }}
+                    onClick={() => { window.location.href = "./feedback.html"; }}
                 >
                     오늘의 피드백 보기
                 </button>
@@ -592,7 +592,7 @@
               <button
                 className="header-btn"
                 onClick={() => {
-                  window.location.href = "setting.html";
+                  window.location.href = "./setting.html";
                 }}
               >
                 ⚙️
@@ -617,7 +617,7 @@
               <button className="ai-plan-btn" onClick={e => {
                 e.stopPropagation();
                 alertMsg('AI 학습 플랜 생성 페이지로 이동합니다! 🤖');
-                window.location.href = "./AI_Plan_side.html";
+                window.location.href = "./plan.html";
               }}>플랜 짜러 가기</button>
             </section>
 
