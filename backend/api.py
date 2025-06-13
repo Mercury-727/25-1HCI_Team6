@@ -229,7 +229,7 @@ def daily_feedback():
 
     now = datetime.now()
     today_results = list(filter(
-        lambda result: now < result.timestamp + timedelta(days=1),
+        lambda result: now < result.timestamp.replace(tzinfo=None) + timedelta(days=1),
         recent_results,
     ))
 

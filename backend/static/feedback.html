@@ -449,67 +449,6 @@
     const { useState, useEffect } = React;
     const root = ReactDOM.createRoot(document.getElementById('root'));
 
-    // Simulated API call function (from original script)
-    const myfetch = function(url, options) {
-      if (url === "/api/feedback/daily") {
-        const feedbacks = [
-          {
-            "analysis": "오늘 이차함수 개념 복습을 60분에 100% 완료해 개념 이해가 탄탄해졌습니다. 반면 스스로 확인하기 문제는 45분에 70% 풀어 정확도와 실전 적용 연습이 더 필요합니다.",
-            "suggestion": "내일은 실제 시험처럼 30분 동안 이차함수 문제 10문제를 풀어보세요. 목표는 최소 8문제 맞히기, 틀린 문제는 오답 노트에 핵심 풀이 과정을 2~3줄로 정리해두면 효율적으로 점수를 올릴 수 있습니다.",
-            "encouragement": "작은 성취가 모여 큰 점수 차이를 만듭니다. 꾸준히 연습하며 한 걸음씩 나아가요!"
-          },
-          {
-            "analysis": "오늘 이차함수 개념 복습은 100% 완벽히 마쳤고 60분을 투자해 기초를 다졌습니다. 문제 풀이(45분)는 70% 정확도로, 특히 꼭짓점 좌표와 대칭축 문제에서 오답이 있었습니다. 꾸준한 복습은 강점이지만 문제 정확도를 높일 여지가 보입니다.",
-            "suggestion": "내일은 오늘 틀린 3~5문제를 골라 풀이 과정을 필기하며 오답 노트를 만들고, 유사 문제 5개를 30분 타이머를 켜고 풀어 즉시 채점 후 오답 원인을 정리해보세요.",
-            "encouragement": "작은 노력들이 모여 높은 점수로 이어집니다. 오늘도 잘했어요, 내일도 파이팅!"
-          },
-          {
-            "analysis": "오늘 이차함수 복습에서 개념 이해를 100% 달성해 탄탄한 기초를 다졌습니다. 그러나 실전 문제 풀이는 70% 수준으로, 특히 응용 문제에서 시간이 부족하거나 풀이 절차가 헷갈린 것으로 보입니다.",
-            "suggestion": "내일은 시험 직전처럼 30분 안에 이차함수 문제 10문제를 풀고, 틀리거나 시간이 오래 걸린 문제는 즉시 오답 노트에 정리해 보세요.",
-            "encouragement": "지금처럼 기초를 다지고 실전 연습을 늘리면 곧 점수 향상이 눈에 보일 거예요!"
-          },
-          {
-            "analysis": "오늘 이차함수 핵심 개념 복습을 100% 완료하며 그래프 개형 이해가 탄탄해졌습니다. 하지만 스스로 확인하기 문제는 70%만 맞춰 시험 대비가 부족한 부분이 남아 있습니다.",
-            "suggestion": "내일은 틀린 문제 위주로 오답노트를 만들어 핵심 공식과 풀이 과정을 정리한 뒤, 30분 동안 타이머를 켜고 10문제를 풀어보세요. 스스로 채점해 목표 맞힌 개수를 기록하면 성취감을 느끼기 좋습니다.",
-            "encouragement": "지금처럼 꾸준히 해나가면 점점 시험 성적에 자신감이 생길 거예요. 화이팅!"
-          },
-          {
-            "analysis": "오늘 이차함수 핵심 개념 복습을 100% 완료하며 기초를 탄탄히 다졌습니다. 하지만 문제 풀이에서는 70%의 정답률을 보여, 특히 꼭짓점 좌표와 이차식 변형 문제에서 실수가 있었습니다.",
-            "suggestion": "내일은 오답 노트에 틀린 문제를 유형별로 정리한 뒤, 비슷한 문제 3개를 각각 제한시간 10분 안에 풀어 보세요. 시험 실전 감각과 문제 해결 속도를 동시에 높일 수 있습니다.",
-            "encouragement": "작은 성취들이 쌓이면 점수가 크게 오릅니다. 꾸준히 해 나가면 원하는 목표에 꼭 도달할 거예요!"
-          },
-        ];
-        const feedback = feedbacks[Math.floor(Math.random() * feedbacks.length)];
-
-        return Promise.resolve({
-          ok: true,
-          status: 200,
-          json: () => Promise.resolve({
-            date: (new Date()).toLocaleString("ko-KR", {
-              year: "numeric",
-              day: "numeric",
-              month: "numeric",
-              weekday: "long",
-            }),
-            achievement: 87,
-            totalTime: 105, // in minutes
-            comparisonText: "지난주 오늘보다 15분 더 공부했어요", // Example comparison text
-            studyItems: [
-              "이차함수 복습: 핵심 개념 및 ax^2 그래프 개형(pp.118-129)",
-              "이차함수 문제: 스스로 확인하기 풀기(p.121, p.128, p.133)",
-            ],
-            feedback: feedback,
-          })
-        });
-      }
-
-      return Promise.resolve({
-        ok: false,
-        status: 404,
-        json: () => Promise.resolve({ error: "Not found" })
-      });
-    };
-
     // Component for the Header
     const Header = () => (
       <header className="header">
@@ -518,7 +457,7 @@
         </div>
         <div className="header-actions">
           <button
-            onClick={(e) => {e.stopPropagation(); window.location.href = 'home.html';}}
+            onClick={(e) => {e.stopPropagation(); window.location.href = './home.html';}}
             className="header-btn"
           >
             <i data-lucide="home" className="lucide" style={{ width: 20, height: 20 }} />
@@ -703,10 +642,45 @@
     function DailyFeedback() {
       const [feedbackData, setFeedbackData] = useState(null);
       const [loading, setLoading] = useState(true);
+      const [userPlans, setUserPlans] = useState([]);
+      const [summary, setSummary] = useState(null);
+
+        useEffect(() => {
+          const saved = localStorage.getItem("userPlans");
+          if (saved) {
+            try {
+              const parsed = JSON.parse(saved);
+              if (Array.isArray(parsed)) {
+                setUserPlans(parsed);
+
+                const completedPlans = parsed.filter(p => p.done);
+                const [averageAchievement, totalDuration] = completedPlans
+                    .reduce(
+                        ([avg, weight], plan) => [Math.floor((avg * weight + plan.achievement * plan.duration) / (weight + plan.duration)), weight + plan.duration],
+                        [0, 0]
+                    );
+                const totalHours = Math.floor(totalDuration / 3600);
+                const totalMinutes = Math.floor(totalDuration / 60) % 60;
+
+                setSummary({
+                    achievement: averageAchievement,
+                    totalHours,
+                    totalMinutes
+                });
+              } else {
+                console.warn("\u{26A0} userPlans가 배열이 아닙니다.");
+              }
+            } catch (e) {
+              console.error("\u{274C} JSON parse error:", e);
+            }
+          } else {
+            console.warn("\u{2753} localStorage에 userPlans 없음");
+          }
+        }, []);
 
       useEffect(() => {
         // Fetch main data
-        myfetch("/api/feedback/daily")
+        fetch("https://doziapi.duckdns.org/api/feedback/daily")
           .then((response) => response.json())
           .then((data) => {
             setFeedbackData(data);
@@ -739,8 +713,15 @@
       }
 
       const encouragementSubtitle = feedbackData ?
-        feedbackData.feedback.encouragement
+        feedbackData.encouragement
         : '데이터 로딩에 실패했어요.';
+
+      const todayStr = (new Date()).toLocaleString("ko-KR", {
+        year: "numeric",
+        day: "numeric",
+        month: "numeric",
+        weekday: "long",
+      });
 
       return (
         <>
@@ -748,7 +729,7 @@
           <div className="main-container">
             <div className="page-title">
               <h1>오늘의 학습 피드백 📅</h1>
-              <p>{feedbackData?.date || "— — — — — 학습 결과를 확인해보세요"}</p>
+              <p>{todayStr}</p>
             </div>
 
             <div className="card">
@@ -759,29 +740,19 @@
 
               <div className="summary-stats">
                 <div className="stat-item">
-                  <div className="stat-value">{feedbackData?.achievement != null ? feedbackData.achievement + "%" : "--%"}</div>
+                  <div className="stat-value">{summary?.achievement != null ? summary.achievement + "%" : "--%"}</div>
                   <div className="stat-label">목표 달성률</div>
                   <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: `${feedbackData?.achievement || 0}%` }}></div>
+                    <div className="progress-fill" style={{ width: `${summary?.achievement || 0}%` }}></div>
                   </div>
                 </div>
                 <div className="stat-item">
                   <div className="stat-value">
-                    {feedbackData?.totalTime != null ? `${Math.floor(feedbackData.totalTime / 60)}시간 ${(feedbackData.totalTime % 60)}분` : "--시간 --분"}
+                    {summary != null ? `${summary.totalHours}시간 ${summary.totalMinutes}분` : "--시간 --분"}
                   </div>
                   <div className="stat-label">총 학습 시간</div>
                 </div>
               </div>
-
-              {feedbackData?.comparisonText && (
-                <div className="comparison-text">
-                  <i className="fas fa-arrow-up"></i>
-                  {feedbackData.comparisonText}
-                </div>
-              )}
-              {!feedbackData?.comparisonText && (
-                <div className="comparison-text" style={{display: 'none'}}></div>
-              )}
             </div>
 
             <div className="card">
@@ -791,11 +762,11 @@
               </h2>
 
               <ul className="study-list">
-                {feedbackData?.studyItems?.length > 0 ? (
-                  feedbackData.studyItems.map((item, index) => (
+                {userPlans?.length > 0 ? (
+                  userPlans.filter(p => p.done).map((item, index) => (
                     <li key={index} className="study-item">
                       <span className="study-checkbox"><i className="fas fa-check"></i></span>
-                      <span className="study-text">{item}</span>
+                      <span className="study-text">{item.title}</span>
                     </li>
                   ))
                 ) : (
@@ -811,9 +782,9 @@
               </h2>
 
               <div className="feedback-text">
-                {feedbackData?.feedback ? 
+                {feedbackData ? 
                   <>
-                    <h3>🔍 학습 분석</h3>{feedbackData.feedback.analysis}<h3>💬 제안</h3>{feedbackData.feedback.suggestion}
+                    <h3>🔍 학습 분석</h3>{feedbackData.analysis}<h3>💬 제안</h3>{feedbackData.suggestion}
                   </> : (
                     "피드백을 불러오지 못했습니다."
                   )}
