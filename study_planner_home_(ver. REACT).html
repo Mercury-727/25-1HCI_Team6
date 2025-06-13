@@ -632,7 +632,7 @@
               </div>
             </section>
 
-            <section className="card daily-question" onClick={() => alertMsg('회고 탭으로 이동합니다!')}>
+            <section className="card daily-question" onClick={() => { alertMsg('회고 탭으로 이동합니다!'); window.location.href = "chat.html"; }}>
               <h3>💭 오늘의 질문</h3>
               <p>"오늘 가장 잘한 일이 무엇인가요?"</p>
               <p>클릭 시 회고 탭으로 이동</p>
