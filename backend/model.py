@@ -23,7 +23,8 @@ class UserData(BaseModel):
     progress: int
 
 class QuizResult(BaseModel):
-    answers: list[bool]
+    forced: list[bool]
+    likert: list[int]
 
 class TaskResult(BaseModel):
     topic: str

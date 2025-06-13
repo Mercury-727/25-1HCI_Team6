@@ -1,4 +1,6 @@
-from model import TaskResult, UserData
+from typing import Optional
+
+from model import TaskResult, UserData, QuizResult
 from knowledge_base import KnowledgeBase
 
 PLAN_SYSTEM_PROMPT = """You are a study planner for self-directed learners.
@@ -58,31 +60,33 @@ def make_user_input(userdata: UserData, data_available=False) -> str:
 
     return prompt
 
-def make_learning_preference(answers: list[bool]) -> str:
+def make_learning_preference(result: Optional[QuizResult]) -> str:
     preferences = [
         "- The user's following learning preferences extracted from a quiz:",
     ]
 
-    if not answers:
+    if not result:
         return preferences[0]
 
-    answer_len = len(answers)
+    preferences.append("conceptual approach: " + ("holistic" if result.forced[0] else "detail_focused"))
+    preferences.append("motivation type: " + ("extrinsic" if result.forced[1] else "intrinsic"))
+    preferences.append("study time allocation: " + ("preference based" if result.forced[2] else "plan based"))
 
-    if answer_len >= 4 and any(answers[:4]):
-        preferences.append("- Has internal motivation to learn math.")
-    else:
-        preferences.append("- Shows low intrinsic interest  in learning math.")
-
-    if answer_len >= 6 and any(answers[4:6]):
-        preferences.append("- Understands the value of math in life or grades.")
-
-    if answer_len >= 9 and any(answers[6:9]):
-        preferences.append("- Studies math to gain recognition or enter a good school.")
-
-    if answer_len >= 10 and answers[9]:
-        preferences.append("- Feels stressed about math test scores.")
-    else:
-        preferences.append("- Shows little stress about math tests.")
+    preferences.append("self regulation: " + (
+        ("strong" if result.likert[0] >= 4 else (
+            "weak" if result.likert[0] <= 2 else "moderate"
+        ))
+    ))
+    preferences.append("achievement motivation: " + (
+        ("high" if result.likert[0] >= 4 else (
+            "low" if result.likert[0] <= 2 else "medium"
+        ))
+    ))
+    preferences.append("mood based study: " + (
+        ("frequent" if result.likert[0] >= 4 else (
+            "rare" if result.likert[0] <= 2 else "sometimes"
+        ))
+    ))
 
     preferences.append("Adapt the schedule to match these preferences.")
 
@@ -101,12 +105,12 @@ def make_recent_results(results: list[TaskResult]) -> str:
 
     return "\n".join(recent_results)
 
-def make_planning_considerations(answers: list[bool], results: list[TaskResult]):
+def make_planning_considerations(quiz_result: QuizResult, results: list[TaskResult]):
     prompt = [
         "For planning, consider:",
     ]
 
-    prompt.append(make_learning_preference(answers))
+    prompt.append(make_learning_preference(quiz_result))
     prompt.append(make_recent_results(results))
 
     return "\n".join(prompt)

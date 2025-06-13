@@ -44,7 +44,7 @@ def quiz():
     user_id = get_uuid()
 
     if request.method == "GET":
-        quiz_result = get_db(user_id, "quiz_result", QuizResult(answers=[]))
+        quiz_result = get_db(user_id, "quiz_result", QuizResult(forced=[], likert=[]))
 
         return quiz_result.model_dump_json()
 
@@ -111,7 +111,7 @@ def plan():
     if not book_info:
         return "You must provide your book information for planning"
 
-    quiz_result = get_db(user_id, "quiz_result", QuizResult(answers=[]))
+    quiz_result = get_db(user_id, "quiz_result", QuizResult(forced=[], likert=[]))
 
     recent_results: list[TaskResult] = get_db(user_id, "recent_results", [])
     now = datetime.now()
@@ -223,8 +223,7 @@ def complete_task():
 def daily_feedback():
     user_id = get_uuid()
 
-    quiz_result = get_db(user_id, "quiz_result", QuizResult(answers=[]))
-    answers = quiz_result.answers
+    quiz_result = get_db(user_id, "quiz_result")
 
     recent_results: list[TaskResult] = get_db(user_id, "recent_results", [])
 
@@ -234,7 +233,7 @@ def daily_feedback():
         recent_results,
     ))
 
-    if not (answers and recent_results):
+    if not (quiz_result and recent_results):
         return ""
 
     client = OpenAI()
@@ -249,7 +248,7 @@ def daily_feedback():
             },
             {
                 "role": "user",
-                "content": make_learning_preference(answers)
+                "content": make_learning_preference(quiz_result)
             },
             {
                 "role": "user",
