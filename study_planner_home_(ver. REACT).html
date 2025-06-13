@@ -591,6 +591,14 @@
             <div className="header-buttons">
               <button
                 className="header-btn"
+                onClick={() => {
+                  window.location.href = "setting.html";
+                }}
+              >
+                ⚙️
+              </button>
+              <button
+                className="header-btn"
                 onClick={() => window.location.reload()}
               >
                 <i data-lucide="refresh-cw" className="lucide" style={{ width: 20, height: 20 }} />
