@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Study Planner App (5분 단위 조정)</title>
+  <title>학습 계획</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -66,32 +66,14 @@
       });
 
       useEffect(() => {
-
-
         const saved = localStorage.getItem("userPlans");
-
-
         if (saved) {
-
-
           try {
-
-
             setUserPlans(JSON.parse(saved));
-
-
           } catch (e) {
-
-
             console.error("저장된 일정 데이터를 불러오지 못했습니다.", e);
-
-
           }
-
-
         }
-
-
       }, []);
 
       useEffect(() => {
@@ -101,11 +83,7 @@
       }, [currentView]);
 
       useEffect(() => {
-
-
         localStorage.setItem("userPlans", JSON.stringify(userPlans));
-
-
       }, [userPlans]);
 
       useEffect(() => {
@@ -388,7 +366,7 @@
             <h1 className="text-xl font-bold text-gray-800">My Plan</h1>
             <div className="flex gap-2">
               <button
-                onClick={(e) => {e.stopPropagation(); window.location.href = 'home.html';}}
+                onClick={(e) => {e.stopPropagation(); window.location.href = './home.html';}}
                 className="p-2 text-orange-600 hover:bg-orange-100 rounded-lg"
                 aria-label="메인화면면"
               >
@@ -400,13 +378,6 @@
                 aria-label="새로고침"
               >
                 <i data-lucide="refresh-cw" className="lucide" style={{ width: 20, height: 20 }} />
-              </button>
-              <button
-                onClick={() => alert('설정')}
-                className="p-2 text-orange-600 hover:bg-orange-100 rounded-lg"
-                aria-label="설정"
-              >
-                <i data-lucide="settings" className="lucide" style={{ width: 20, height: 20 }} />
               </button>
             </div>
           </header>

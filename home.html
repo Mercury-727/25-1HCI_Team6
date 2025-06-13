@@ -595,7 +595,7 @@
                   window.location.href = "./setting.html";
                 }}
               >
-                ⚙️
+                <i data-lucide="settings" className="lucide" style={{ width: 20, height: 20 }} />
               </button>
               <button
                 className="header-btn"
@@ -616,7 +616,6 @@
               <div className="ai-plan-text">🤖 AI가 오늘의 학습 계획을 짜드릴게요! 🗓️</div>
               <button className="ai-plan-btn" onClick={e => {
                 e.stopPropagation();
-                alertMsg('AI 학습 플랜 생성 페이지로 이동합니다! 🤖');
                 window.location.href = "./plan.html";
               }}>플랜 짜러 가기</button>
             </section>
@@ -784,7 +783,7 @@
           </main>
 
           {showFloating && (
-            <button className="floating-ai-btn" onClick={() => alertMsg('AI 학습 플랜 생성 페이지로 이동합니다! 🤖')}>
+            <button className="floating-ai-btn" onClick={() => window.location.href = "./plan.html" }>
               {showTooltip && <span className="tooltip show">학습 계획이 필요하신가요?</span>}
               🤖 AI 플랜 생성하기
             </button>
