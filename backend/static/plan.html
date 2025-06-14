@@ -654,11 +654,7 @@
 
       // =============== 상태 정의 ===============
       const [currentView, setCurrentView] = useState('schedule');
-      const [userPlans, setUserPlans] = useState([
-        // 초기 예시 플랜들 (이 부분은 localStorage에서 불러온 후 덮어쓰여집니다)
-        { id: 1, title: '이차함수 복습: 핵심 개념 및 ax^2 그래프 개형', memo: '', start: '09:00', end: '10:00', emoji: '📚', done: false, duration: 0, achievement: 0 },
-        { id: 2, title: '이차함수 문제: 스스로 확인하기 풀기(p.121, p.128, p.133)', memo: '', start: '10:30', end: '11:30', emoji: '📐', done: false, duration: 0, achievement: 0 }
-      ]);
+      const [userPlans, setUserPlans] = useState([]);
       const [aiPlans, setAiPlans] = useState([]);
       const [isDraggingOrResizing, setIsDraggingOrResizing] = useState(false); // New state
 
@@ -669,11 +665,8 @@
       // Double Tap ref
       const lastTapTimeRef = useRef({}); // Stores timestamp of the last touchstart per plan ID
 
-
       // 겹침/원복용 ref
-      // Renamed from originalPlanTimeRef to currentPlanBeforeDragOrResizeRef for clarity
       const currentPlanBeforeDragOrResizeRef = useRef({});
-
 
       // 모달 관련 상태
       const [showModal, setShowModal] = useState(false);
@@ -744,14 +737,16 @@
         }
       }, [currentView]);
 
+      function timeToInt(t) {
+        const [h, m] = t.split(':').map(Number);
+        return h * 60 + m;
+      }
 
       // =============== 시간 겹침 검사 ===============
       function isTimeOverlap(newPlan, plans, editingId = null) {
         // Ensure start time is before end time
-        const [s2h, s2m] = newPlan.start.split(':').map(Number);
-        const [e2h, e2m] = newPlan.end.split(':').map(Number);
-        const s2TotalMins = s2h * 60 + s2m;
-        const e2TotalMins = e2h * 60 + e2m;
+        const s2TotalMins = timeToInt(newPlan.start);
+        const e2TotalMins = timeToInt(newPlan.end);
 
         if (s2TotalMins >= e2TotalMins) {
           return true; // Overlap if start is same as or after end (or duration is zero/negative)
@@ -801,135 +796,83 @@
         setShowModal(true);
       };
 
-      // =============== AI 제안 생성 (랜덤 더미) ===============
-      const generateAiSuggestions = () => {
+      // =============== AI 제안 생성 ===============
+      const generateAiSuggestions = async () => {
         // Clear previous suggestions
         setAiPlans([]);
 
-        const suggestions = [
-          { title: '물리 공식 정리', emoji: '⚛️' },
-          { title: '역사 연표 암기', emoji: '📜' },
-          { title: '생물 세포 구조', emoji: '🔬' },
-          { title: '문학 작품 분석', emoji: '📖' },
-          { title: '화학 반응식', emoji: '🧪' },
-        ];
-        // Generate 3 random suggestions
-        const pick = suggestions.sort(() => 0.5 - Math.random()).slice(0, 3);
+        const currentPlan = userPlans.map(plan => { return {
+          uuid: plan.id,
+          emoji: plan.emoji,
+          topic: plan.title,
+          schedule: {
+            start: plan.start + ':00',
+            duration_minute: timeToInt(plan.end) - timeToInt(plan.start),
+          },
+          done: plan.done
+        }});
 
-        // Find available time slots (simple check, could be more sophisticated)
-        const availableSlots = [];
-        const totalMinsInRange = (endHour - startHour) * 60;
-        const minDuration = 30; // Minimum duration for an AI task (in minutes)
-        const maxDuration = 90; // Maximum duration for an AI task (in minutes)
-        const interval = 5; // Check every 5 minutes
+        const currentPlanResponse = await fetch("https://doziapi.duckdns.org/api/plan", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ plan: currentPlan })
+        });
 
+        const suggestions = await fetch("https://doziapi.duckdns.org/api/plan")
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          });
 
-        // Check for contiguous free slots of at least minDuration
-        for (let i = 0; i <= totalMinsInRange - minDuration; i += interval) {
-          const startTimeMins = startHour * 60 + i;
-          const potentialEndTimeMins = startTimeMins + minDuration;
-
-          const potentialPlan = {
-            start: `${String(Math.floor(startTimeMins / 60)).padStart(2, '0')}:${String(startTimeMins % 60).padStart(2, '0')}`,
-            end: `${String(Math.floor(potentialEndTimeMins / 60)).padStart(2, '0')}:${String(potentialEndTimeMins % 60).padStart(2, '0')}`
-          };
-
-          // Check if this potential minDuration slot overlaps with existing user plans
-          if (!isTimeOverlap(potentialPlan, userPlans)) {
-            // Found a free spot for at least minDuration
-            availableSlots.push(potentialPlan.start); // Store the start time of the free slot
-          }
-        }
-
-
-        if (availableSlots.length < pick.length) {
-          // Not enough places found to fit minDuration tasks
-          alert("현재 비어있는 시간이 충분하지 않습니다. 다른 시간을 선택해보세요.");
-          return; // Don't generate AI plans
-        }
-
-        // Assign random available *start* times to picked suggestions
-        const randomStartTimes = availableSlots.sort(() => 0.5 - Math.random()).slice(0, pick.length);
-
-        const newAi = pick.map((it, index) => {
-          const startTime = randomStartTimes[index];
-          const slotStartMins = startTime.split(':').map(Number).reduce((h, m) => h * 60 + m);
-
-          // Determine a random duration for this plan, respecting max duration and end time
-          const maxPossibleEndMins = endHour * 60;
-          let actualMaxDurationMins = maxPossibleEndMins - slotStartMins;
-
-          // Clamp the random duration range [minDuration, maxDuration]
-          let effectiveMinDuration = minDuration;
-          let effectiveMaxDuration = Math.min(maxDuration, actualMaxDurationMins);
-
-          // Ensure we can actually fit at least the minDuration
-          if (effectiveMaxDuration < effectiveMinDuration) {
-            effectiveMinDuration = effectiveMaxDuration; // Fallback to max possible duration rounded down
-          }
-
-          let suggestedDurationMins = effectiveMinDuration; // Start with minimum
-          if (effectiveMaxDuration > effectiveMinDuration) {
-            // Choose a random duration in 5-minute increments within the allowed range
-            const durationRange = effectiveMaxDuration - effectiveMinDuration;
-            const numIncrements = Math.floor(durationRange / 5);
-            suggestedDurationMins = effectiveMinDuration + Math.floor(Math.random() * (numIncrements + 1)) * 5;
-          }
-
-          // Ensure the duration is at least 5 minutes if times are valid
-          if (suggestedDurationMins < 5 && actualMaxDurationMins >= 5) suggestedDurationMins = 5;
-          if (suggestedDurationMins < 5 && actualMaxDurationMins < 5 && actualMaxDurationMins > 0) suggestedDurationMins = Math.floor(actualMaxDurationMins / 5) * 5 || 5; // Smallest valid duration
-
-          const suggestedEndMins = slotStartMins + suggestedDurationMins;
-          const suggestedEndTime = `${String(Math.floor(suggestedEndMins / 60)).padStart(2, '0')}:${String(suggestedEndMins % 60).padStart(2, '0')}`;
+        const suggestionPlans = suggestions.plan.map(suggestion => {
+          const start = suggestion.schedule.start.slice(0, 5);
+          const startTimestamp = timeToInt(start);
+          const endTimestamp = timeToInt(start) + suggestion.schedule["duration_minute"];
+          const endHour = String(Math.floor(endTimestamp / 60)).padStart(2, '0');
+          const endMinute = String(endTimestamp % 60).padStart(2, '0');
+          const end = endHour + ':' + endMinute;
 
           return {
-            id: `ai-${Date.now()}-${index}`, // Unique ID for AI plans (prefix to distinguish)
-            title: it.title,
-            memo: '', // AI doesn't generate memo
-            start: startTime,
-            end: suggestedEndTime, // Use calculated end time
-            emoji: it.emoji
+            id: suggestion.uuid,
+            emoji: suggestion.emoji,
+            title: suggestion.topic,
+            memo: '',
+            start, end
           };
         });
 
-        // Final overlap check among the generated AI plans themselves
-        const finalAiPlans = [];
-        for(const aiPlan of newAi) {
-          // Check overlap against user plans AND already accepted AI plans
-          if (!isTimeOverlap(aiPlan, userPlans.concat(finalAiPlans))) {
-            finalAiPlans.push(aiPlan);
-          }
-        }
-
-        if(finalAiPlans.length === 0 && newAi.length > 0) {
-          alert("AI 플랜을 생성했지만, 서로 시간이 겹쳐 적용할 수 없습니다. 다시 시도해주세요.");
-          return; // Don't show suggestions if all overlapped internally
-        }
-
-
-        setAiPlans(finalAiPlans);
+        setAiPlans(suggestionPlans);
         setCurrentView('ai'); // Switch to AI view after generation
       };
 
       const applyAiPlans = () => {
-        // Perform a final overlap check before applying
-        const potentialNewPlans = aiPlans.map(pl => ({ ...pl, id: Date.now() + Math.random(), done: false, duration: 0, achievement: 0 }));
-        let hasOverlap = false;
-        for(const newPlan of potentialNewPlans) {
-          // Check overlap against current user plans AND other new plans being added
-          if (isTimeOverlap(newPlan, userPlans.concat(potentialNewPlans.filter(p => p.id !== newPlan.id)))) {
-            hasOverlap = true;
-            break;
+        const potentialNewPlans = aiPlans.map(pl => ({ ...pl, done: false, duration: 0, achievement: 0 }));
+        let newUserPlans = [];
+
+        for (const newPlan of potentialNewPlans) {
+          let found = false;
+
+          // if matching user plan found, it must be marked as done
+          // do not modify tasks marked as done
+          for (const userPlan of userPlans) {
+            if (newPlan.id === userPlan.id) {
+              newUserPlans.push(userPlan);
+              found = true;
+              break;
+            }
           }
+
+          if (found) continue;
+
+          newUserPlans.push(newPlan);
         }
 
-        if (hasOverlap) {
-          alert("선택한 AI 플랜 중 일부가 현재 플래너와 겹칩니다. 다시 생성하거나 직접 조정해주세요.");
-          return; // Don't apply if there's an overlap
-        }
-
-        setUserPlans(plans => [...plans, ...potentialNewPlans]);
+        setUserPlans(newUserPlans);
         setAiPlans([]); // Clear AI suggestions after applying
         setCurrentView('schedule'); // Switch back to schedule view
       };
@@ -938,7 +881,6 @@
       const deleteAiPlan = (id) => {
         setAiPlans(plans => plans.filter(p => p.id !== id));
       };
-
 
       // =============== 신규/수정 저장(겹침 검사) ===============
       const savePlan = () => {
@@ -959,8 +901,8 @@
             )
           );
         } else {
-          // Assign a new unique ID (use Date.now() + random number for better uniqueness)
-          setUserPlans(plans => [...plans, { ...newPlan, id: Date.now() + Math.random(), done: false, duration: 0, achievement: 0 }]);
+          // Assign a new unique ID
+          setUserPlans(plans => [...plans, { ...newPlan, id: crypto.randomUUID(), done: false, duration: 0, achievement: 0 }]);
         }
         setEditingPlan(null); // Clear editing state
         setNewPlan({ title: '', memo: '', start: '21:00', end: '22:00', emoji: '📚' }); // Reset new plan form

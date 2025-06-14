@@ -467,7 +467,7 @@
       alert(plan.title + ' 활동을 시작합니다!')
 
       const currentPlanID = plan.id;
-      localStorage.setItem("currentPlanID", JSON.stringify(currentPlanID));
+      localStorage.setItem("currentPlanID", currentPlanID);
       window.location.href = "./timer.html";
     }
 

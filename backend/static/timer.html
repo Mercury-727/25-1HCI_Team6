@@ -273,9 +273,9 @@
       const [phase, setPhase] = useState('timer'); // 'timer', 'confirm', 'achievement', 'feedback'
       const [achievement, setAchievement] = useState(50);
 
-      const planID = Number(localStorage.getItem("currentPlanID"));
+      const planID = localStorage.getItem("currentPlanID");
       const plans = JSON.parse(localStorage.getItem("userPlans")) || [];
-      const plan = !isNaN(planID) ? plans.find(p => p.id === planID) : {
+      const plan = plans.find(p => p.id === planID) || {
         emoji: "🎯",
         title: "목표 없음",
         memo: "",
@@ -291,7 +291,7 @@
 
       useEffect(() => {
         if (isRunning) {
-          timerRef.current = setInterval(() => setSeconds(prev => prev + 1), 1000);
+          timerRef.current = setInterval(() => setSeconds(prev => prev + 60), 1000);
         } else {
           clearInterval(timerRef.current);
         }
