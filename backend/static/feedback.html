@@ -18,488 +18,488 @@
     <style>
     /* Basic Reset */
     * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        /* Prevent selection, tap highlight on touch devices */
-        user-select: none;
-        -webkit-user-select: none; /* Safari */
-        -ms-user-select: none; /* IE 10+ */
-        -webkit-touch-callout: none; /* Prevent callout menu on iOS */
-        -webkit-tap-highlight-color: transparent; /* Prevent tap highlight */
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* Prevent selection, tap highlight on touch devices */
+    user-select: none;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10+ */
+    -webkit-touch-callout: none; /* Prevent callout menu on iOS */
+    -webkit-tap-highlight-color: transparent; /* Prevent tap highlight */
     }
 
     /* Body styles for centering and background */
     body {
-        font-family: "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
-        background-color: #fdf8f4; /* Light orange background */
-        color: #333; /* Default text color */
-        line-height: 1.6;
-        max-width: 390px; /* Target max-width */
-        margin: 0 auto;
-        min-height: 100vh; /* Ensure body fills viewport height */
-        display: flex; /* Use flex to push footer down */
-        flex-direction: column; /* Arrange children vertically */
-        overflow-y: auto; /* Default scroll behavior */
-        overflow-x: hidden; /* Prevent horizontal scroll */
+    font-family: "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #fdf8f4; /* Light orange background */
+    color: #333; /* Default text color */
+    line-height: 1.6;
+    max-width: 390px; /* Target max-width */
+    margin: 0 auto;
+    min-height: 100vh; /* Ensure body fills viewport height */
+    display: flex; /* Use flex to push footer down */
+    flex-direction: column; /* Arrange children vertically */
+    overflow-y: auto; /* Default scroll behavior */
+    overflow-x: hidden; /* Prevent horizontal scroll */
     }
 
     /* Class to disable scrolling on body */
     body.no-scroll {
-        overflow-y: hidden;
-        overscroll-behavior-y: contain; /* Prevent pull-to-refresh etc. */
+    overflow-y: hidden;
+    overscroll-behavior-y: contain; /* Prevent pull-to-refresh etc. */
     }
 
     /* Header style */
     .header {
-        position: sticky;
-        top: 0;
-        width: 100%; /* Takes full width of the body (390px) */
-        background-color: #fdf8f4; /* Match body background */
-        padding: 12px 16px; /* Padding */
-        border-bottom: 1px solid #e8ddd4; /* Bottom border */
-        display: flex;
-        justify-content: space-between; /* Space out logo and buttons */
-        align-items: center;
-        z-index: 1000; /* Above other content */
-        transition: filter 0.3s ease; /* Smooth blur transition */
+    position: sticky;
+    top: 0;
+    width: 100%; /* Takes full width of the body (390px) */
+    background-color: #fdf8f4; /* Match body background */
+    padding: 12px 16px; /* Padding */
+    border-bottom: 1px solid #e8ddd4; /* Bottom border */
+    display: flex;
+    justify-content: space-between; /* Space out logo and buttons */
+    align-items: center;
+    z-index: 1000; /* Above other content */
+    transition: filter 0.3s ease; /* Smooth blur transition */
     }
 
     /* Header blur effect when modal is open */
     .header.blurred {
-      filter: blur(3px);
-      pointer-events: none; /* Disable clicks */
+    filter: blur(3px);
+    pointer-events: none; /* Disable clicks */
     }
 
     .logo {
-        display: flex;
-        align-items: center;
-        font-size: 18px;
-        font-weight: 700;
-        color: #f96c50; /* Orange color */
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: #f96c50; /* Orange color */
     }
 
     .header-buttons { /* Container for header buttons */
-        display: flex;
-        gap: 8px; /* Gap between buttons */
+    display: flex;
+    gap: 8px; /* Gap between buttons */
     }
 
     .header-btn { /* Individual header button */
-        background: none;
-        border: none;
-        padding: 8px;
-        border-radius: 8px;
-        color: #DD6B20; /* Darker orange color */
-        cursor: pointer;
-        transition: all 0.2s ease;
+    background: none;
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    color: #DD6B20; /* Darker orange color */
+    cursor: pointer;
+    transition: all 0.2s ease;
     }
 
     .header-btn:hover {
-        transform: scale(1.05);
+    transform: scale(1.05);
     }
 
     /* Main container */
     .main-container {
-        margin-top: 20px;
-        padding: 16px;
-        width: 100%;
-        flex-grow: 1;
-        /* Added min-height to ensure it takes up space even if content is short */
-        min-height: calc(100vh - 50px - 40px); /* viewport height - header height - some margin/padding */
-        display: flex; /* Use flex to center loading */
-        flex-direction: column; /* Stack children vertically */
+    margin-top: 20px;
+    padding: 16px;
+    width: 100%;
+    flex-grow: 1;
+    /* Added min-height to ensure it takes up space even if content is short */
+    min-height: calc(100vh - 50px - 40px); /* viewport height - header height - some margin/padding */
+    display: flex; /* Use flex to center loading */
+    flex-direction: column; /* Stack children vertically */
     }
 
     /* Loading Indicator Styles */
     .loading-container {
-        flex-grow: 1; /* Take available space to center vertically */
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center; /* Center vertically */
-        padding: 50px 0; /* Add some padding */
-        color: #f96c50;
-        font-weight: 500;
+    flex-grow: 1; /* Take available space to center vertically */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Center vertically */
+    padding: 50px 0; /* Add some padding */
+    color: #f96c50;
+    font-weight: 500;
     }
 
     .spinner {
-        width: 40px; /* Spinner size */
-        height: 40px;
-        border: 4px solid #f3f3f3; /* Light grey border */
-        border-top: 4px solid #f96c50; /* Orange border for animation */
-        border-radius: 50%;
-        animation: spin 1s linear infinite; /* Apply spinning animation */
-        margin-bottom: 15px; /* Space between spinner and text */
+    width: 40px; /* Spinner size */
+    height: 40px;
+    border: 4px solid #f3f3f3; /* Light grey border */
+    border-top: 4px solid #f96c50; /* Orange border for animation */
+    border-radius: 50%;
+    animation: spin 1s linear infinite; /* Apply spinning animation */
+    margin-bottom: 15px; /* Space between spinner and text */
     }
 
     @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
     }
 
     .loading-text {
-        font-size: 16px;
-        margin-bottom: 5px;
+    font-size: 16px;
+    margin-bottom: 5px;
     }
 
     .eta-text {
-        font-size: 14px;
-        color: #666;
+    font-size: 14px;
+    color: #666;
     }
 
 
     /* 페이지 타이틀 */
     .page-title {
-        text-align: center;
-        margin-bottom: 24px; /* Adjusted margin */
+    text-align: center;
+    margin-bottom: 24px; /* Adjusted margin */
     }
 
     .page-title h1 {
-        font-size: 24px; /* Reduced font size */
-        font-weight: 700;
-        color: #333;
-        margin-bottom: 4px; /* Reduced margin */
+    font-size: 24px; /* Reduced font size */
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 4px; /* Reduced margin */
     }
 
     .page-title p {
-        font-size: 14px; /* Reduced font size */
-        color: #666;
+    font-size: 14px; /* Reduced font size */
+    color: #666;
     }
 
     /* 카드 공통 스타일 */
     .card {
-        background: white;
-        border-radius: 12px; /* Slightly smaller border-radius */
-        padding: 16px; /* Reduced padding */
-        margin-bottom: 16px; /* Reduced margin-bottom */
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Slightly softer shadow */
-        border: 1px solid #f0f0f0;
+    background: white;
+    border-radius: 12px; /* Slightly smaller border-radius */
+    padding: 16px; /* Reduced padding */
+    margin-bottom: 16px; /* Reduced margin-bottom */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Slightly softer shadow */
+    border: 1px solid #f0f0f0;
     }
 
     .card-title {
-        font-size: 18px; /* Reduced font size */
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 12px; /* Reduced margin */
-        display: flex;
-        align-items: center;
+    font-size: 18px; /* Reduced font size */
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px; /* Reduced margin */
+    display: flex;
+    align-items: center;
     }
 
     .card-title i {
-        margin-right: 8px;
-        color: #f96c50;
-        font-size: 1.1em; /* Relative size */
+    margin-right: 8px;
+    color: #f96c50;
+    font-size: 1.1em; /* Relative size */
     }
 
     /* 오늘의 학습 요약 */
     .summary-stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Adjusted minmax */
-        gap: 16px; /* Reduced gap */
-        margin-bottom: 16px; /* Reduced margin */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Adjusted minmax */
+    gap: 16px; /* Reduced gap */
+    margin-bottom: 16px; /* Reduced margin */
     }
 
     .stat-item {
-        text-align: center;
-        padding: 16px; /* Reduced padding */
-        background: #f8f9fa;
-        border-radius: 10px; /* Slightly smaller border-radius */
+    text-align: center;
+    padding: 16px; /* Reduced padding */
+    background: #f8f9fa;
+    border-radius: 10px; /* Slightly smaller border-radius */
     }
 
     .stat-value {
-        font-size: 24px; /* Reduced font size */
-        font-weight: 700;
-        color: #f96c50;
-        margin-bottom: 4px;
+    font-size: 24px; /* Reduced font size */
+    font-weight: 700;
+    color: #f96c50;
+    margin-bottom: 4px;
     }
 
     .stat-label {
-        font-size: 13px; /* Slightly smaller font size */
-        color: #666;
+    font-size: 13px; /* Slightly smaller font size */
+    color: #666;
     }
 
     .progress-bar {
-        width: 100%;
-        height: 6px; /* Reduced height */
-        background: #e8ddd4;
-        border-radius: 3px; /* Reduced border-radius */
-        overflow: hidden;
-        margin: 10px 0; /* Reduced margin */
+    width: 100%;
+    height: 6px; /* Reduced height */
+    background: #e8ddd4;
+    border-radius: 3px; /* Reduced border-radius */
+    overflow: hidden;
+    margin: 10px 0; /* Reduced margin */
     }
 
     .progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #f96c50, #ff8a75);
-        width: 0%; /* Initial width */
-        border-radius: 3px; /* Match parent */
-        transition: width 0.5s ease;
+    height: 100%;
+    background: linear-gradient(90deg, #f96c50, #ff8a75);
+    width: 0%; /* Initial width */
+    border-radius: 3px; /* Match parent */
+    transition: width 0.5s ease;
     }
 
     .comparison-text {
-        background: #e8f5e8;
-        padding: 10px 12px; /* Reduced padding */
-        border-radius: 6px; /* Reduced border-radius */
-        color: #2d7a2d;
-        font-size: 13px; /* Reduced font size */
-        border-left: 3px solid #4caf50; /* Reduced border width */
-        display: flex;
-        align-items: center;
-        gap: 6px; /* Reduced gap */
+    background: #e8f5e8;
+    padding: 10px 12px; /* Reduced padding */
+    border-radius: 6px; /* Reduced border-radius */
+    color: #2d7a2d;
+    font-size: 13px; /* Reduced font size */
+    border-left: 3px solid #4caf50; /* Reduced border width */
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Reduced gap */
     }
 
     /* 오늘의 공부 목록 */
     .study-list {
-        list-style: none;
+    list-style: none;
     }
 
     .study-item {
-        display: flex;
-        align-items: flex-start; /* Align items to start in case text wraps */
-        padding: 12px 0; /* Reduced padding */
-        border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: flex-start; /* Align items to start in case text wraps */
+    padding: 12px 0; /* Reduced padding */
+    border-bottom: 1px solid #f0f0f0;
     }
 
     .study-item:last-child {
-        border-bottom: none;
+    border-bottom: none;
     }
 
     .study-checkbox {
-        min-width: 18px; /* Reduced width */
-        width: 18px; /* Reduced width */
-        height: 18px; /* Reduced height */
-        border: 2px solid #f96c50;
-        border-radius: 4px;
-        margin-right: 12px; /* Reduced margin */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #f96c50;
-        color: white;
-        font-size: 10px; /* Reduced font size */
-        flex-shrink: 0; /* Prevent shrinking */
-        margin-top: 2px; /* Adjust vertical alignment */
+    min-width: 18px; /* Reduced width */
+    width: 18px; /* Reduced width */
+    height: 18px; /* Reduced height */
+    border: 2px solid #f96c50;
+    border-radius: 4px;
+    margin-right: 12px; /* Reduced margin */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f96c50;
+    color: white;
+    font-size: 10px; /* Reduced font size */
+    flex-shrink: 0; /* Prevent shrinking */
+    margin-top: 2px; /* Adjust vertical alignment */
     }
 
     .study-text {
-        font-size: 15px; /* Slightly reduced font size */
-        color: #333;
-        word-break: break-word; /* Ensure long words break */
+    font-size: 15px; /* Slightly reduced font size */
+    color: #333;
+    word-break: break-word; /* Ensure long words break */
     }
 
     /* 오늘의 피드백 */
     .feedback-card {
-        background: linear-gradient(135deg, #fff5f3, #fff8f7);
-        border-left: 3px solid #f96c50; /* Reduced border width */
+    background: linear-gradient(135deg, #fff5f3, #fff8f7);
+    border-left: 3px solid #f96c50; /* Reduced border width */
     }
 
     .feedback-text {
-        font-size: 15px; /* Slightly reduced font size */
-        line-height: 1.7; /* Slightly adjusted line height */
-        color: #444;
-        padding: 12px; /* Reduced padding */
-        background: rgba(255, 255, 255, 0.7);
-        border-radius: 8px;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
+    font-size: 15px; /* Slightly reduced font size */
+    line-height: 1.7; /* Slightly adjusted line height */
+    color: #444;
+    padding: 12px; /* Reduced padding */
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     }
-     .feedback-text h3 {
-         font-size: 16px; /* Ensure heading inside feedback text is readable */
-         margin-bottom: 4px; /* Space below heading */
-         color: #E14A2E; /* Match header/logo color */
-     }
+    .feedback-text h3 {
+    font-size: 16px; /* Ensure heading inside feedback text is readable */
+    margin-bottom: 4px; /* Space below heading */
+    color: #E14A2E; /* Match header/logo color */
+    }
 
 
     /* 상호작용 버튼 */
     .action-buttons {
-        display: flex;
-        flex-direction: column;
-        gap: 12px; /* Reduced gap */
-        margin-top: 24px; /* Reduced margin */
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Reduced gap */
+    margin-top: 24px; /* Reduced margin */
     }
 
     .btn-primary, .btn-secondary {
-        width: 100%; /* Make buttons full width on small screens */
-        padding: 14px 20px; /* Adjusted padding */
-        border-radius: 10px; /* Adjusted border-radius */
-        font-size: 15px; /* Adjusted font size */
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        text-decoration: none; /* Ensure buttons used as links look correct */
+    width: 100%; /* Make buttons full width on small screens */
+    padding: 14px 20px; /* Adjusted padding */
+    border-radius: 10px; /* Adjusted border-radius */
+    font-size: 15px; /* Adjusted font size */
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none; /* Ensure buttons used as links look correct */
     }
 
     .btn-primary {
-        background: #f96c50; /* Primary orange */
-        color: white;
-        border: none; /* No border for primary */
+    background: #f96c50; /* Primary orange */
+    color: white;
+    border: none; /* No border for primary */
     }
 
 
     .btn-primary:hover {
-        background: #e85a3f;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(249, 108, 80, 0.25); /* Adjusted shadow */
+    background: #e85a3f;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(249, 108, 80, 0.25); /* Adjusted shadow */
     }
 
     .btn-secondary {
-        background: linear-gradient(135deg, #ffe5e0, #fff0ed);
-        color: #f96c50;
-        border: 2px solid #f96c50;
+    background: linear-gradient(135deg, #ffe5e0, #fff0ed);
+    color: #f96c50;
+    border: 2px solid #f96c50;
     }
 
     .btn-secondary:hover {
-        background: #f96c50;
-        color: white;
-        transform: translateY(-2px);
+    background: #f96c50;
+    color: white;
+    transform: translateY(-2px);
     }
 
 
     .encouragement-section {
-        text-align: center;
-        padding: 24px 16px; /* Reduced padding */
-        background: linear-gradient(135deg, #fff8f7, #fff5f3);
-        border-radius: 12px; /* Adjusted border-radius */
-        margin: 0;
+    text-align: center;
+    padding: 24px 16px; /* Reduced padding */
+    background: linear-gradient(135deg, #fff8f7, #fff5f3);
+    border-radius: 12px; /* Adjusted border-radius */
+    margin: 0;
     }
 
     .encouragement-text {
-        font-size: 20px; /* Reduced font size */
-        font-weight: 600;
-        color: #333;
-        margin: 12px auto; /* Adjusted margin */
-        align-items: center;
-        gap: 8px;
-        word-break: break-word;
+    font-size: 20px; /* Reduced font size */
+    font-weight: 600;
+    color: #333;
+    margin: 12px auto; /* Adjusted margin */
+    align-items: center;
+    gap: 8px;
+    word-break: break-word;
     }
 
     .encouragement-subtitle {
-        font-size: 14px; /* Reduced font size */
-        color: #666;
-        margin-bottom: 20px; /* Adjusted margin */
-        word-break: break-word;
+    font-size: 14px; /* Reduced font size */
+    color: #666;
+    margin-bottom: 20px; /* Adjusted margin */
+    word-break: break-word;
     }
 
 
     /* 모달 스타일 */
     .modal {
-        display: flex; /* Use flex for centering */
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 2000;
-        animation: fadeIn 0.3s ease;
-        align-items: center; /* Center vertically */
-        justify-content: center; /* Center horizontally */
-        padding: 16px; /* Add padding to prevent content touching edges */
+    display: flex; /* Use flex for centering */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    animation: fadeIn 0.3s ease;
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    padding: 16px; /* Add padding to prevent content touching edges */
     }
 
-     /* Hidden state for modal */
+    /* Hidden state for modal */
     .modal.hidden {
-        display: none;
+    display: none;
     }
 
     .modal-content {
-        /* Removed absolute positioning and transform */
-        background: white;
-        padding: 24px; /* Reduced padding */
-        border-radius: 12px; /* Reduced border-radius */
-        max-width: 360px; /* Adjusted max-width to fit within body */
-        width: 100%; /* Take full width up to max-width */
-        box-shadow: 0 8px 16px rgba(0,0,0,0.15); /* shadow-lg */
-        box-sizing: border-box; /* Include padding in width */
-        animation: slideUp 0.3s ease; /* Keep slide up animation */
+    /* Removed absolute positioning and transform */
+    background: white;
+    padding: 24px; /* Reduced padding */
+    border-radius: 12px; /* Reduced border-radius */
+    max-width: 360px; /* Adjusted max-width to fit within body */
+    width: 100%; /* Take full width up to max-width */
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15); /* shadow-lg */
+    box-sizing: border-box; /* Include padding in width */
+    animation: slideUp 0.3s ease; /* Keep slide up animation */
     }
 
     .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px; /* Reduced margin */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px; /* Reduced margin */
     }
 
     .modal-title {
-        font-size: 18px; /* Reduced font size */
-        font-weight: 600;
-        color: #333;
+    font-size: 18px; /* Reduced font size */
+    font-weight: 600;
+    color: #333;
     }
 
     .close-btn {
-        background: none;
-        border: none;
-        font-size: 22px; /* Reduced font size */
-        color: #666;
-        cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 22px; /* Reduced font size */
+    color: #666;
+    cursor: pointer;
     }
 
     /* Emoji rating styling */
     #emoji-rating span {
-        transition: all 0.2s;
-        border-radius: 50%;
-        padding: 2px 4px;
-        filter: grayscale(1); /* Start with grayscale */
-        opacity: 0.6; /* Start with reduced opacity */
-        transform: scale(1);
-        display: inline-block; /* Ensure transform works */
+    transition: all 0.2s;
+    border-radius: 50%;
+    padding: 2px 4px;
+    filter: grayscale(1); /* Start with grayscale */
+    opacity: 0.6; /* Start with reduced opacity */
+    transform: scale(1);
+    display: inline-block; /* Ensure transform works */
     }
 
     #emoji-rating span:hover {
-         filter: grayscale(0); /* Remove grayscale on hover */
-         opacity: 1; /* Full opacity on hover */
-         transform: scale(1.1); /* Slight scale on hover */
+    filter: grayscale(0); /* Remove grayscale on hover */
+    opacity: 1; /* Full opacity on hover */
+    transform: scale(1.1); /* Slight scale on hover */
     }
 
 
     #emoji-rating span.selected {
-        transform: scale(1.2); /* Slightly less scale when selected */
-        filter: none; /* Remove grayscale */
-        background: #fff0ed;
-        opacity: 1; /* Full opacity */
+    transform: scale(1.2); /* Slightly less scale when selected */
+    filter: none; /* Remove grayscale */
+    background: #fff0ed;
+    opacity: 1; /* Full opacity */
     }
 
     #emoji-rating span.unselected {
-        filter: grayscale(1);
-        opacity: 0.5; /* More opacity for unselected */
-        transform: scale(1);
-        background: none;
+    filter: grayscale(1);
+    opacity: 0.5; /* More opacity for unselected */
+    transform: scale(1);
+    background: none;
     }
 
     /* Satisfaction textarea */
     #satisfaction-text {
-        resize: vertical; /* Allow vertical resize */
-        overflow: auto; /* Show scrollbar if needed */
-        box-sizing: border-box;
-        width: 100%; /* Make it responsive */
-        margin-bottom: 12px;
-        border-radius: 8px;
-        border: 1px solid #e8ddd4;
-        padding: 8px;
-        min-height: 60px; /* Increased min-height */
-        font-size: 14px; /* Consistent font size */
-        outline: none; /* Remove default outline */
+    resize: vertical; /* Allow vertical resize */
+    overflow: auto; /* Show scrollbar if needed */
+    box-sizing: border-box;
+    width: 100%; /* Make it responsive */
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border: 1px solid #e8ddd4;
+    padding: 8px;
+    min-height: 60px; /* Increased min-height */
+    font-size: 14px; /* Consistent font size */
+    outline: none; /* Remove default outline */
     }
-     #satisfaction-text:focus {
-        border-color: #f96c50; /* Focus border color */
-        box-shadow: 0 0 0 3px rgba(249, 108, 80, 0.2); /* Focus ring */
-     }
+    #satisfaction-text:focus {
+    border-color: #f96c50; /* Focus border color */
+    box-shadow: 0 0 0 3px rgba(249, 108, 80, 0.2); /* Focus ring */
+    }
 
     /* Animation Keyframes */
     @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+    from { opacity: 0; }
+    to { opacity: 1; }
     }
 
     @keyframes slideUp {
-        /* Adjusted animation for flex centering */
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+    /* Adjusted animation for flex centering */
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
     }
 
     </style>
@@ -509,8 +509,8 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
-     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script> <!-- Add Moment.js for date formatting -->
-     <script src="https://cdn.jsdelivr.net/npm/moment/locale/ko.js"></script> <!-- Korean locale for Moment.js -->
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script> <!-- Add Moment.js for date formatting -->
+    <script src="https://cdn.jsdelivr.net/npm/moment/locale/ko.js"></script> <!-- Korean locale for Moment.js -->
 
   </head>
   <body className={loading ? 'no-scroll' : ''}>
@@ -698,10 +698,10 @@
       // Initial style for the button
       useEffect(() => {
         setButtonStyle({
-            background: 'linear-gradient(135deg, #FFE5E0, #FFF0ED)',
-            color: '#F96C50',
-            border: '2px solid #F96C50'
-          });
+          background: 'linear-gradient(135deg, #FFE5E0, #FFF0ED)',
+          color: '#F96C50',
+          border: '2px solid #F96C50'
+        });
       }, []);
 
 
@@ -724,12 +724,12 @@
 
     // Component for the Loading Indicator
     const LoadingIndicator = ({ eta }) => (
-        <div className="loading-container">
-            <div className="spinner"></div>
-            <div className="loading-text">로딩 중...</div>
-            {eta > 0 && <div className="eta-text">예상 완료까지: {eta}초</div>}
-             {eta <= 0 && <div className="eta-text">조금만 기다려주세요</div>}
-        </div>
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <div className="loading-text">로딩 중...</div>
+        {eta > 0 && <div className="eta-text">예상 완료까지: {eta}초</div>}
+        {eta <= 0 && <div className="eta-text">조금만 기다려주세요</div>}
+      </div>
     );
 
 
@@ -742,74 +742,74 @@
       const [etaRemaining, setEtaRemaining] = useState(10); // Default ETA 10 seconds
       const timerRef = useRef(null); // Ref for the interval timer
 
-        // Load user plans and calculate summary on mount
-        useEffect(() => {
-          const saved = localStorage.getItem("userPlans");
-          if (saved) {
-            try {
-              const parsed = JSON.parse(saved);
-              if (Array.isArray(parsed)) {
-                setUserPlans(parsed);
-
-                const completedPlans = parsed.filter(p => p.done);
-                 // Calculate total duration and weighted average achievement only if there are completed plans
-                 if (completedPlans.length > 0) {
-                    const totalDuration = completedPlans.reduce((sum, plan) => sum + (plan.duration || 0), 0);
-                     // Calculate total 'achievement points' (achievement * duration)
-                    const totalAchievementPoints = completedPlans.reduce((sum, plan) => sum + (plan.achievement || 0) * (plan.duration || 0), 0);
-
-                    const averageAchievement = totalDuration > 0 ? Math.floor(totalAchievementPoints / totalDuration) : 0;
-
-                    const totalHours = Math.floor(totalDuration / 3600);
-                    const totalMinutes = Math.floor(totalDuration / 60) % 60;
-
-                    setSummary({
-                        achievement: averageAchievement,
-                        totalHours,
-                        totalMinutes
-                    });
-                 } else {
-                    // Handle case with no completed plans
-                     setSummary({
-                         achievement: 0,
-                         totalHours: 0,
-                         totalMinutes: 0
-                     });
-                 }
-
-              } else {
-                console.warn("\u{26A0} userPlans가 배열이 아닙니다. 초기화합니다.");
-                 setUserPlans([]);
-                 setSummary({ achievement: 0, totalHours: 0, totalMinutes: 0 });
-              }
-            } catch (e) {
-              console.error("\u{274C} JSON parse error:", e);
-               setUserPlans([]);
-               setSummary({ achievement: 0, totalHours: 0, totalMinutes: 0 });
-            }
-          } else {
-            console.warn("\u{2753} localStorage에 userPlans 없음. 초기화합니다.");
-             setUserPlans([]);
-             setSummary({ achievement: 0, totalHours: 0, totalMinutes: 0 });
-          }
-        }, []); // Empty dependency array means this effect runs once on mount
-
-        // Fetch feedback data and manage loading state
+      // Load user plans and calculate summary on mount
       useEffect(() => {
-          // Start the timer when loading begins
-           setEtaRemaining(10); // Reset ETA to 10 seconds
-           timerRef.current = setInterval(() => {
-               setEtaRemaining(prevEta => (prevEta > 0 ? prevEta - 1 : 0));
-           }, 1000);
+        const saved = localStorage.getItem("userPlans");
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed)) {
+              setUserPlans(parsed);
+
+              const completedPlans = parsed.filter(p => p.done);
+              // Calculate total duration and weighted average achievement only if there are completed plans
+              if (completedPlans.length > 0) {
+                const totalDuration = completedPlans.reduce((sum, plan) => sum + (plan.duration || 0), 0);
+                // Calculate total 'achievement points' (achievement * duration)
+                const totalAchievementPoints = completedPlans.reduce((sum, plan) => sum + (plan.achievement || 0) * (plan.duration || 0), 0);
+
+                const averageAchievement = totalDuration > 0 ? Math.floor(totalAchievementPoints / totalDuration) : 0;
+
+                const totalHours = Math.floor(totalDuration / 3600);
+                const totalMinutes = Math.floor(totalDuration / 60) % 60;
+
+                setSummary({
+                  achievement: averageAchievement,
+                  totalHours,
+                  totalMinutes
+                });
+              } else {
+                // Handle case with no completed plans
+                setSummary({
+                  achievement: 0,
+                  totalHours: 0,
+                  totalMinutes: 0
+                });
+              }
+
+            } else {
+              console.warn("\u{26A0} userPlans가 배열이 아닙니다. 초기화합니다.");
+              setUserPlans([]);
+              setSummary({ achievement: 0, totalHours: 0, totalMinutes: 0 });
+            }
+          } catch (e) {
+            console.error("\u{274C} JSON parse error:", e);
+            setUserPlans([]);
+            setSummary({ achievement: 0, totalHours: 0, totalMinutes: 0 });
+          }
+        } else {
+          console.warn("\u{2753} localStorage에 userPlans 없음. 초기화합니다.");
+          setUserPlans([]);
+          setSummary({ achievement: 0, totalHours: 0, totalMinutes: 0 });
+        }
+      }, []); // Empty dependency array means this effect runs once on mount
+
+      // Fetch feedback data and manage loading state
+      useEffect(() => {
+        // Start the timer when loading begins
+        setEtaRemaining(10); // Reset ETA to 10 seconds
+        timerRef.current = setInterval(() => {
+          setEtaRemaining(prevEta => (prevEta > 0 ? prevEta - 1 : 0));
+        }, 1000);
 
 
         fetch("https://doziapi.duckdns.org/api/feedback/daily")
           .then((response) => {
-               if (!response.ok) {
-                   throw new Error(`HTTP error! status: ${response.status}`);
-               }
-               return response.json();
-           })
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
           .then((data) => {
             setFeedbackData(data);
           })
@@ -817,64 +817,64 @@
             console.error("Failed to fetch feedback data:", err);
             // Set empty state or error state if needed
             setFeedbackData({
-                analysis: "피드백 로딩에 실패했습니다.",
-                suggestion: "잠시 후 다시 시도해주세요.",
-                encouragement: "데이터 로딩에 실패했어요."
+              analysis: "피드백 로딩에 실패했습니다.",
+              suggestion: "잠시 후 다시 시도해주세요.",
+              encouragement: "데이터 로딩에 실패했어요."
             });
-             // Ensure ETA stops
+            // Ensure ETA stops
             setEtaRemaining(0);
           })
           .finally(() => {
             setLoading(false);
-             // Stop the timer once loading is complete (whether success or error)
-             if (timerRef.current) {
-                 clearInterval(timerRef.current);
-             }
+            // Stop the timer once loading is complete (whether success or error)
+            if (timerRef.current) {
+              clearInterval(timerRef.current);
+            }
           });
 
-           // Cleanup function for the fetch effect
-           return () => {
-               // Stop the timer if the component unmounts while loading
-               if (timerRef.current) {
-                   clearInterval(timerRef.current);
-               }
-           };
+        // Cleanup function for the fetch effect
+        return () => {
+          // Stop the timer if the component unmounts while loading
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+          }
+        };
 
       }, []); // Empty dependency array means this effect runs once on mount
 
 
-       // Effect to manage the body's no-scroll class based on loading state (and potentially modal state if added later)
-       useEffect(() => {
-           const body = document.body;
-            // Apply no-scroll class while loading
-           if (loading) { // Assuming no modal in this specific feedback page
-               body.classList.add('no-scroll');
-           } else {
-               body.classList.remove('no-scroll');
-           }
-            // Cleanup effect
-            return () => {
-                body.classList.remove('no-scroll'); // Ensure scroll is re-enabled on component unmount
-            };
-       }, [loading]); // Effect depends on loading state
+      // Effect to manage the body's no-scroll class based on loading state (and potentially modal state if added later)
+      useEffect(() => {
+        const body = document.body;
+        // Apply no-scroll class while loading
+        if (loading) { // Assuming no modal in this specific feedback page
+          body.classList.add('no-scroll');
+        } else {
+          body.classList.remove('no-scroll');
+        }
+        // Cleanup effect
+        return () => {
+          body.classList.remove('no-scroll'); // Ensure scroll is re-enabled on component unmount
+        };
+      }, [loading]); // Effect depends on loading state
 
 
-       // Effect to initialize Lucide icons after content is rendered
-       useEffect(() => {
-           // Only create icons once loading is false and data is likely rendered
-           if (!loading && feedbackData) {
-               lucide.createIcons();
-           }
-       }, [loading, feedbackData]); // Rerun when loading state or feedbackData changes
+      // Effect to initialize Lucide icons after content is rendered
+      useEffect(() => {
+        // Only create icons once loading is false and data is likely rendered
+        if (!loading && feedbackData) {
+          lucide.createIcons();
+        }
+      }, [loading, feedbackData]); // Rerun when loading state or feedbackData changes
 
 
       if (loading) {
         return (
           <>
             <Header />
-             {/* Render the loading indicator */}
+            {/* Render the loading indicator */}
             <main className="main-container"> {/* Use main tag for semantics */}
-               <LoadingIndicator eta={etaRemaining} />
+              <LoadingIndicator eta={etaRemaining} />
             </main>
           </>
         );
@@ -949,10 +949,10 @@
               </h2>
 
               <div className="feedback-text">
-                  <h3>🔍 학습 분석</h3>
-                  <p>{analysisText}</p>
-                  <h3>💬 제안</h3>
-                  <p>{suggestionText}</p>
+                <h3>🔍 학습 분석</h3>
+                <p>{analysisText}</p>
+                <h3>💬 제안</h3>
+                <p>{suggestionText}</p>
               </div>
             </section>
 

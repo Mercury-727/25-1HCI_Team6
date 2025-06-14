@@ -1,121 +1,120 @@
 <!DOCTYPE html>
 <html lang="ko">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>스터디 플래너 홈</title>
-  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>스터디 플래너 홈</title>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
     /* --- 전체 CSS (원본과 동일) --- */
     * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
     }
 
     body {
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #FDF8F4;
-      color: #333;
-      line-height: 1.5;
-      max-width: 390px;
-      margin: 0 auto;
-      min-height: 100vh;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #FDF8F4;
+    color: #333;
+    line-height: 1.5;
+    max-width: 390px;
+    margin: 0 auto;
+    min-height: 100vh;
     }
 
     .header {
-        position: sticky;
-        top: 0;
-        left: 0;
-        right: 0;
-        background-color: #fdf8f4;
-        padding: 12px 16px; /* Reduced horizontal padding */
-        border-bottom: 1px solid #e8ddd4;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        z-index: 1000;
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #fdf8f4;
+    padding: 12px 16px; /* Reduced horizontal padding */
+    border-bottom: 1px solid #e8ddd4;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
     }
 
     .logo {
-        display: flex;
-        align-items: center;
-        font-size: 18px;
-        font-weight: 700;
-        color: #f96c50;
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: #f96c50;
     }
 
     .logo i {
-        margin-right: 8px;
-        font-size: 22px; /* Slightly smaller icon */
+    margin-right: 8px;
+    font-size: 22px; /* Slightly smaller icon */
     }
 
     .header-actions {
-        display: flex;
-        gap: 12px; /* Reduced gap */
+    display: flex;
+    gap: 12px; /* Reduced gap */
     }
 
     .header-btn {
-        background: none;
-        border: none;
-        padding: 8px;
-        border-radius: 8px;
-        color: #DD6B20;
-        cursor: pointer;
-        transition: all 0.2s ease;
+    background: none;
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    color: #DD6B20;
+    cursor: pointer;
+    transition: all 0.2s ease;
     }
 
     .header-btn:hover {
-        transform: scale(1.05);
+    transform: scale(1.05);
     }
 
     .main-container {
-      padding: 16px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     }
 
     .card {
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-      transition: all 0.2s ease;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.2s ease;
     }
 
     .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     .daily-summary {
-      background: linear-gradient(135deg, #FEE6DD 0%, #FFF3F0 100%);
-      text-align: center;
-      position: relative;
-      overflow: hidden;
+    background: linear-gradient(135deg, #FEE6DD 0%, #FFF3F0 100%);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
     }
 
     @keyframes shine {
-      0% {
-        transform: translate(-100%, -100%) rotate(45deg);
-      }
+    0% {
+    transform: translate(-100%, -100%) rotate(45deg);
+    }
 
-      100% {
-        transform: translate(100%, 100%) rotate(45deg);
-      }
+    100% {
+    transform: translate(100%, 100%) rotate(45deg);
+    }
     }
 
     .daily-summary h3 {
-      font-size: 20px;
-      font-weight: 600;
-      color: #E14A2E;
-      margin-bottom: 8px;
-      text-align: left;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #E14A2E;
+    margin-bottom: 8px;
+    text-align: left;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     }
 
     .summary-stats {
@@ -162,304 +161,304 @@
     }
 
     .summary-feedback-btn {
-      background: none;
-      border: 1px solid #F96C50;
-      color: #F96C50;
-      padding: 8px 15px;
-      border-radius: 16px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      margin-top: 16px;
-      display: block;
-      width: fit-content;
-      margin-left: auto;
-      margin-right: auto;
+    background: none;
+    border: 1px solid #F96C50;
+    color: #F96C50;
+    padding: 8px 15px;
+    border-radius: 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 16px;
+    display: block;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
     }
 
     .summary-feedback-btn:hover {
-      background: #F96C50;
-      color: white;
-      transform: scale(1.02);
+    background: #F96C50;
+    color: white;
+    transform: scale(1.02);
     }
 
     .summary-feedback-btn:active {
-      transform: scale(0.98);
+    transform: scale(0.98);
     }
 
     .ai-plan-card {
-      background: linear-gradient(135deg, #F96C50 0%, #E14A2E 100%);
-      color: white;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
+    background: linear-gradient(135deg, #F96C50 0%, #E14A2E 100%);
+    color: white;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
     }
 
     .ai-plan-card::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      animation: shine 4s infinite;
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: shine 4s infinite;
     }
 
     .ai-plan-text {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     }
 
     .ai-plan-btn {
-      background: rgba(255, 255, 255, 0.9);
-      color: #F96C50;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.9);
+    color: #F96C50;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     .ai-plan-btn:hover {
-      background: rgba(255, 255, 255, 1);
-      transform: scale(1.05);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .ai-plan-btn:active {
-      transform: scale(0.98);
+    transform: scale(0.98);
     }
 
     .floating-ai-btn {
-      position: fixed;
-      bottom: 30px;
-      right: 20px;
-      z-index: 1000;
-      background: linear-gradient(135deg, #E14A2E 0%, #F96C50 100%);
-      color: white;
-      border: none;
-      padding: 16px 20px;
-      border-radius: 25px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 4px 16px rgba(225, 74, 46, 0.3);
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    position: fixed;
+    bottom: 30px;
+    right: 20px;
+    z-index: 1000;
+    background: linear-gradient(135deg, #E14A2E 0%, #F96C50 100%);
+    color: white;
+    border: none;
+    padding: 16px 20px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(225, 74, 46, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     }
 
     .tooltip {
-      position: absolute;
-      top: -35px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(51, 51, 51, 0.9);
-      color: white;
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 12px;
-      white-space: nowrap;
-      opacity: 0;
-      pointer-events: none;
-      transition: all 0.3s ease;
+    position: absolute;
+    top: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(51, 51, 51, 0.9);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
     }
 
     .tooltip.show {
-      opacity: 1;
+    opacity: 1;
     }
 
     .feedback-item {
-      margin-bottom: 8px;
-      font-size: 14px;
+    margin-bottom: 8px;
+    font-size: 14px;
     }
 
     .feedback-label {
-      color: #666;
-      font-size: 12px;
+    color: #666;
+    font-size: 12px;
     }
 
     .feedback-value {
-      color: #333;
-      font-weight: 500;
+    color: #333;
+    font-weight: 500;
     }
 
     .feedback-positive {
-      color: #66C3A7;
+    color: #66C3A7;
     }
 
     .feedback-quote {
-      background: rgba(255, 255, 255, 0.8);
-      padding: 8px;
-      border-radius: 8px;
-      font-size: 12px;
-      color: #555;
-      font-style: italic;
-      border-left: 3px solid #F96C50;
-      margin-top: 8px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #555;
+    font-style: italic;
+    border-left: 3px solid #F96C50;
+    margin-top: 8px;
     }
 
     .activity-scroll {
-      display: flex;
-      gap: 12px;
-      overflow-x: auto;
-      padding-bottom: 8px;
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
     }
 
     .activity-card {
-      min-width: 200px;
-      background: #FFDDD6;
-      border-radius: 12px;
-      padding: 12px;
-      flex-shrink: 0;
-      position: relative;
-      cursor: pointer;
-      transition: all 0.2s ease;
+    min-width: 200px;
+    background: #FFDDD6;
+    border-radius: 12px;
+    padding: 12px;
+    flex-shrink: 0;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
     }
 
     .activity-card:hover {
-      transform: scale(1.02);
-      background: #FFD0C6;
+    transform: scale(1.02);
+    background: #FFD0C6;
     }
 
     .activity-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
     }
 
     .activity-duration {
-      font-size: 12px;
-      color: #666;
-      margin-bottom: 8px;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 8px;
     }
 
     .start-btn {
-      background: #F96C50;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
+    background: #F96C50;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
     }
 
     .start-btn:hover {
-      background: #E14A2E;
-      transform: scale(1.05);
+    background: #E14A2E;
+    transform: scale(1.05);
     }
 
     .learning-style {
-      background: linear-gradient(135deg, #FCDDD3 0%, #FEE6DD 100%);
+    background: linear-gradient(135deg, #FCDDD3 0%, #FEE6DD 100%);
     }
 
     .learning-style h3 {
-      font-size: 16px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     }
 
     .trend-btn {
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid #F96C50;
-      color: #F96C50;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid #F96C50;
+    color: #F96C50;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
     }
 
     .trend-btn:hover {
-      background: #F96C50;
-      color: white;
+    background: #F96C50;
+    color: white;
     }
 
     .daily-question {
-      background: linear-gradient(135deg, #FFF7DA 0%, #FFFBEA 100%);
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
+    background: linear-gradient(135deg, #FFF7DA 0%, #FFFBEA 100%);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
     }
 
     .daily-question h3 {
-      font-size: 16px;
-      font-weight: 600;
-      color: #B8860B;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #B8860B;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     }
 
     .daily-question p {
-      font-size: 12px;
-      color: #666;
-      opacity: 0.8;
+    font-size: 12px;
+    color: #666;
+    opacity: 0.8;
     }
 
     @keyframes bounceIn {
-      0% {
-        transform: scale(0.3) translateY(20px);
-        opacity: 0;
-      }
+    0% {
+    transform: scale(0.3) translateY(20px);
+    opacity: 0;
+    }
 
-      50% {
-        transform: scale(1.05) translateY(-5px);
-        opacity: 0.8;
-      }
+    50% {
+    transform: scale(1.05) translateY(-5px);
+    opacity: 0.8;
+    }
 
-      100% {
-        transform: scale(1) translateY(0);
-        opacity: 1;
-      }
+    100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    }
     }
 
     .floating {
-      animation: float 3s ease-in-out infinite;
+    animation: float 3s ease-in-out infinite;
     }
 
     @keyframes float {
 
-      0%,
-      100% {
-        transform: translateY(0px);
-      }
-
-      50% {
-        transform: translateY(-4px);
-      }
+    0%,
+    100% {
+    transform: translateY(0px);
     }
-  </style>
-</head>
 
-<body>
-  <div id="root"></div>
+    50% {
+    transform: translateY(-4px);
+    }
+    }
+    </style>
+  </head>
 
-  <!-- React & Babel CDN -->
-  <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <body>
+    <div id="root"></div>
 
-  <script type="text/babel">
+    <!-- React & Babel CDN -->
+    <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
     const { useState, useEffect, useRef } = React;
 
     function jumpToTimer(e, plan) {
@@ -473,65 +472,65 @@
     }
 
     function Header() {
-        return (
-          <header className="header">
-            <div className="logo">My Study</div>
-            <div className="header-buttons">
-              <button
-                className="header-btn"
-                onClick={() => {
-                  window.location.href = "./setting.html";
-                }}
-              >
-                <i data-lucide="settings" className="lucide" style={{ width: 20, height: 20 }} />
-              </button>
-              <button
-                className="header-btn"
-                onClick={() => window.location.reload()}
-              >
-                <i data-lucide="refresh-cw" className="lucide" style={{ width: 20, height: 20 }} />
-              </button>
-            </div>
-          </header>
-        );
+      return (
+        <header className="header">
+          <div className="logo">My Study</div>
+          <div className="header-buttons">
+            <button
+              className="header-btn"
+              onClick={() => {
+                window.location.href = "./setting.html";
+              }}
+            >
+              <i data-lucide="settings" className="lucide" style={{ width: 20, height: 20 }} />
+            </button>
+            <button
+              className="header-btn"
+              onClick={() => window.location.reload()}
+            >
+              <i data-lucide="refresh-cw" className="lucide" style={{ width: 20, height: 20 }} />
+            </button>
+          </div>
+        </header>
+      );
     }
 
     function DailySummary({ userPlans }) {
-        const completedPlans = userPlans.filter(p => p.done);
-        const [averageAchievement, totalDuration] = completedPlans
-            .reduce(
-                ([avg, weight], plan) => [Math.floor((avg * weight + plan.achievement * plan.duration) / (weight + plan.duration)), weight + plan.duration],
-                [0, 0]
-            );
-        const totalHours = Math.floor(totalDuration / 3600);
-        const totalMinutes = Math.floor(totalDuration / 60) % 60;
+      const completedPlans = userPlans.filter(p => p.done);
+      const [averageAchievement, totalDuration] = completedPlans
+      .reduce(
+        ([avg, weight], plan) => [Math.floor((avg * weight + plan.achievement * plan.duration) / (weight + plan.duration)), weight + plan.duration],
+        [0, 0]
+      );
+      const totalHours = Math.floor(totalDuration / 3600);
+      const totalMinutes = Math.floor(totalDuration / 60) % 60;
 
-        return (completedPlans.length > 0) ? (
-            <section className="card daily-summary">
-                <h3>오늘의 학습 요약</h3>
-                <div className="summary-stats">
-                    <div className="stat-item">
-                        <div className="stat-value">{averageAchievement}%</div>
-                        <div className="stat-label">목표 달성률</div>
-                        <div className="progress-bar">
-                            <div className="progress-fill" style={{ width: `${averageAchievement}%` }}></div>
-                        </div>
-                    </div>
-                    <div className="stat-item">
-                        <div className="stat-value">
-                            {totalHours}시간 {totalMinutes}분
-                        </div>
-                        <div className="stat-label">총 학습 시간</div>
-                    </div>
-                </div>
-                <button
-                    className="summary-feedback-btn"
-                    onClick={() => { window.location.href = "./feedback.html"; }}
-                >
-                    오늘의 피드백 보기
-                </button>
-            </section>
-        ) : (<></>);
+      return (completedPlans.length > 0) ? (
+        <section className="card daily-summary">
+          <h3>오늘의 학습 요약</h3>
+          <div className="summary-stats">
+            <div className="stat-item">
+              <div className="stat-value">{averageAchievement}%</div>
+              <div className="stat-label">목표 달성률</div>
+              <div className="progress-bar">
+                <div className="progress-fill" style={{ width: `${averageAchievement}%` }}></div>
+              </div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-value">
+                {totalHours}시간 {totalMinutes}분
+              </div>
+              <div className="stat-label">총 학습 시간</div>
+            </div>
+          </div>
+          <button
+            className="summary-feedback-btn"
+            onClick={() => { window.location.href = "./feedback.html"; }}
+          >
+            오늘의 피드백 보기
+          </button>
+        </section>
+      ) : (<></>);
     }
 
     function StudyPlannerHome() {
@@ -542,26 +541,26 @@
       const lastY = useRef(0);
       const [userPlans, setUserPlans] = useState([]);
 
-        // localStorage에서 불러오기
-        useEffect(() => {
-          const saved = localStorage.getItem("userPlans");
-          console.log("\u{1F4DD} raw:", saved);
-          if (saved) {
-            try {
-              const parsed = JSON.parse(saved);
-              console.log("\u{2705} parsed:", parsed);
-              if (Array.isArray(parsed)) {
-                setUserPlans(parsed);
-              } else {
-                console.warn("\u{26A0} userPlans가 배열이 아닙니다.");
-              }
-            } catch (e) {
-              console.error("\u{274C} JSON parse error:", e);
+      // localStorage에서 불러오기
+      useEffect(() => {
+        const saved = localStorage.getItem("userPlans");
+        console.log("\u{1F4DD} raw:", saved);
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            console.log("\u{2705} parsed:", parsed);
+            if (Array.isArray(parsed)) {
+              setUserPlans(parsed);
+            } else {
+              console.warn("\u{26A0} userPlans가 배열이 아닙니다.");
             }
-          } else {
-            console.warn("\u{2753} localStorage에 userPlans 없음");
+          } catch (e) {
+            console.error("\u{274C} JSON parse error:", e);
           }
-        }, []);
+        } else {
+          console.warn("\u{2753} localStorage에 userPlans 없음");
+        }
+      }, []);
 
       // 초기 로드 애니메이션 & 스크롤 핸들러
       useEffect(() => {
@@ -631,16 +630,16 @@
               <div className="activity-scroll">
                 {
                   userPlans
-                    .filter(p => !p.done) // 1. 완료 안 된 것만
-                    .sort((a, b) => a.start.localeCompare(b.start)) // 2. 시작 시간 오름차순 정렬
-                    .slice(0, 3) // 3. 상위 3개만
-                    .map((plan, i) => (
-                      <div key={i} className="activity-card" onClick={e => jumpToTimer(e, plan)}>
-                        <div className="activity-title">{plan.emoji} {plan.title}</div>
-                        <div className="activity-duration">⏱️ {plan.start} ~ {plan.end}</div>
-                        <button className="start-btn" onClick={e => jumpToTimer(e, plan)}>시작하기</button>
-                      </div>
-                    ))
+                  .filter(p => !p.done) // 1. 완료 안 된 것만
+                  .sort((a, b) => a.start.localeCompare(b.start)) // 2. 시작 시간 오름차순 정렬
+                  .slice(0, 3) // 3. 상위 3개만
+                  .map((plan, i) => (
+                    <div key={i} className="activity-card" onClick={e => jumpToTimer(e, plan)}>
+                      <div className="activity-title">{plan.emoji} {plan.title}</div>
+                      <div className="activity-duration">⏱️ {plan.start} ~ {plan.end}</div>
+                      <button className="start-btn" onClick={e => jumpToTimer(e, plan)}>시작하기</button>
+                    </div>
+                  ))
                 }
               </div>
             </section>
@@ -799,7 +798,7 @@
     }
 
     ReactDOM.render(<StudyPlannerHome />, document.getElementById('root'));
-  </script>
-</body>
+    </script>
+  </body>
 
 </html>

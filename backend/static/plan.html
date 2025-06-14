@@ -1,640 +1,640 @@
 <!DOCTYPE html>
 <html lang="ko">
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>학습 계획</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>학습 계획</title>
 
-  <!-- React & ReactDOM -->
-  <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
-  <!-- Babel for JSX -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <!-- Lucide Icons UMD -->
-  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
-  <style>
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Lucide Icons UMD -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
     /* Basic Reset */
     * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      /* Prevent selection, tap highlight on touch devices */
-      user-select: none;
-      -webkit-user-select: none;
-      -ms-user-select: none;
-      -webkit-touch-callout: none;
-      -webkit-tap-highlight-color: transparent;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* Prevent selection, tap highlight on touch devices */
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
     }
 
     /* Body styles for centering and background */
     body {
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #FDF8F4; /* Light orange background */
-      color: #333; /* Default text color */
-      line-height: 1.5;
-      max-width: 390px; /* Max width for content */
-      margin: 0 auto; /* Center the body horizontally */
-      min-height: 100vh;
-      position: relative; /* For positioning absolute children (like add button) relative to body */
-      overflow-y: auto; /* Default scroll behavior */
-      overflow-x: hidden; /* Prevent horizontal scroll */
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #FDF8F4; /* Light orange background */
+    color: #333; /* Default text color */
+    line-height: 1.5;
+    max-width: 390px; /* Max width for content */
+    margin: 0 auto; /* Center the body horizontally */
+    min-height: 100vh;
+    position: relative; /* For positioning absolute children (like add button) relative to body */
+    overflow-y: auto; /* Default scroll behavior */
+    overflow-x: hidden; /* Prevent horizontal scroll */
     }
 
     /* Class to disable scrolling on body */
     body.no-scroll {
-        overflow-y: hidden;
-        overscroll-behavior-y: contain; /* Prevent pull-to-refresh etc. */
+    overflow-y: hidden;
+    overscroll-behavior-y: contain; /* Prevent pull-to-refresh etc. */
     }
 
     /* Header style */
     .header {
-        position: sticky;
-        top: 0;
-        width: 100%; /* Takes full width of the body (390px) */
-        background-color: #fdf8f4; /* Match body background */
-        padding: 12px 16px; /* Padding */
-        border-bottom: 1px solid #e8ddd4; /* Bottom border */
-        display: flex;
-        justify-content: space-between; /* Space out logo and buttons */
-        align-items: center;
-        z-index: 1000; /* Above other content */
-        transition: filter 0.3s ease; /* Smooth blur transition */
+    position: sticky;
+    top: 0;
+    width: 100%; /* Takes full width of the body (390px) */
+    background-color: #fdf8f4; /* Match body background */
+    padding: 12px 16px; /* Padding */
+    border-bottom: 1px solid #e8ddd4; /* Bottom border */
+    display: flex;
+    justify-content: space-between; /* Space out logo and buttons */
+    align-items: center;
+    z-index: 1000; /* Above other content */
+    transition: filter 0.3s ease; /* Smooth blur transition */
     }
 
     /* Header blur effect when modal is open */
     .header.blurred {
-      filter: blur(3px);
-      pointer-events: none; /* Disable clicks */
+    filter: blur(3px);
+    pointer-events: none; /* Disable clicks */
     }
 
     .logo {
-        display: flex;
-        align-items: center;
-        font-size: 18px;
-        font-weight: 700;
-        color: #f96c50; /* Orange color */
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: #f96c50; /* Orange color */
     }
 
     .header-buttons { /* Container for header buttons */
-        display: flex;
-        gap: 8px; /* Gap between buttons */
+    display: flex;
+    gap: 8px; /* Gap between buttons */
     }
 
     .header-btn { /* Individual header button */
-        background: none;
-        border: none;
-        padding: 8px;
-        border-radius: 8px;
-        color: #DD6B20; /* Darker orange color */
-        cursor: pointer;
-        transition: all 0.2s ease;
+    background: none;
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    color: #DD6B20; /* Darker orange color */
+    cursor: pointer;
+    transition: all 0.2s ease;
     }
 
     .header-btn:hover {
-        transform: scale(1.05);
+    transform: scale(1.05);
     }
 
     /* Main content area - holds schedule and AI views */
     /* This div slides left/right */
     .main-content {
-      display: flex;
-      height: 100%; /* Fill parent height */
-      position: relative;
-      overflow: hidden; /* Hide sliding content */
+    display: flex;
+    height: 100%; /* Fill parent height */
+    position: relative;
+    overflow: hidden; /* Hide sliding content */
     }
 
     /* View container (schedule or AI) */
     .view-container {
-      width: 100%; /* Each view takes full width of parent (390px) */
-      position: relative;
-      transition-property: transform;
-      transition-duration: 300ms;
-      transition-timing-function: ease; /* Match Tailwind duration-300 transition-transform */
+    width: 100%; /* Each view takes full width of parent (390px) */
+    position: relative;
+    transition-property: transform;
+    transition-duration: 300ms;
+    transition-timing-function: ease; /* Match Tailwind duration-300 transition-transform */
     }
 
     /* Schedule view position */
     .schedule-view {
-      transform: translateX(0); /* Default position */
+    transform: translateX(0); /* Default position */
     }
 
     /* AI view position */
     .ai-view {
-       position: absolute; /* Position AI view on top */
-       top: 0;
-       /* Instead of translate-x-full, position it to the right */
-       left: 100%; /* Start 100% to the right of its container */
-       /* When active, move to translateX(-100%) to slide into view */
+    position: absolute; /* Position AI view on top */
+    top: 0;
+    /* Instead of translate-x-full, position it to the right */
+    left: 100%; /* Start 100% to the right of its container */
+    /* When active, move to translateX(-100%) to slide into view */
     }
 
     /* AI view active state */
     .ai-view.active {
-        transform: translateX(-100%); /* Slide left to cover schedule view */
+    transform: translateX(-100%); /* Slide left to cover schedule view */
     }
-     /* Schedule view active state when AI view is showing */
+    /* Schedule view active state when AI view is showing */
     .schedule-view.shifted {
-        transform: translateX(-100%); /* Slide left out of view */
+    transform: translateX(-100%); /* Slide left out of view */
     }
 
 
     /* Time grid background and padding */
     .time-grid {
-      height: 100%; /* Fill parent height */
-      background-color: #fff7ed; /* Light orange */
-      /* Padding at the bottom to account for fixed footer */
-      padding-bottom: 120px; /* Matches fixed-bottom-bar height roughly + buffer */
+    height: 100%; /* Fill parent height */
+    background-color: #fff7ed; /* Light orange */
+    /* Padding at the bottom to account for fixed footer */
+    padding-bottom: 120px; /* Matches fixed-bottom-bar height roughly + buffer */
     }
 
     /* Style for each 30-min time slot row */
     .time-slot {
-      display: flex;
-      align-items: flex-start;
-      height: 84px; /* slotHeight30 */
-      border-bottom: 1px solid #e5e7eb; /* gray-200 border */
+    display: flex;
+    align-items: flex-start;
+    height: 84px; /* slotHeight30 */
+    border-bottom: 1px solid #e5e7eb; /* gray-200 border */
     }
 
     /* Special style for hour markers */
     .time-slot.is-hour {
-      background-color: #ffffff; /* White background for hours */
+    background-color: #ffffff; /* White background for hours */
     }
 
     .time-label {
-      width: 64px; /* w-16 */
-      text-align: center;
-      color: #4b5563; /* gray-600 */
-      font-weight: 500; /* font-medium */
-      padding-top: 8px; /* pt-2 */
+    width: 64px; /* w-16 */
+    text-align: center;
+    color: #4b5563; /* gray-600 */
+    font-weight: 500; /* font-medium */
+    padding-top: 8px; /* pt-2 */
     }
 
     .time-content {
-      flex: 1 1 0%; /* flex-1 */
-      padding-left: 16px; /* pl-4 */
+    flex: 1 1 0%; /* flex-1 */
+    padding-left: 16px; /* pl-4 */
     }
 
     /* Plan card styles */
     .plan-card {
-      position: absolute; /* Position over the grid */
-      left: calc(64px + 4px); /* Time label width + padding */
-      right: 16px; /* Right padding */
-      border-width: 2px; /* border-2 */
-      border-style: solid;
-      background-color: white;
-      border-radius: 12px; /* rounded-xl */
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* shadow-md */
-      overflow: hidden;
-      z-index: 10; /* Above time grid */
+    position: absolute; /* Position over the grid */
+    left: calc(64px + 4px); /* Time label width + padding */
+    right: 16px; /* Right padding */
+    border-width: 2px; /* border-2 */
+    border-style: solid;
+    background-color: white;
+    border-radius: 12px; /* rounded-xl */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* shadow-md */
+    overflow: hidden;
+    z-index: 10; /* Above time grid */
     }
 
     .plan-card:hover {
-      box-shadow: 0 8px 16px rgba(0,0,0,0.15); /* hover:shadow-lg */
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15); /* hover:shadow-lg */
     }
 
     .plan-card.is-done { /* Style for done plans */
-        border-color: #d1fae5; /* green-300 */
-        background-color: #f0fdf4; /* green-50 */
+    border-color: #d1fae5; /* green-300 */
+    background-color: #f0fdf4; /* green-50 */
     }
 
     .plan-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 4px 12px; /* py-1 px-3 */
-       /* Add pointer-events-none here and auto on children */
-       pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 12px; /* py-1 px-3 */
+    /* Add pointer-events-none here and auto on children */
+    pointer-events: none;
     }
-     .plan-header > * { pointer-events: auto; } /* Allow clicks on children */
+    .plan-header > * { pointer-events: auto; } /* Allow clicks on children */
 
 
     .plan-title {
-      display: flex;
-      align-items: center;
-      gap: 8px; /* gap-2 */
+    display: flex;
+    align-items: center;
+    gap: 8px; /* gap-2 */
     }
 
     .plan-emoji {
-      font-size: 24px; /* text-2xl */
+    font-size: 24px; /* text-2xl */
     }
 
     .plan-title-text {
-      font-weight: 500; /* font-medium */
-      font-size: 14px; /* text-sm */
+    font-weight: 500; /* font-medium */
+    font-size: 14px; /* text-sm */
     }
 
     .plan-actions {
-      display: flex;
-      gap: 4px; /* gap-1 */
+    display: flex;
+    gap: 4px; /* gap-1 */
     }
 
     .plan-action-btn {
-      background: none;
-      border: none;
-      padding: 4px; /* p-1 */
-      border-radius: 4px; /* rounded */
-      cursor: pointer;
+    background: none;
+    border: none;
+    padding: 4px; /* p-1 */
+    border-radius: 4px; /* rounded */
+    cursor: pointer;
     }
 
     .plan-action-btn:hover {
-      background-color: #e5e7eb; /* hover:bg-gray-200 */
+    background-color: #e5e7eb; /* hover:bg-gray-200 */
     }
 
     .plan-action-btn .lucide {
-        pointer-events: none; /* Prevent icon from blocking button */
+    pointer-events: none; /* Prevent icon from blocking button */
     }
 
 
     .plan-content {
-      padding: 0 12px 8px; /* px-3 pb-2 */
-       /* Add pointer-events-none here */
-       pointer-events: none;
+    padding: 0 12px 8px; /* px-3 pb-2 */
+    /* Add pointer-events-none here */
+    pointer-events: none;
     }
 
     .plan-times,
     .plan-memo {
-      font-size: 12px; /* text-xs */
-      color: #6b7280; /* text-gray-500 / text-gray-600 */
+    font-size: 12px; /* text-xs */
+    color: #6b7280; /* text-gray-500 / text-gray-600 */
     }
-     .plan-memo {
-         color: #4b5563; /* text-gray-600 */
-         margin-top: 4px; /* Small space below time */
-     }
+    .plan-memo {
+    color: #4b5563; /* text-gray-600 */
+    margin-top: 4px; /* Small space below time */
+    }
 
 
-     /* Style for resize handles */
-     .resize-handle {
-        position: absolute;
-        left: 0;
-        right: 0;
-        height: 8px; /* Increased touch area */
-        cursor: ns-resize;
-        z-index: 20; /* Below buttons/icons, above card content */
-     }
+    /* Style for resize handles */
+    .resize-handle {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 8px; /* Increased touch area */
+    cursor: ns-resize;
+    z-index: 20; /* Below buttons/icons, above card content */
+    }
 
-     .resize-handle.top {
-        top: -4px; /* Position outside the card border for better touch */
-     }
+    .resize-handle.top {
+    top: -4px; /* Position outside the card border for better touch */
+    }
 
-     .resize-handle.bottom {
-        bottom: -4px; /* Position outside the card border for better touch */
-     }
+    .resize-handle.bottom {
+    bottom: -4px; /* Position outside the card border for better touch */
+    }
 
     /* AI View styles */
     .ai-view-content {
-      padding: 16px; /* p-4 */
-      height: 100%; /* Fill parent height */
-      background-color: #fff7ed; /* Unified background color (matching time-grid) */
-      padding-bottom: 120px; /* Padding for fixed footer */
+    padding: 16px; /* p-4 */
+    height: 100%; /* Fill parent height */
+    background-color: #fff7ed; /* Unified background color (matching time-grid) */
+    padding-bottom: 120px; /* Padding for fixed footer */
     }
 
     .ai-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px; /* mb-4 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px; /* mb-4 */
     }
 
     .ai-title {
-      font-size: 18px; /* text-lg */
-      font-weight: 700; /* font-bold */
-      display: flex;
-      align-items: center;
-      gap: 8px; /* gap-2 */
+    font-size: 18px; /* text-lg */
+    font-weight: 700; /* font-bold */
+    display: flex;
+    align-items: center;
+    gap: 8px; /* gap-2 */
     }
 
     .ai-back-btn {
-      color: #f59e0b; /* orange-600 */
-      background: none;
-      border: none;
-      cursor: pointer;
+    color: #f59e0b; /* orange-600 */
+    background: none;
+    border: none;
+    cursor: pointer;
     }
-     .ai-back-btn:hover { text-decoration: underline; }
+    .ai-back-btn:hover { text-decoration: underline; }
 
     .ai-plans-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px; /* space-y-3 */
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* space-y-3 */
     }
 
     .ai-plan-card {
-      position: relative; /* Needed for absolute delete button */
-      padding: 16px; /* p-4 */
-      background-color: #f97316; /* orange-500 */
-      color: white;
-      border-radius: 12px; /* rounded-xl */
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* shadow-sm */
-      display: flex;
-      align-items: center;
-      gap: 12px; /* gap-3 */
-      /* Adjust padding-right to make space for the delete button */
-      padding-right: 40px; /* Add space for the button */
+    position: relative; /* Needed for absolute delete button */
+    padding: 16px; /* p-4 */
+    background-color: #f97316; /* orange-500 */
+    color: white;
+    border-radius: 12px; /* rounded-xl */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* shadow-sm */
+    display: flex;
+    align-items: center;
+    gap: 12px; /* gap-3 */
+    /* Adjust padding-right to make space for the delete button */
+    padding-right: 40px; /* Add space for the button */
     }
 
     .ai-plan-emoji {
-      font-size: 24px; /* text-2xl */
+    font-size: 24px; /* text-2xl */
     }
 
     .ai-plan-details { /* Container for title and time */
-       flex-grow: 1; /* Allow details to take space */
+    flex-grow: 1; /* Allow details to take space */
     }
 
     .ai-plan-details .title {
-      font-weight: 500; /* font-medium */
-      font-size: 15px; /* Slightly larger font */
-      line-height: 1.3; /* Tighter line height for multi-line titles */
+    font-weight: 500; /* font-medium */
+    font-size: 15px; /* Slightly larger font */
+    line-height: 1.3; /* Tighter line height for multi-line titles */
     }
 
     .ai-plan-details .time {
-      font-size: 13px; /* text-sm */
-      color: #ffedd5; /* orange-100 */
-      margin-top: 4px; /* Space below title */
+    font-size: 13px; /* text-sm */
+    color: #ffedd5; /* orange-100 */
+    margin-top: 4px; /* Space below title */
     }
 
     .ai-plan-delete-btn {
-       position: absolute;
-       top: 8px; /* Position from top */
-       right: 8px; /* Position from right */
-       background: none;
-       border: none;
-       color: rgba(255, 255, 255, 0.7); /* Slightly transparent white */
-       cursor: pointer;
-       padding: 4px; /* Clickable area */
-       border-radius: 4px;
-       z-index: 5; /* Ensure clickable */
-       transition: color 0.2s ease;
+    position: absolute;
+    top: 8px; /* Position from top */
+    right: 8px; /* Position from right */
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7); /* Slightly transparent white */
+    cursor: pointer;
+    padding: 4px; /* Clickable area */
+    border-radius: 4px;
+    z-index: 5; /* Ensure clickable */
+    transition: color 0.2s ease;
     }
-     .ai-plan-delete-btn:hover {
-         color: white;
-     }
-     .ai-plan-delete-btn .lucide {
-         pointer-events: none; /* Prevent icon blocking click */
-     }
+    .ai-plan-delete-btn:hover {
+    color: white;
+    }
+    .ai-plan-delete-btn .lucide {
+    pointer-events: none; /* Prevent icon blocking click */
+    }
 
 
     .ai-empty-state {
-      text-align: center;
-      padding: 32px 0; /* py-8 */
-      color: #4b5563; /* gray-600 */
+    text-align: center;
+    padding: 32px 0; /* py-8 */
+    color: #4b5563; /* gray-600 */
     }
 
     .ai-generate-btn {
-      background-color: #f97316; /* orange-500 */
-      color: white;
-      padding: 12px 24px; /* px-6 py-3 */
-      border-radius: 9999px; /* rounded-full */
-      border: none;
-      font-weight: 700; /* font-bold */
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* shadow-md */
-      transition: all 0.2s ease; /* transition-all duration-200 */
-      cursor: pointer;
-      margin-top: 16px; /* Add some space */
+    background-color: #f97316; /* orange-500 */
+    color: white;
+    padding: 12px 24px; /* px-6 py-3 */
+    border-radius: 9999px; /* rounded-full */
+    border: none;
+    font-weight: 700; /* font-bold */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* shadow-md */
+    transition: all 0.2s ease; /* transition-all duration-200 */
+    cursor: pointer;
+    margin-top: 16px; /* Add some space */
     }
-     .ai-generate-btn:hover {
-         background-color: #ea580c; /* hover:bg-orange-600 */
-         box-shadow: 0 8px 16px rgba(0,0,0,0.15); /* hover:shadow-lg */
-         transform: scale(1.05); /* hover:scale-105 */
-     }
-     .ai-generate-btn:active {
-         transform: scale(0.95); /* active:scale-95 */
-     }
+    .ai-generate-btn:hover {
+    background-color: #ea580c; /* hover:bg-orange-600 */
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15); /* hover:shadow-lg */
+    transform: scale(1.05); /* hover:scale-105 */
+    }
+    .ai-generate-btn:active {
+    transform: scale(0.95); /* active:scale-95 */
+    }
 
     /* Fixed bottom command bar */
     .fixed-bottom-bar {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%); /* Center horizontally */
-      width: 100%;
-      max-width: 390px; /* Match body width */
-      padding: 16px; /* p-4 */
-      background-color: white;
-      border-top: 1px solid #e8ddd4; /* gray-200 border */
-      z-index: 40; /* Above main content, below modal */
-      box-sizing: border-box; /* Include padding in width */
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%); /* Center horizontally */
+    width: 100%;
+    max-width: 390px; /* Match body width */
+    padding: 16px; /* p-4 */
+    background-color: white;
+    border-top: 1px solid #e8ddd4; /* gray-200 border */
+    z-index: 40; /* Above main content, below modal */
+    box-sizing: border-box; /* Include padding in width */
     }
 
     .fixed-bottom-bar .content-wrapper { /* Inner wrapper for max-width and gap */
-        max-width: 390px; /* Redundant if parent is 390, but good practice */
-        margin: 0 auto; /* Redundant if parent is centered, but harmless */
-        display: flex;
-        gap: 12px; /* gap-3 */
+    max-width: 390px; /* Redundant if parent is 390, but good practice */
+    margin: 0 auto; /* Redundant if parent is centered, but harmless */
+    display: flex;
+    gap: 12px; /* gap-3 */
     }
 
     /* Common button style for the command bar */
     .command-btn {
-       flex: 1 1 0%; /* flex-1 */
-       padding: 12px 16px; /* py-3 */
-       border-radius: 9999px; /* rounded-full */
-       font-weight: 700; /* font-bold */
-       letter-spacing: 0.025em; /* tracking-wide */
-       box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* shadow-md */
-       transition: all 0.2s ease; /* transition-all duration-200 */
-       cursor: pointer;
-       border: none; /* Remove default button border */
-       display: flex; /* For icon + text */
-       align-items: center;
-       justify-content: center;
-       gap: 8px; /* gap-2 */
+    flex: 1 1 0%; /* flex-1 */
+    padding: 12px 16px; /* py-3 */
+    border-radius: 9999px; /* rounded-full */
+    font-weight: 700; /* font-bold */
+    letter-spacing: 0.025em; /* tracking-wide */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* shadow-md */
+    transition: all 0.2s ease; /* transition-all duration-200 */
+    cursor: pointer;
+    border: none; /* Remove default button border */
+    display: flex; /* For icon + text */
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* gap-2 */
     }
 
     /* Primary orange button */
     .command-btn.primary {
-       background-color: #f97316; /* orange-500 */
-       color: white;
+    background-color: #f97316; /* orange-500 */
+    color: white;
     }
-     .command-btn.primary:hover {
-         background-color: #ea580c; /* hover:bg-orange-600 */
-         box-shadow: 0 8px 16px rgba(0,0,0,0.15); /* hover:shadow-lg */
-         transform: scale(1.05); /* hover:scale-105 */
-     }
-      .command-btn.primary:active {
-         transform: scale(0.95); /* active:scale-95 */
-     }
+    .command-btn.primary:hover {
+    background-color: #ea580c; /* hover:bg-orange-600 */
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15); /* hover:shadow-lg */
+    transform: scale(1.05); /* hover:scale-105 */
+    }
+    .command-btn.primary:active {
+    transform: scale(0.95); /* active:scale-95 */
+    }
 
 
     /* Add plan button (floating) */
     .add-plan-button {
-      position: fixed; /* Changed to fixed */
-      bottom: 96px; /* Position from bottom */
-      right: 16px; /* Position from right edge of viewport */
-      background-color: #F96C50; /* orange-500 */
-      color: white;
-      width: 56px; /* w-14 */
-      height: 56px; /* h-14 */
-      border-radius: 9999px; /* rounded-full */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 30; /* Below fixed bar */
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* shadow-md */
-      cursor: pointer;
-      border: none;
-      transition: transform 0.2s ease;
+    position: fixed; /* Changed to fixed */
+    bottom: 96px; /* Position from bottom */
+    right: 16px; /* Position from right edge of viewport */
+    background-color: #F96C50; /* orange-500 */
+    color: white;
+    width: 56px; /* w-14 */
+    height: 56px; /* h-14 */
+    border-radius: 9999px; /* rounded-full */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 30; /* Below fixed bar */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* shadow-md */
+    cursor: pointer;
+    border: none;
+    transition: transform 0.2s ease;
     }
-     .add-plan-button:hover {
-          transform: scale(1.1); /* Simple hover effect */
-     }
-     .add-plan-button:active {
-          transform: scale(0.95); /* active effect */
-     }
-     .add-plan-button .lucide {
-         pointer-events: none; /* Prevent icon from blocking button */
-     }
+    .add-plan-button:hover {
+    transform: scale(1.1); /* Simple hover effect */
+    }
+    .add-plan-button:active {
+    transform: scale(0.95); /* active effect */
+    }
+    .add-plan-button .lucide {
+    pointer-events: none; /* Prevent icon from blocking button */
+    }
 
 
     /* Modal Overlay */
     .modal-overlay {
-      position: fixed;
-      inset: 0; /* top:0, right:0, bottom:0, left:0 */
-      background-color: rgba(0, 0, 0, 0.5); /* bg-black bg-opacity-50 */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px; /* p-4 */
-      z-index: 50; /* Above everything else */
+    position: fixed;
+    inset: 0; /* top:0, right:0, bottom:0, left:0 */
+    background-color: rgba(0, 0, 0, 0.5); /* bg-black bg-opacity-50 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px; /* p-4 */
+    z-index: 50; /* Above everything else */
     }
 
     /* Modal Content */
     .modal-content {
-      background-color: white;
-      border-radius: 16px; /* rounded-2xl */
-      width: 100%;
-      max-width: 384px; /* max-w-sm - using 384px */
-      padding: 24px; /* p-6 */
-      box-shadow: 0 8px 16px rgba(0,0,0,0.15); /* shadow-lg */
-      box-sizing: border-box; /* Include padding in width */
+    background-color: white;
+    border-radius: 16px; /* rounded-2xl */
+    width: 100%;
+    max-width: 384px; /* max-w-sm - using 384px */
+    padding: 24px; /* p-6 */
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15); /* shadow-lg */
+    box-sizing: border-box; /* Include padding in width */
     }
 
     .modal-title {
-      font-size: 20px; /* text-xl */
-      font-weight: 700; /* font-bold */
-      text-align: center;
-      margin-bottom: 16px; /* mb-4 */
+    font-size: 20px; /* text-xl */
+    font-weight: 700; /* font-bold */
+    text-align: center;
+    margin-bottom: 16px; /* mb-4 */
     }
 
     .modal-form-group {
-       margin-bottom: 16px; /* space-y-4 simulation */
+    margin-bottom: 16px; /* space-y-4 simulation */
     }
     .modal-form-group:last-child {
-       margin-bottom: 0;
+    margin-bottom: 0;
     }
 
 
     .modal-label {
-      display: block;
-      margin-bottom: 4px; /* mb-1 */
-      font-size: 14px; /* text-sm */
-      font-weight: 500; /* font-medium */
-      color: #4b5563; /* gray-700 */
+    display: block;
+    margin-bottom: 4px; /* mb-1 */
+    font-size: 14px; /* text-sm */
+    font-weight: 500; /* font-medium */
+    color: #4b5563; /* gray-700 */
     }
 
     .modal-input {
-      width: 100%;
-      border: 1px solid #d1d5db; /* border border-gray-300 */
-      padding: 8px; /* p-2 */
-      border-radius: 4px; /* rounded */
-      outline: none;
-       box-sizing: border-box; /* Include padding in width */
+    width: 100%;
+    border: 1px solid #d1d5db; /* border border-gray-300 */
+    padding: 8px; /* p-2 */
+    border-radius: 4px; /* rounded */
+    outline: none;
+    box-sizing: border-box; /* Include padding in width */
     }
     .modal-input:focus {
-       border-color: #f97316; /* focus:border-orange-500 */
-       box-shadow: 0 0 0 3px rgba(253, 186, 116, 0.5); /* focus:ring focus:ring-orange-200 (using rgba for transparency) */
+    border-color: #f97316; /* focus:border-orange-500 */
+    box-shadow: 0 0 0 3px rgba(253, 186, 116, 0.5); /* focus:ring focus:ring-orange-200 (using rgba for transparency) */
     }
 
     .modal-time-inputs {
-        display: flex;
-        align-items: center;
-        gap: 8px; /* gap-2 */
+    display: flex;
+    align-items: center;
+    gap: 8px; /* gap-2 */
     }
-     .modal-time-inputs input {
-         width: calc(50% - 4px); /* w-1/2 adjusted for gap */
-         box-sizing: border-box;
-     }
+    .modal-time-inputs input {
+    width: calc(50% - 4px); /* w-1/2 adjusted for gap */
+    box-sizing: border-box;
+    }
 
 
     .modal-emoji-picker {
-        display: flex;
-        gap: 8px; /* gap-2 */
-        flex-wrap: wrap; /* flex-wrap */
+    display: flex;
+    gap: 8px; /* gap-2 */
+    flex-wrap: wrap; /* flex-wrap */
     }
 
     .modal-emoji-button {
-        padding: 8px; /* p-2 */
-        font-size: 24px; /* text-2xl */
-        border-radius: 4px; /* rounded */
-        border: none;
-        background: none;
-        cursor: pointer;
+    padding: 8px; /* p-2 */
+    font-size: 24px; /* text-2xl */
+    border-radius: 4px; /* rounded */
+    border: none;
+    background: none;
+    cursor: pointer;
     }
 
     .modal-emoji-button:hover {
-        background-color: #f3f4f6; /* hover:bg-gray-100 */
+    background-color: #f3f4f6; /* hover:bg-gray-100 */
     }
-     .modal-emoji-button.selected {
-         background-color: #ffedd5; /* bg-orange-100 */
-     }
+    .modal-emoji-button.selected {
+    background-color: #ffedd5; /* bg-orange-100 */
+    }
 
     .modal-actions {
-      margin-top: 24px; /* mt-6 */
-      display: flex;
-      gap: 12px; /* gap-3 */
+    margin-top: 24px; /* mt-6 */
+    display: flex;
+    gap: 12px; /* gap-3 */
     }
 
     .modal-action-btn {
-       flex: 1; /* flex-1 */
-       padding: 12px; /* py-3 */
-       border-radius: 4px; /* rounded */
-       font-weight: 500;
-       cursor: pointer;
-       border: 1px solid #d1d5db; /* border border-gray-300 */
-       background-color: white;
-       transition: background-color 0.2s ease;
+    flex: 1; /* flex-1 */
+    padding: 12px; /* py-3 */
+    border-radius: 4px; /* rounded */
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid #d1d5db; /* border border-gray-300 */
+    background-color: white;
+    transition: background-color 0.2s ease;
     }
 
     .modal-action-btn:hover {
-        background-color: #f3f4f6; /* hover:bg-gray-100 */
+    background-color: #f3f4f6; /* hover:bg-gray-100 */
     }
 
     .modal-action-btn.primary {
-       background-color: #f97316; /* bg-orange-500 */
-       color: white;
-       border-color: #f97316; /* Match background */
+    background-color: #f97316; /* bg-orange-500 */
+    color: white;
+    border-color: #f97316; /* Match background */
     }
-     .modal-action-btn.primary:hover {
-         background-color: #ea580c; /* hover:bg-orange-600 */
-     }
+    .modal-action-btn.primary:hover {
+    background-color: #ea580c; /* hover:bg-orange-600 */
+    }
 
-  </style>
-</head>
+    </style>
+  </head>
 
-<body className={`bg-gray-100 ${isDraggingOrResizing ? 'no-scroll' : ''}`}>
-  <div id="root"></div>
+  <body className={`bg-gray-100 ${isDraggingOrResizing ? 'no-scroll' : ''}`}>
+    <div id="root"></div>
 
-  <script type="text/babel">
+    <script type="text/babel">
     const { useState, useEffect, useRef } = React;
 
     // Pass showModal prop to header
     function Header({ showModal }) {
-        // Using custom .header CSS now
-        return (
-          <header className={`header ${showModal ? 'blurred' : ''}`}>
-            <div className="logo">My Study</div>
-            <div className="header-buttons">
-              <button
-                className="header-btn"
-                onClick={(e) => { e.stopPropagation(); window.location.href = "./home.html"; }}
-                aria-label="메인화면"
-              >
-                <i data-lucide="home" className="lucide" style={{ width: 20, height: 20, pointerEvents: 'none' }} /> {/* Add pointer-events: none */}
-              </button>
-              <button
-                className="header-btn"
-                onClick={(e) => { e.stopPropagation(); window.location.reload(); }}
-                aria-label="새로고침"
-              >
-                <i data-lucide="refresh-cw" className="lucide" style={{ width: 20, height: 20, pointerEvents: 'none' }} /> {/* Add pointer-events: none */}
-              </button>
-            </div>
-          </header>
-        );
+      // Using custom .header CSS now
+      return (
+        <header className={`header ${showModal ? 'blurred' : ''}`}>
+          <div className="logo">My Study</div>
+          <div className="header-buttons">
+            <button
+              className="header-btn"
+              onClick={(e) => { e.stopPropagation(); window.location.href = "./home.html"; }}
+              aria-label="메인화면"
+            >
+              <i data-lucide="home" className="lucide" style={{ width: 20, height: 20, pointerEvents: 'none' }} /> {/* Add pointer-events: none */}
+            </button>
+            <button
+              className="header-btn"
+              onClick={(e) => { e.stopPropagation(); window.location.reload(); }}
+              aria-label="새로고침"
+            >
+              <i data-lucide="refresh-cw" className="lucide" style={{ width: 20, height: 20, pointerEvents: 'none' }} /> {/* Add pointer-events: none */}
+            </button>
+          </div>
+        </header>
+      );
     }
 
     function StudyPlannerApp() {
@@ -656,8 +656,8 @@
       const [currentView, setCurrentView] = useState('schedule');
       const [userPlans, setUserPlans] = useState([
         // 초기 예시 플랜들 (이 부분은 localStorage에서 불러온 후 덮어쓰여집니다)
-         { id: 1, title: '이차함수 복습: 핵심 개념 및 ax^2 그래프 개형', memo: '', start: '09:00', end: '10:00', emoji: '📚', done: false, duration: 0, achievement: 0 },
-         { id: 2, title: '이차함수 문제: 스스로 확인하기 풀기(p.121, p.128, p.133)', memo: '', start: '10:30', end: '11:30', emoji: '📐', done: false, duration: 0, achievement: 0 }
+        { id: 1, title: '이차함수 복습: 핵심 개념 및 ax^2 그래프 개형', memo: '', start: '09:00', end: '10:00', emoji: '📚', done: false, duration: 0, achievement: 0 },
+        { id: 2, title: '이차함수 문제: 스스로 확인하기 풀기(p.121, p.128, p.133)', memo: '', start: '10:30', end: '11:30', emoji: '📐', done: false, duration: 0, achievement: 0 }
       ]);
       const [aiPlans, setAiPlans] = useState([]);
       const [isDraggingOrResizing, setIsDraggingOrResizing] = useState(false); // New state
@@ -693,24 +693,24 @@
           try {
             const loadedPlans = JSON.parse(saved);
             if (Array.isArray(loadedPlans)) {
-               // Basic validation: ensure plans have required properties
-               const validPlans = loadedPlans.filter(p =>
-                   p && typeof p.id !== 'undefined' && // Allow id to be number or string (for AI plans)
-                   typeof p.title === 'string' &&
-                   typeof p.start === 'string' &&
-                   typeof p.end === 'string' &&
-                   typeof p.emoji === 'string' &&
-                   typeof p.done === 'boolean' &&
-                   typeof p.duration === 'number' &&
-                   typeof p.achievement === 'number'
-               );
-               setUserPlans(validPlans);
-               if (validPlans.length !== loadedPlans.length) {
-                   console.warn("일부 저장된 플랜 데이터가 유효하지 않아 제외되었습니다.");
-               }
+              // Basic validation: ensure plans have required properties
+              const validPlans = loadedPlans.filter(p =>
+                p && typeof p.id !== 'undefined' && // Allow id to be number or string (for AI plans)
+                  typeof p.title === 'string' &&
+                  typeof p.start === 'string' &&
+                  typeof p.end === 'string' &&
+                  typeof p.emoji === 'string' &&
+                  typeof p.done === 'boolean' &&
+                  typeof p.duration === 'number' &&
+                  typeof p.achievement === 'number'
+              );
+              setUserPlans(validPlans);
+              if (validPlans.length !== loadedPlans.length) {
+                console.warn("일부 저장된 플랜 데이터가 유효하지 않아 제외되었습니다.");
+              }
             } else {
-               console.error("저장된 일정 데이터 형식이 올바르지 않습니다. 초기화합니다.");
-               setUserPlans([]); // Reset if data is corrupt
+              console.error("저장된 일정 데이터 형식이 올바르지 않습니다. 초기화합니다.");
+              setUserPlans([]); // Reset if data is corrupt
             }
           } catch (e) {
             console.error("저장된 일정 데이터를 불러오지 못했습니다. 초기화합니다.", e);
@@ -721,48 +721,48 @@
       }, []); // Run only once on mount
 
       useEffect(() => {
-         // Only save if userPlans has been loaded or changed from its initial state.
-         // A simple check might be to see if the effect has run after initial mount.
-         // Using a ref or checking a flag could be more precise.
-         // For now, saving any time userPlans changes after initial load seems okay.
-         localStorage.setItem("userPlans", JSON.stringify(userPlans));
+        // Only save if userPlans has been loaded or changed from its initial state.
+        // A simple check might be to see if the effect has run after initial mount.
+        // Using a ref or checking a flag could be more precise.
+        // For now, saving any time userPlans changes after initial load seems okay.
+        localStorage.setItem("userPlans", JSON.stringify(userPlans));
         // Re-create lucide icons whenever plans change (because cards might be re-rendered)
         // Consider debouncing this if performance is an issue with many rapid plan changes
         lucide.createIcons();
       }, [userPlans]); // Save whenever userPlans changes
 
-       // Re-create lucide icons initially and when view changes (AI view might have different icons)
-       useEffect(() => {
-         lucide.createIcons();
-       }, [currentView]);
+      // Re-create lucide icons initially and when view changes (AI view might have different icons)
+      useEffect(() => {
+        lucide.createIcons();
+      }, [currentView]);
 
 
       useEffect(() => {
         if (currentView === 'ai') {
           // Consider scrolling to the top if AI view is entered
-           // window.scrollTo({ top: 0, behavior: 'smooth' });
+          // window.scrollTo({ top: 0, behavior: 'smooth' });
         }
       }, [currentView]);
 
 
       // =============== 시간 겹침 검사 ===============
       function isTimeOverlap(newPlan, plans, editingId = null) {
-         // Ensure start time is before end time
+        // Ensure start time is before end time
         const [s2h, s2m] = newPlan.start.split(':').map(Number);
         const [e2h, e2m] = newPlan.end.split(':').map(Number);
         const s2TotalMins = s2h * 60 + s2m;
         const e2TotalMins = e2h * 60 + e2m;
 
         if (s2TotalMins >= e2TotalMins) {
-            return true; // Overlap if start is same as or after end (or duration is zero/negative)
+          return true; // Overlap if start is same as or after end (or duration is zero/negative)
         }
-         // Ensure times are within the valid range (startHour to endHour inclusive of start, exclusive of endHour:00 if it exists)
-         // A plan ending at 24:00 is valid if startHour is 8 and endHour is 24.
-         // The range is [startHour*60, endHour*60)
-         if (s2TotalMins < startHour * 60 || e2TotalMins > endHour * 60) {
-             console.warn(`Plan time out of range: ${newPlan.start} - ${newPlan.end}`);
-             return true; // Treat out of range as overlap for simplicity
-         }
+        // Ensure times are within the valid range (startHour to endHour inclusive of start, exclusive of endHour:00 if it exists)
+        // A plan ending at 24:00 is valid if startHour is 8 and endHour is 24.
+        // The range is [startHour*60, endHour*60)
+        if (s2TotalMins < startHour * 60 || e2TotalMins > endHour * 60) {
+          console.warn(`Plan time out of range: ${newPlan.start} - ${newPlan.end}`);
+          return true; // Treat out of range as overlap for simplicity
+        }
 
 
         return plans.some(p => {
@@ -781,15 +781,15 @@
 
       // =============== 플랜 삭제 & 편집 ===============
       const deletePlan = id => {
-         // Prevent deletion if currently dragging/resizing
-         if (isDraggingOrResizing) return;
-         if (window.confirm("정말로 이 플랜을 삭제하시겠습니까?")) {
-            setUserPlans(plans => plans.filter(x => x.id !== id));
-         }
+        // Prevent deletion if currently dragging/resizing
+        if (isDraggingOrResizing) return;
+        if (window.confirm("정말로 이 플랜을 삭제하시겠습니까?")) {
+          setUserPlans(plans => plans.filter(x => x.id !== id));
+        }
       };
       const onEdit = plan => {
-         // Prevent editing if currently dragging/resizing
-         if (isDraggingOrResizing) return;
+        // Prevent editing if currently dragging/resizing
+        if (isDraggingOrResizing) return;
         setEditingPlan(plan);
         setNewPlan({
           title: plan.title,
@@ -803,8 +803,8 @@
 
       // =============== AI 제안 생성 (랜덤 더미) ===============
       const generateAiSuggestions = () => {
-         // Clear previous suggestions
-         setAiPlans([]);
+        // Clear previous suggestions
+        setAiPlans([]);
 
         const suggestions = [
           { title: '물리 공식 정리', emoji: '⚛️' },
@@ -824,88 +824,88 @@
         const interval = 5; // Check every 5 minutes
 
 
-         // Check for contiguous free slots of at least minDuration
-         for (let i = 0; i <= totalMinsInRange - minDuration; i += interval) {
-             const startTimeMins = startHour * 60 + i;
-             const potentialEndTimeMins = startTimeMins + minDuration;
+        // Check for contiguous free slots of at least minDuration
+        for (let i = 0; i <= totalMinsInRange - minDuration; i += interval) {
+          const startTimeMins = startHour * 60 + i;
+          const potentialEndTimeMins = startTimeMins + minDuration;
 
-             const potentialPlan = {
-                 start: `${String(Math.floor(startTimeMins / 60)).padStart(2, '0')}:${String(startTimeMins % 60).padStart(2, '0')}`,
-                 end: `${String(Math.floor(potentialEndTimeMins / 60)).padStart(2, '0')}:${String(potentialEndTimeMins % 60).padStart(2, '0')}`
-             };
+          const potentialPlan = {
+            start: `${String(Math.floor(startTimeMins / 60)).padStart(2, '0')}:${String(startTimeMins % 60).padStart(2, '0')}`,
+            end: `${String(Math.floor(potentialEndTimeMins / 60)).padStart(2, '0')}:${String(potentialEndTimeMins % 60).padStart(2, '0')}`
+          };
 
-             // Check if this potential minDuration slot overlaps with existing user plans
-             if (!isTimeOverlap(potentialPlan, userPlans)) {
-                 // Found a free spot for at least minDuration
-                 availableSlots.push(potentialPlan.start); // Store the start time of the free slot
-             }
-         }
+          // Check if this potential minDuration slot overlaps with existing user plans
+          if (!isTimeOverlap(potentialPlan, userPlans)) {
+            // Found a free spot for at least minDuration
+            availableSlots.push(potentialPlan.start); // Store the start time of the free slot
+          }
+        }
 
 
-         if (availableSlots.length < pick.length) {
-            // Not enough places found to fit minDuration tasks
-             alert("현재 비어있는 시간이 충분하지 않습니다. 다른 시간을 선택해보세요.");
-             return; // Don't generate AI plans
-         }
+        if (availableSlots.length < pick.length) {
+          // Not enough places found to fit minDuration tasks
+          alert("현재 비어있는 시간이 충분하지 않습니다. 다른 시간을 선택해보세요.");
+          return; // Don't generate AI plans
+        }
 
         // Assign random available *start* times to picked suggestions
         const randomStartTimes = availableSlots.sort(() => 0.5 - Math.random()).slice(0, pick.length);
 
         const newAi = pick.map((it, index) => {
-            const startTime = randomStartTimes[index];
-            const slotStartMins = startTime.split(':').map(Number).reduce((h, m) => h * 60 + m);
+          const startTime = randomStartTimes[index];
+          const slotStartMins = startTime.split(':').map(Number).reduce((h, m) => h * 60 + m);
 
-             // Determine a random duration for this plan, respecting max duration and end time
-             const maxPossibleEndMins = endHour * 60;
-             let actualMaxDurationMins = maxPossibleEndMins - slotStartMins;
+          // Determine a random duration for this plan, respecting max duration and end time
+          const maxPossibleEndMins = endHour * 60;
+          let actualMaxDurationMins = maxPossibleEndMins - slotStartMins;
 
-             // Clamp the random duration range [minDuration, maxDuration]
-             let effectiveMinDuration = minDuration;
-             let effectiveMaxDuration = Math.min(maxDuration, actualMaxDurationMins);
+          // Clamp the random duration range [minDuration, maxDuration]
+          let effectiveMinDuration = minDuration;
+          let effectiveMaxDuration = Math.min(maxDuration, actualMaxDurationMins);
 
-             // Ensure we can actually fit at least the minDuration
-             if (effectiveMaxDuration < effectiveMinDuration) {
-                 effectiveMinDuration = effectiveMaxDuration; // Fallback to max possible duration rounded down
-             }
+          // Ensure we can actually fit at least the minDuration
+          if (effectiveMaxDuration < effectiveMinDuration) {
+            effectiveMinDuration = effectiveMaxDuration; // Fallback to max possible duration rounded down
+          }
 
-             let suggestedDurationMins = effectiveMinDuration; // Start with minimum
-             if (effectiveMaxDuration > effectiveMinDuration) {
-                  // Choose a random duration in 5-minute increments within the allowed range
-                 const durationRange = effectiveMaxDuration - effectiveMinDuration;
-                 const numIncrements = Math.floor(durationRange / 5);
-                 suggestedDurationMins = effectiveMinDuration + Math.floor(Math.random() * (numIncrements + 1)) * 5;
-             }
+          let suggestedDurationMins = effectiveMinDuration; // Start with minimum
+          if (effectiveMaxDuration > effectiveMinDuration) {
+            // Choose a random duration in 5-minute increments within the allowed range
+            const durationRange = effectiveMaxDuration - effectiveMinDuration;
+            const numIncrements = Math.floor(durationRange / 5);
+            suggestedDurationMins = effectiveMinDuration + Math.floor(Math.random() * (numIncrements + 1)) * 5;
+          }
 
-             // Ensure the duration is at least 5 minutes if times are valid
-             if (suggestedDurationMins < 5 && actualMaxDurationMins >= 5) suggestedDurationMins = 5;
-             if (suggestedDurationMins < 5 && actualMaxDurationMins < 5 && actualMaxDurationMins > 0) suggestedDurationMins = Math.floor(actualMaxDurationMins / 5) * 5 || 5; // Smallest valid duration
+          // Ensure the duration is at least 5 minutes if times are valid
+          if (suggestedDurationMins < 5 && actualMaxDurationMins >= 5) suggestedDurationMins = 5;
+          if (suggestedDurationMins < 5 && actualMaxDurationMins < 5 && actualMaxDurationMins > 0) suggestedDurationMins = Math.floor(actualMaxDurationMins / 5) * 5 || 5; // Smallest valid duration
 
-            const suggestedEndMins = slotStartMins + suggestedDurationMins;
-             const suggestedEndTime = `${String(Math.floor(suggestedEndMins / 60)).padStart(2, '0')}:${String(suggestedEndMins % 60).padStart(2, '0')}`;
+          const suggestedEndMins = slotStartMins + suggestedDurationMins;
+          const suggestedEndTime = `${String(Math.floor(suggestedEndMins / 60)).padStart(2, '0')}:${String(suggestedEndMins % 60).padStart(2, '0')}`;
 
-            return {
-                id: `ai-${Date.now()}-${index}`, // Unique ID for AI plans (prefix to distinguish)
-                title: it.title,
-                memo: '', // AI doesn't generate memo
-                start: startTime,
-                end: suggestedEndTime, // Use calculated end time
-                emoji: it.emoji
-            };
+          return {
+            id: `ai-${Date.now()}-${index}`, // Unique ID for AI plans (prefix to distinguish)
+            title: it.title,
+            memo: '', // AI doesn't generate memo
+            start: startTime,
+            end: suggestedEndTime, // Use calculated end time
+            emoji: it.emoji
+          };
         });
 
-         // Final overlap check among the generated AI plans themselves
+        // Final overlap check among the generated AI plans themselves
         const finalAiPlans = [];
         for(const aiPlan of newAi) {
-             // Check overlap against user plans AND already accepted AI plans
-             if (!isTimeOverlap(aiPlan, userPlans.concat(finalAiPlans))) {
-                 finalAiPlans.push(aiPlan);
-             }
+          // Check overlap against user plans AND already accepted AI plans
+          if (!isTimeOverlap(aiPlan, userPlans.concat(finalAiPlans))) {
+            finalAiPlans.push(aiPlan);
+          }
         }
 
-         if(finalAiPlans.length === 0 && newAi.length > 0) {
-             alert("AI 플랜을 생성했지만, 서로 시간이 겹쳐 적용할 수 없습니다. 다시 시도해주세요.");
-             return; // Don't show suggestions if all overlapped internally
-         }
+        if(finalAiPlans.length === 0 && newAi.length > 0) {
+          alert("AI 플랜을 생성했지만, 서로 시간이 겹쳐 적용할 수 없습니다. 다시 시도해주세요.");
+          return; // Don't show suggestions if all overlapped internally
+        }
 
 
         setAiPlans(finalAiPlans);
@@ -917,16 +917,16 @@
         const potentialNewPlans = aiPlans.map(pl => ({ ...pl, id: Date.now() + Math.random(), done: false, duration: 0, achievement: 0 }));
         let hasOverlap = false;
         for(const newPlan of potentialNewPlans) {
-             // Check overlap against current user plans AND other new plans being added
-            if (isTimeOverlap(newPlan, userPlans.concat(potentialNewPlans.filter(p => p.id !== newPlan.id)))) {
-                hasOverlap = true;
-                break;
-            }
+          // Check overlap against current user plans AND other new plans being added
+          if (isTimeOverlap(newPlan, userPlans.concat(potentialNewPlans.filter(p => p.id !== newPlan.id)))) {
+            hasOverlap = true;
+            break;
+          }
         }
 
         if (hasOverlap) {
-             alert("선택한 AI 플랜 중 일부가 현재 플래너와 겹칩니다. 다시 생성하거나 직접 조정해주세요.");
-             return; // Don't apply if there's an overlap
+          alert("선택한 AI 플랜 중 일부가 현재 플래너와 겹칩니다. 다시 생성하거나 직접 조정해주세요.");
+          return; // Don't apply if there's an overlap
         }
 
         setUserPlans(plans => [...plans, ...potentialNewPlans]);
@@ -934,18 +934,18 @@
         setCurrentView('schedule'); // Switch back to schedule view
       };
 
-       // Delete AI plan suggestion
-       const deleteAiPlan = (id) => {
-           setAiPlans(plans => plans.filter(p => p.id !== id));
-       };
+      // Delete AI plan suggestion
+      const deleteAiPlan = (id) => {
+        setAiPlans(plans => plans.filter(p => p.id !== id));
+      };
 
 
       // =============== 신규/수정 저장(겹침 검사) ===============
       const savePlan = () => {
         if (!newPlan.title || !newPlan.start || !newPlan.end) {
-             alert("할 일, 시작 시간, 종료 시간을 모두 입력해주세요.");
-             return;
-         }
+          alert("할 일, 시작 시간, 종료 시간을 모두 입력해주세요.");
+          return;
+        }
 
         const overlap = isTimeOverlap(newPlan, userPlans, editingPlan?.id);
         if (overlap) {
@@ -971,251 +971,251 @@
 
       // Helper to get coordinates and scroll position from mouse or touch event
       const getCoordsAndScroll = (e) => {
-         if (e.touches && e.touches[0]) {
-             // Touch event
-             return {
-                 clientX: e.touches[0].clientX,
-                 clientY: e.touches[0].clientY,
-                 scrollY: window.scrollY || document.documentElement.scrollTop
-             };
-         } else if (e.clientX !== undefined) {
-             // Mouse event
-             return {
-                 clientX: e.clientX,
-                 clientY: e.clientY,
-                 scrollY: window.scrollY || document.documentElement.scrollTop
-             };
-         }
-         return null; // Should not happen
+        if (e.touches && e.touches[0]) {
+          // Touch event
+          return {
+            clientX: e.touches[0].clientX,
+            clientY: e.touches[0].clientY,
+            scrollY: window.scrollY || document.documentElement.scrollTop
+          };
+        } else if (e.clientX !== undefined) {
+          // Mouse event
+          return {
+            clientX: e.clientX,
+            clientY: e.clientY,
+            scrollY: window.scrollY || document.documentElement.scrollTop
+          };
+        }
+        return null; // Should not happen
       };
 
 
       const startResizing = (e, planId, edge) => {
-         // Prevent default touch behavior like scrolling/zooming
-         if (e.cancelable) e.preventDefault();
-         e.stopPropagation(); // Stop propagation to prevent triggering drag
+        // Prevent default touch behavior like scrolling/zooming
+        if (e.cancelable) e.preventDefault();
+        e.stopPropagation(); // Stop propagation to prevent triggering drag
 
-         dragDataRef.current = null; // Ensure drag is not active
+        dragDataRef.current = null; // Ensure drag is not active
 
-         const plan = userPlans.find(p => p.id === planId);
-         if (!plan) return;
+        const plan = userPlans.find(p => p.id === planId);
+        if (!plan) return;
 
-         const coords = getCoordsAndScroll(e);
-         if (!coords) return;
+        const coords = getCoordsAndScroll(e);
+        if (!coords) return;
 
-         // Store original time for potential revert
-         currentPlanBeforeDragOrResizeRef.current[planId] = { start: plan.start, end: plan.end };
+        // Store original time for potential revert
+        currentPlanBeforeDragOrResizeRef.current[planId] = { start: plan.start, end: plan.end };
 
-         const [sh, sm] = plan.start.split(':').map(Number);
-         const totalStartMins = sh * 60 + sm;
-         const startIdx5 = (totalStartMins - startHour * 60) / 5;
+        const [sh, sm] = plan.start.split(':').map(Number);
+        const totalStartMins = sh * 60 + sm;
+        const startIdx5 = (totalStartMins - startHour * 60) / 5;
 
-         const [eh, em] = plan.end.split(':').map(Number);
-         const totalEndMins = eh * 60 + em;
-         const endIdx5 = (totalEndMins - startHour * 60) / 5;
+        const [eh, em] = plan.end.split(':').map(Number);
+        const totalEndMins = eh * 60 + em;
+        const endIdx5 = (totalEndMins - startHour * 60) / 5;
 
-         // Check if the plan has zero or negative duration before allowing resize
-         if (endIdx5 <= startIdx5) {
-             console.warn("Cannot resize a plan with zero or negative duration.");
-             return;
-         }
-
-
-         resizeDataRef.current = {
-           planId,
-           edge,
-           initialClientY: coords.clientY, // Store clientY from event
-           initialScrollY: coords.scrollY, // Store initial scroll position
-           initialStartIdx5: startIdx5,
-           initialEndIdx5: endIdx5
-         };
-
-         setIsDraggingOrResizing(true); // Set dragging/resizing state to true
-       };
+        // Check if the plan has zero or negative duration before allowing resize
+        if (endIdx5 <= startIdx5) {
+          console.warn("Cannot resize a plan with zero or negative duration.");
+          return;
+        }
 
 
-       const startDragging = (e, planId) => {
-          // Prevent default touch behavior like scrolling/zooming
-          if (e.cancelable) e.preventDefault();
-          e.stopPropagation(); // Stop propagation to prevent triggering resize handles
+        resizeDataRef.current = {
+          planId,
+          edge,
+          initialClientY: coords.clientY, // Store clientY from event
+          initialScrollY: coords.scrollY, // Store initial scroll position
+          initialStartIdx5: startIdx5,
+          initialEndIdx5: endIdx5
+        };
 
-          resizeDataRef.current = null; // Ensure resize is not active
-
-          const plan = userPlans.find(p => p.id === planId);
-          if (!plan) return;
-
-          const coords = getCoordsAndScroll(e);
-          if (!coords) return;
-
-
-          // Store original time for potential revert
-          currentPlanBeforeDragOrResizeRef.current[planId] = { start: plan.start, end: plan.end };
-
-          const [sh, sm] = plan.start.split(':').map(Number);
-          const startIdx5 = ((sh * 60 + sm) - startHour * 60) / 5;
-
-          const [eh, em] = plan.end.split(':').map(Number);
-          const endIdx5 = ((eh * 60 + em) - startHour * 60) / 5;
-
-          const durationSlots5 = endIdx5 - startIdx5;
-          // Do not start dragging if the plan has zero or negative duration (shouldn't happen with isTimeOverlap check, but safety)
-          if (durationSlots5 <= 0) {
-              console.warn("Cannot drag a plan with zero or negative duration.");
-              return;
-          }
+        setIsDraggingOrResizing(true); // Set dragging/resizing state to true
+      };
 
 
-          dragDataRef.current = {
-            planId,
-            initialClientY: coords.clientY, // Store clientY from event
-            initialScrollY: coords.scrollY, // Store initial scroll position
-            initialStartIdx5: startIdx5,
-            durationSlots5
-          };
+      const startDragging = (e, planId) => {
+        // Prevent default touch behavior like scrolling/zooming
+        if (e.cancelable) e.preventDefault();
+        e.stopPropagation(); // Stop propagation to prevent triggering resize handles
 
-          setIsDraggingOrResizing(true); // Set dragging/resizing state to true
-       };
+        resizeDataRef.current = null; // Ensure resize is not active
+
+        const plan = userPlans.find(p => p.id === planId);
+        if (!plan) return;
+
+        const coords = getCoordsAndScroll(e);
+        if (!coords) return;
+
+
+        // Store original time for potential revert
+        currentPlanBeforeDragOrResizeRef.current[planId] = { start: plan.start, end: plan.end };
+
+        const [sh, sm] = plan.start.split(':').map(Number);
+        const startIdx5 = ((sh * 60 + sm) - startHour * 60) / 5;
+
+        const [eh, em] = plan.end.split(':').map(Number);
+        const endIdx5 = ((eh * 60 + em) - startHour * 60) / 5;
+
+        const durationSlots5 = endIdx5 - startIdx5;
+        // Do not start dragging if the plan has zero or negative duration (shouldn't happen with isTimeOverlap check, but safety)
+        if (durationSlots5 <= 0) {
+          console.warn("Cannot drag a plan with zero or negative duration.");
+          return;
+        }
+
+
+        dragDataRef.current = {
+          planId,
+          initialClientY: coords.clientY, // Store clientY from event
+          initialScrollY: coords.scrollY, // Store initial scroll position
+          initialStartIdx5: startIdx5,
+          durationSlots5
+        };
+
+        setIsDraggingOrResizing(true); // Set dragging/resizing state to true
+      };
 
 
       const onMove = e => {
-         // Only proceed if there's an active drag or resize
-         if (!dragDataRef.current && !resizeDataRef.current) {
-             return;
-         }
+        // Only proceed if there's an active drag or resize
+        if (!dragDataRef.current && !resizeDataRef.current) {
+          return;
+        }
 
-          // Prevent default scroll behavior if dragging or resizing is active
-         if (e.cancelable) e.preventDefault();
-         e.stopPropagation();
+        // Prevent default scroll behavior if dragging or resizing is active
+        if (e.cancelable) e.preventDefault();
+        e.stopPropagation();
 
-         const coords = getCoordsAndScroll(e);
-         if (!coords) return;
+        const coords = getCoordsAndScroll(e);
+        if (!coords) return;
 
-         // Calculate delta Y relative to initial *page* position, accounting for scroll
-         const initialClientY = resizeDataRef.current?.initialClientY || dragDataRef.current?.initialClientY;
-         const initialScrollY = resizeDataRef.current?.initialScrollY || dragDataRef.current?.initialScrollY;
+        // Calculate delta Y relative to initial *page* position, accounting for scroll
+        const initialClientY = resizeDataRef.current?.initialClientY || dragDataRef.current?.initialClientY;
+        const initialScrollY = resizeDataRef.current?.initialScrollY || dragDataRef.current?.initialScrollY;
 
-         // Only proceed if initial coords were captured (should always be if refs are set)
-         if (initialClientY === undefined || initialScrollY === undefined) return;
+        // Only proceed if initial coords were captured (should always be if refs are set)
+        if (initialClientY === undefined || initialScrollY === undefined) return;
 
 
-         const deltaY = (coords.clientY + coords.scrollY) - (initialClientY + initialScrollY);
-         const deltaSlots5 = Math.round(deltaY / slotHeight5);
+        const deltaY = (coords.clientY + coords.scrollY) - (initialClientY + initialScrollY);
+        const deltaSlots5 = Math.round(deltaY / slotHeight5);
 
-         // --- 리사이즈 중일 때 ---
-         if (resizeDataRef.current) {
-           const { planId, edge, initialStartIdx5, initialEndIdx5 } = resizeDataRef.current;
+        // --- 리사이즈 중일 때 ---
+        if (resizeDataRef.current) {
+          const { planId, edge, initialStartIdx5, initialEndIdx5 } = resizeDataRef.current;
 
-           let newStartIdx5 = initialStartIdx5;
-           let newEndIdx5 = initialEndIdx5;
+          let newStartIdx5 = initialStartIdx5;
+          let newEndIdx5 = initialEndIdx5;
 
-           if (edge === 'top') {
-             newStartIdx5 = initialStartIdx5 + deltaSlots5;
-             // Clamp new start index: min 0, max (initialEndIdx5 - 1)
-             if (newStartIdx5 < 0) newStartIdx5 = 0;
-             if (newStartIdx5 >= initialEndIdx5) newStartIdx5 = initialEndIdx5 - 1; // Ensure min duration of 5 mins
-           } else if (edge === 'bottom') {
-             newEndIdx5 = initialEndIdx5 + deltaSlots5;
-             // Clamp new end index: min (initialStartIdx5 + 1), max total slots
-             const total5Slots = ((endHour - startHour) * 60) / 5;
-             if (newEndIdx5 <= initialStartIdx5) newEndIdx5 = initialStartIdx5 + 1; // Ensure min duration of 5 mins
-             if (newEndIdx5 > total5Slots) newEndIdx5 = total5Slots;
-           }
+          if (edge === 'top') {
+            newStartIdx5 = initialStartIdx5 + deltaSlots5;
+            // Clamp new start index: min 0, max (initialEndIdx5 - 1)
+            if (newStartIdx5 < 0) newStartIdx5 = 0;
+            if (newStartIdx5 >= initialEndIdx5) newStartIdx5 = initialEndIdx5 - 1; // Ensure min duration of 5 mins
+          } else if (edge === 'bottom') {
+            newEndIdx5 = initialEndIdx5 + deltaSlots5;
+            // Clamp new end index: min (initialStartIdx5 + 1), max total slots
+            const total5Slots = ((endHour - startHour) * 60) / 5;
+            if (newEndIdx5 <= initialStartIdx5) newEndIdx5 = initialStartIdx5 + 1; // Ensure min duration of 5 mins
+            if (newEndIdx5 > total5Slots) newEndIdx5 = total5Slots;
+          }
 
-           // Convert indices back to times
-           const newStartMins = startHour * 60 + newStartIdx5 * 5;
-           const updatedStart = `${String(Math.floor(newStartMins / 60)).padStart(2, '0')}:${String(newStartMins % 60).padStart(2, '0')}`;
+          // Convert indices back to times
+          const newStartMins = startHour * 60 + newStartIdx5 * 5;
+          const updatedStart = `${String(Math.floor(newStartMins / 60)).padStart(2, '0')}:${String(newStartMins % 60).padStart(2, '0')}`;
 
-           const newEndMins = startHour * 60 + newEndIdx5 * 5;
-           const updatedEnd = `${String(Math.floor(newEndMins / 60)).padStart(2, '0')}:${String(newEndMins % 60).padStart(2, '0')}`;
+          const newEndMins = startHour * 60 + newEndIdx5 * 5;
+          const updatedEnd = `${String(Math.floor(newEndMins / 60)).padStart(2, '0')}:${String(newEndMins % 60).padStart(2, '0')}`;
 
-           // Update state immutably only if times actually changed
-           setUserPlans(plans => {
-              const currentPlan = plans.find(p => p.id === planId);
-              if (currentPlan && (currentPlan.start !== updatedStart || currentPlan.end !== updatedEnd)) {
-                 return plans.map(x =>
-                   x.id === planId ? { ...x, start: updatedStart, end: updatedEnd } : x
-                 );
-              }
-              return plans; // No change needed
-           });
-           // return; // Stop processing if resizing - Handled by the initial if check
-         }
+          // Update state immutably only if times actually changed
+          setUserPlans(plans => {
+            const currentPlan = plans.find(p => p.id === planId);
+            if (currentPlan && (currentPlan.start !== updatedStart || currentPlan.end !== updatedEnd)) {
+              return plans.map(x =>
+                x.id === planId ? { ...x, start: updatedStart, end: updatedEnd } : x
+              );
+            }
+            return plans; // No change needed
+          });
+          // return; // Stop processing if resizing - Handled by the initial if check
+        }
 
-         // --- 이동 중일 때 ---
-         if (dragDataRef.current) {
-           const { planId, initialStartIdx5, durationSlots5 } = dragDataRef.current;
+        // --- 이동 중일 때 ---
+        if (dragDataRef.current) {
+          const { planId, initialStartIdx5, durationSlots5 } = dragDataRef.current;
 
-           let newStartIdx5 = initialStartIdx5 + deltaSlots5;
-           const total5Slots = ((endHour - startHour) * 60) / 5;
+          let newStartIdx5 = initialStartIdx5 + deltaSlots5;
+          const total5Slots = ((endHour - startHour) * 60) / 5;
 
-           // Clamp new start index for dragging
-           if (newStartIdx5 < 0) newStartIdx5 = 0;
-           if (newStartIdx5 + durationSlots5 > total5Slots) newStartIdx5 = total5Slots - durationSlots5;
+          // Clamp new start index for dragging
+          if (newStartIdx5 < 0) newStartIdx5 = 0;
+          if (newStartIdx5 + durationSlots5 > total5Slots) newStartIdx5 = total5Slots - durationSlots5;
 
-           const newEndIdx5 = newStartIdx5 + durationSlots5;
+          const newEndIdx5 = newStartIdx5 + durationSlots5;
 
-           // Convert indices back to times
-           const newStartMins = startHour * 60 + newStartIdx5 * 5;
-           const updatedStart = `${String(Math.floor(newStartMins / 60)).padStart(2, '0')}:${String(newStartMins % 60).padStart(2, '0')}`;
+          // Convert indices back to times
+          const newStartMins = startHour * 60 + newStartIdx5 * 5;
+          const updatedStart = `${String(Math.floor(newStartMins / 60)).padStart(2, '0')}:${String(newStartMins % 60).padStart(2, '0')}`;
 
-           const newEndMins = startHour * 60 + newEndIdx5 * 5;
-           const updatedEnd = `${String(Math.floor(newEndMins / 60)).padStart(2, '0')}:${String(newEndMins % 60).padStart(2, '0')}`;
+          const newEndMins = startHour * 60 + newEndIdx5 * 5;
+          const updatedEnd = `${String(Math.floor(newEndMins / 60)).padStart(2, '0')}:${String(newEndMins % 60).padStart(2, '0')}`;
 
-            // Update state immutably only if start time actually changed
-            setUserPlans(plans => {
-               const currentPlan = plans.find(p => p.id === planId);
-               if (currentPlan && currentPlan.start !== updatedStart) {
-                   return plans.map(x =>
-                     x.id === planId ? { ...x, start: updatedStart, end: updatedEnd } : x
-                   );
-               }
-               return plans; // No change needed
-            });
-           // return; // Stop processing if dragging - Handled by the initial if check
-         }
+          // Update state immutably only if start time actually changed
+          setUserPlans(plans => {
+            const currentPlan = plans.find(p => p.id === planId);
+            if (currentPlan && currentPlan.start !== updatedStart) {
+              return plans.map(x =>
+                x.id === planId ? { ...x, start: updatedStart, end: updatedEnd } : x
+              );
+            }
+            return plans; // No change needed
+          });
+          // return; // Stop processing if dragging - Handled by the initial if check
+        }
       };
 
       // =============== 드래그/리사이즈 종료 시 겹침 검사 및 원복 ===============
       const handleEnd = () => {
-          let activeRef = null;
-          if(dragDataRef.current) activeRef = dragDataRef.current;
-          if(resizeDataRef.current) activeRef = resizeDataRef.current;
+        let activeRef = null;
+        if(dragDataRef.current) activeRef = dragDataRef.current;
+        if(resizeDataRef.current) activeRef = resizeDataRef.current;
 
-          if (activeRef) {
-              const { planId } = activeRef;
-              const changedPlan = userPlans.find(p => p.id === planId);
-              if (changedPlan) {
-                   // Filter out the plan being moved/resized when checking overlap
-                  const plansToCheckAgainst = userPlans.filter(x => x.id !== planId);
-                  if (isTimeOverlap(changedPlan, plansToCheckAgainst)) {
-                      // 겹치면 원복
-                      const orig = currentPlanBeforeDragOrResizeRef.current[planId];
-                       // Only revert if original time exists and is different from current
-                      if (orig && (changedPlan.start !== orig.start || changedPlan.end !== orig.end)) {
-                           setUserPlans(plans =>
-                               plans.map(x =>
-                                   x.id === planId
-                                       ? { ...x, start: orig.start, end: orig.end }
-                                       : x
-                               )
-                           );
-                           alert("다른 플랜과 시간이 겹칠 수 없습니다!");
-                       } else if (!orig) {
-                            // This case indicates an issue where original time wasn't stored
-                           console.error(`Original time not stored for plan ${planId}`);
-                       }
-                  }
+        if (activeRef) {
+          const { planId } = activeRef;
+          const changedPlan = userPlans.find(p => p.id === planId);
+          if (changedPlan) {
+            // Filter out the plan being moved/resized when checking overlap
+            const plansToCheckAgainst = userPlans.filter(x => x.id !== planId);
+            if (isTimeOverlap(changedPlan, plansToCheckAgainst)) {
+              // 겹치면 원복
+              const orig = currentPlanBeforeDragOrResizeRef.current[planId];
+              // Only revert if original time exists and is different from current
+              if (orig && (changedPlan.start !== orig.start || changedPlan.end !== orig.end)) {
+                setUserPlans(plans =>
+                  plans.map(x =>
+                    x.id === planId
+                      ? { ...x, start: orig.start, end: orig.end }
+                      : x
+                  )
+                );
+                alert("다른 플랜과 시간이 겹칠 수 없습니다!");
+              } else if (!orig) {
+                // This case indicates an issue where original time wasn't stored
+                console.error(`Original time not stored for plan ${planId}`);
               }
+            }
           }
-          // Clear refs regardless of overlap check result
-          dragDataRef.current = null;
-          resizeDataRef.current = null;
-          currentPlanBeforeDragOrResizeRef.current = {}; // Clear original times
+        }
+        // Clear refs regardless of overlap check result
+        dragDataRef.current = null;
+        resizeDataRef.current = null;
+        currentPlanBeforeDragOrResizeRef.current = {}; // Clear original times
 
-          setIsDraggingOrResizing(false); // Set dragging/resizing state to false
-          // Reset last tap time here in case touch end wasn't part of a double tap
-          // This prevents a subsequent single tap from being mistaken for a double tap's second tap.
-          lastTapTimeRef.current = {};
+        setIsDraggingOrResizing(false); // Set dragging/resizing state to false
+        // Reset last tap time here in case touch end wasn't part of a double tap
+        // This prevents a subsequent single tap from being mistaken for a double tap's second tap.
+        lastTapTimeRef.current = {};
       };
 
 
@@ -1226,7 +1226,7 @@
         // Use { passive: false } on touchmove to allow preventDefault for stopping scroll
         window.addEventListener('touchmove', onMove, { passive: false });
         window.addEventListener('touchend', handleEnd);
-         // Also listen for touchcancel - useful if the touch is interrupted (e.g., multitasking swipe)
+        // Also listen for touchcancel - useful if the touch is interrupted (e.g., multitasking swipe)
         window.addEventListener('touchcancel', handleEnd);
 
 
@@ -1236,23 +1236,23 @@
           window.removeEventListener('mouseup', handleEnd);
           window.removeEventListener('touchmove', onMove);
           window.removeEventListener('touchend', handleEnd);
-           window.removeEventListener('touchcancel', handleEnd);
+          window.removeEventListener('touchcancel', handleEnd);
         };
       }, [userPlans]); // Re-run effect if userPlans state changes (needed because handleEnd uses userPlans)
 
 
       // Apply no-scroll class to body based on state
       useEffect(() => {
-          const body = document.body;
-          if (isDraggingOrResizing || showModal) { // Also disable scroll when modal is open
-              body.classList.add('no-scroll');
-          } else {
-              body.classList.remove('no-scroll');
-          }
-           // Cleanup effect
-           return () => {
-               body.classList.remove('no-scroll'); // Ensure scroll is re-enabled on component unmount
-           };
+        const body = document.body;
+        if (isDraggingOrResizing || showModal) { // Also disable scroll when modal is open
+          body.classList.add('no-scroll');
+        } else {
+          body.classList.remove('no-scroll');
+        }
+        // Cleanup effect
+        return () => {
+          body.classList.remove('no-scroll'); // Ensure scroll is re-enabled on component unmount
+        };
       }, [isDraggingOrResizing, showModal]); // Effect depends on these states
 
 
@@ -1303,7 +1303,7 @@
                 const startIdx5 = ((sh * 60 + sm) - (startHour * 60)) / 5;
 
                 const [eh, em] = plan.end.split(':').map(Number);
-                 // Convert end time to index
+                // Convert end time to index
                 const endIdx5 = ((eh * 60 + em) - (startHour * 60)) / 5;
 
                 const spanSlots5 = endIdx5 - startIdx5;
@@ -1313,31 +1313,31 @@
 
 
                 // Use onTouchStart to record time and initiate drag detection
-                 // Use onTouchEnd to detect double-tap based on time from start
-                 const handlePlanTouchStart = (e) => {
-                      // Check if touch started on a resize handle or button
-                       if (e.target.closest('.resize-handle') || e.target.closest('button') || e.target.closest('.lucide')) {
-                            return; // Let resize/button handlers take over
-                       }
-                       // Prevent default behavior aggressively to try and stop initial scroll
-                        if (e.cancelable) e.preventDefault();
-                        e.stopPropagation();
+                // Use onTouchEnd to detect double-tap based on time from start
+                const handlePlanTouchStart = (e) => {
+                  // Check if touch started on a resize handle or button
+                  if (e.target.closest('.resize-handle') || e.target.closest('button') || e.target.closest('.lucide')) {
+                    return; // Let resize/button handlers take over
+                  }
+                  // Prevent default behavior aggressively to try and stop initial scroll
+                  if (e.cancelable) e.preventDefault();
+                  e.stopPropagation();
 
-                       lastTapTimeRef.current[plan.id] = Date.now(); // Record touch start time
-                       startDragging(e, plan.id); // Start drag detection immediately
-                 };
+                  lastTapTimeRef.current[plan.id] = Date.now(); // Record touch start time
+                  startDragging(e, plan.id); // Start drag detection immediately
+                };
 
                 // Mouse down handler for starting drag
-                 const handlePlanMouseDown = (e) => {
-                     // Check if mouse down happened on resize handle or icon button, if so, do nothing
-                     if (e.target.closest('.resize-handle') || e.target.closest('button') || e.target.closest('.lucide')) {
-                       return; // Let resize/button handlers take over
-                     }
-                     // Prevent default browser drag behavior
-                     if (e.cancelable) e.preventDefault();
-                     e.stopPropagation(); // Stop propagation
-                     startDragging(e, plan.id);
-                 };
+                const handlePlanMouseDown = (e) => {
+                  // Check if mouse down happened on resize handle or icon button, if so, do nothing
+                  if (e.target.closest('.resize-handle') || e.target.closest('button') || e.target.closest('.lucide')) {
+                    return; // Let resize/button handlers take over
+                  }
+                  // Prevent default browser drag behavior
+                  if (e.cancelable) e.preventDefault();
+                  e.stopPropagation(); // Stop propagation
+                  startDragging(e, plan.id);
+                };
 
                 return (
                   <div
@@ -1353,21 +1353,21 @@
                     onDoubleClick={() => onEdit(plan)} // Keep double click for desktop
                     // onTouchEnd detects double-tap *after* the touch ends
                     onTouchEnd={(e) => {
-                       // Check if touch ended on a handle/button
-                       if (e.target.closest('.resize-handle') || e.target.closest('button') || e.target.closest('.lucide')) {
-                         // Let global handleEnd clear drag/resize state if they were active
-                         return;
-                       }
-                       const now = Date.now();
-                       const last = lastTapTimeRef.current[plan.id] || 0;
-                       // Check if this touchend is part of a potential double-tap sequence (following a touchstart within 300ms)
-                       // Also ensure it wasn't just a very long press/drag (e.g., check if a drag happened)
-                       if (now - last < 300 && now - last > 10 && !dragDataRef.current) { // Add a small minimum gap and check if drag occurred
-                            // This confirms a double tap (and it wasn't a drag)
-                            onEdit(plan); // Trigger edit modal
-                       }
-                       // Clear the recorded touch start time regardless of double-tap status
-                       lastTapTimeRef.current[plan.id] = 0;
+                      // Check if touch ended on a handle/button
+                      if (e.target.closest('.resize-handle') || e.target.closest('button') || e.target.closest('.lucide')) {
+                        // Let global handleEnd clear drag/resize state if they were active
+                        return;
+                      }
+                      const now = Date.now();
+                      const last = lastTapTimeRef.current[plan.id] || 0;
+                      // Check if this touchend is part of a potential double-tap sequence (following a touchstart within 300ms)
+                      // Also ensure it wasn't just a very long press/drag (e.g., check if a drag happened)
+                      if (now - last < 300 && now - last > 10 && !dragDataRef.current) { // Add a small minimum gap and check if drag occurred
+                        // This confirms a double tap (and it wasn't a drag)
+                        onEdit(plan); // Trigger edit modal
+                      }
+                      // Clear the recorded touch start time regardless of double-tap status
+                      lastTapTimeRef.current[plan.id] = 0;
                     }}
                   >
                     {/* ◼ 상단 리사이저 (5분 단위 이동) */}
@@ -1377,9 +1377,9 @@
                       onMouseDown={e => {
                         if (e.cancelable) e.preventDefault(); e.stopPropagation(); startResizing(e, plan.id, 'top');
                       }}
-                       onTouchStart={e => {
-                           if(e.cancelable) e.preventDefault(); e.stopPropagation(); startResizing(e.touches[0], plan.id, 'top');
-                       }}
+                      onTouchStart={e => {
+                        if(e.cancelable) e.preventDefault(); e.stopPropagation(); startResizing(e.touches[0], plan.id, 'top');
+                      }}
                     />
 
                     {/* ◼ 카드 헤더: 이모지, 제목, 편집/삭제 */}
@@ -1401,7 +1401,7 @@
                     </div>
 
                     {/* ◼ 카드 콘텐츠: 시간표시, 메모 */}
-                     {/* Add pointer-events-none to prevent dragging from here, double-tap/drag starts on the outer div */}
+                    {/* Add pointer-events-none to prevent dragging from here, double-tap/drag starts on the outer div */}
                     <div className="plan-content"> {/* Using custom class */}
                       <div className="plan-times">{plan.start} ~ {plan.end}</div> {/* Using custom class */}
                       {plan.memo && <div className="plan-memo">메모: {plan.memo}</div>} {/* Using custom class */}
@@ -1415,8 +1415,8 @@
                         if (e.cancelable) e.preventDefault(); e.stopPropagation(); startResizing(e, plan.id, 'bottom');
                       }}
                       onTouchStart={e => {
-                           if(e.cancelable) e.preventDefault(); e.stopPropagation(); startResizing(e.touches[0], plan.id, 'bottom');
-                       }}
+                        if(e.cancelable) e.preventDefault(); e.stopPropagation(); startResizing(e.touches[0], plan.id, 'bottom');
+                      }}
                     />
                   </div>
                 );
@@ -1438,33 +1438,33 @@
                 </div>
                 <div className="ai-plans-list"> {/* Using custom class */}
                   {aiPlans.length > 0 ? (
-                     aiPlans.map(pl => (
-                       <div key={pl.id} className="ai-plan-card"> {/* Using custom class */}
-                          {/* AI Plan Content */}
-                         <div className="ai-plan-emoji">{pl.emoji}</div> {/* Using custom class */}
-                         <div className="ai-plan-details"> {/* Using custom class */}
-                           <div className="title">{pl.title}</div> {/* Using custom class */}
-                           <div className="time">{pl.start} ~ {pl.end}</div> {/* Using custom class */}
-                         </div>
-                         {/* Delete Button for AI Plan */}
-                         <button
-                             className="ai-plan-delete-btn"
-                             onClick={(e) => { e.stopPropagation(); deleteAiPlan(pl.id); }}
-                             type="button"
-                             aria-label="AI 플랜 삭제"
-                         >
-                             <i data-lucide="x" className="lucide" style={{ width: 18, height: 18, pointerEvents: 'none' }} />
-                         </button>
-                       </div>
-                     ))
+                    aiPlans.map(pl => (
+                      <div key={pl.id} className="ai-plan-card"> {/* Using custom class */}
+                        {/* AI Plan Content */}
+                        <div className="ai-plan-emoji">{pl.emoji}</div> {/* Using custom class */}
+                        <div className="ai-plan-details"> {/* Using custom class */}
+                          <div className="title">{pl.title}</div> {/* Using custom class */}
+                          <div className="time">{pl.start} ~ {pl.end}</div> {/* Using custom class */}
+                        </div>
+                        {/* Delete Button for AI Plan */}
+                        <button
+                          className="ai-plan-delete-btn"
+                          onClick={(e) => { e.stopPropagation(); deleteAiPlan(pl.id); }}
+                          type="button"
+                          aria-label="AI 플랜 삭제"
+                        >
+                          <i data-lucide="x" className="lucide" style={{ width: 18, height: 18, pointerEvents: 'none' }} />
+                        </button>
+                      </div>
+                    ))
                   ) : (
-                     <div className="ai-empty-state"> {/* Using custom class */}
-                         <p className="mb-4">🤖 AI에게 오늘의 학습 플랜을 추천받아 보세요!</p> {/* Basic margin */}
-                         <button onClick={generateAiSuggestions} className="ai-generate-btn" type="button"> {/* Using custom class */}
-                           AI 플랜 생성하기
-                         </button>
-                       </div>
-                  )}
+                      <div className="ai-empty-state"> {/* Using custom class */}
+                        <p className="mb-4">🤖 AI에게 오늘의 학습 플랜을 추천받아 보세요!</p> {/* Basic margin */}
+                        <button onClick={generateAiSuggestions} className="ai-generate-btn" type="button"> {/* Using custom class */}
+                          AI 플랜 생성하기
+                        </button>
+                      </div>
+                    )}
                 </div>
                 {/* Apply button moved to the fixed footer */}
               </div>
@@ -1483,16 +1483,16 @@
                   <span style={{ fontSize: '24px' }}>🤖</span> <span>AI 플랜 생성</span> {/* Icon size inline */}
                 </button>
               ) : (
-                 /* AI View Footer: Only show Apply button if plans exist */
-                 aiPlans.length > 0 && (
-                   <button
+                  /* AI View Footer: Only show Apply button if plans exist */
+                  aiPlans.length > 0 && (
+                    <button
                       onClick={applyAiPlans}
                       className="command-btn primary" type="button" /* Using custom classes */
-                   >
-                     적용
-                   </button>
-                 )
-              )}
+                    >
+                      적용
+                    </button>
+                  )
+                )}
             </div>
           </div>
 
@@ -1514,58 +1514,58 @@
                     autoFocus
                   />
                 </div>
-                 <div className="modal-form-group">
-                    <label className="modal-label">메모</label>
+                <div className="modal-form-group">
+                  <label className="modal-label">메모</label>
+                  <input
+                    type="text"
+                    value={newPlan.memo}
+                    onChange={e => setNewPlan(p => ({ ...p, memo: e.target.value }))}
+                    className="modal-input"
+                    placeholder="예: 새 단어 20개"
+                  />
+                </div>
+                <div className="modal-form-group">
+                  <label className="modal-label">시간</label>
+                  <div className="modal-time-inputs"> {/* Using custom class */}
                     <input
-                      type="text"
-                      value={newPlan.memo}
-                      onChange={e => setNewPlan(p => ({ ...p, memo: e.target.value }))}
-                      className="modal-input"
-                       placeholder="예: 새 단어 20개"
+                      type="time"
+                      value={newPlan.start}
+                      onChange={e => setNewPlan(p => ({ ...p, start: e.target.value }))}
+                      className="modal-input" /* Using custom class */
+                    />
+                    <span>~</span>
+                    <input
+                      type="time"
+                      value={newPlan.end}
+                      onChange={e => setNewPlan(p => ({ ...p, end: e.target.value }))}
+                      className="modal-input" /* Using custom class */
                     />
                   </div>
-                 <div className="modal-form-group">
-                    <label className="modal-label">시간</label>
-                    <div className="modal-time-inputs"> {/* Using custom class */}
-                      <input
-                        type="time"
-                        value={newPlan.start}
-                        onChange={e => setNewPlan(p => ({ ...p, start: e.target.value }))}
-                        className="modal-input" /* Using custom class */
-                      />
-                      <span>~</span>
-                      <input
-                        type="time"
-                        value={newPlan.end}
-                        onChange={e => setNewPlan(p => ({ ...p, end: e.target.value }))}
-                        className="modal-input" /* Using custom class */
-                      />
-                    </div>
+                </div>
+                <div className="modal-form-group">
+                  <label className="modal-label">이모지</label>
+                  <div className="modal-emoji-picker"> {/* Using custom class */}
+                    {['📚', '✏️', '📐', '🧪', '💡', '💻', '🎨', '🎶', '🎧', '🗣️', '💪', '🛀'].map(em => (
+                      <button
+                        key={em}
+                        onClick={() => setNewPlan(p => ({ ...p, emoji: em }))}
+                        className={`modal-emoji-button ${newPlan.emoji === em ? 'selected' : ''}`} /* Using custom classes */
+                        type="button"
+                      >
+                        {em}
+                      </button>
+                    ))}
                   </div>
-                 <div className="modal-form-group">
-                    <label className="modal-label">이모지</label>
-                    <div className="modal-emoji-picker"> {/* Using custom class */}
-                      {['📚', '✏️', '📐', '🧪', '💡', '💻', '🎨', '🎶', '🎧', '🗣️', '💪', '🛀'].map(em => (
-                        <button
-                          key={em}
-                          onClick={() => setNewPlan(p => ({ ...p, emoji: em }))}
-                          className={`modal-emoji-button ${newPlan.emoji === em ? 'selected' : ''}`} /* Using custom classes */
-                           type="button"
-                        >
-                          {em}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                </div>
                 <div className="modal-actions"> {/* Using custom class */}
                   <button
                     onClick={() => {
                       setShowModal(false);
                       setEditingPlan(null);
-                       setNewPlan({ title: '', memo: '', start: '21:00', end: '22:00', emoji: '📚' });
+                      setNewPlan({ title: '', memo: '', start: '21:00', end: '22:00', emoji: '📚' });
                     }}
                     className="modal-action-btn" /* Using custom class */
-                     type="button"
+                    type="button"
                   >
                     취소
                   </button>
@@ -1582,7 +1582,7 @@
             <button
               onClick={() => {
                 setEditingPlan(null);
-                 setNewPlan({ title: '', memo: '', start: '21:00', end: '22:00', emoji: '📚' });
+                setNewPlan({ title: '', memo: '', start: '21:00', end: '22:00', emoji: '📚' });
                 setShowModal(true);
               }}
               className="add-plan-button" /* Using custom class */
@@ -1597,7 +1597,7 @@
     }
 
     ReactDOM.render(<StudyPlannerApp />, document.getElementById('root'));
-  </script>
-</body>
+    </script>
+  </body>
 
 </html>

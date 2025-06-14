@@ -1,965 +1,965 @@
 <!DOCTYPE html>
 <html lang="ko">
 
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원가입</title>
     <link
-        href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
-        rel="stylesheet">
+      href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+      rel="stylesheet">
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    }
 
-        body {
-            font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
-            background-color: #FDF8F4;
-            color: #333;
-            line-height: 1.6;
-        }
+    body {
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+    background-color: #FDF8F4;
+    color: #333;
+    line-height: 1.6;
+    }
 
-        .container {
-            max-width: 480px;
-            margin: 0 auto;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-        }
+    .container {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    }
 
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding-top: 40px;
-        }
+    .header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-top: 40px;
+    }
 
-        .header h1 {
-            color: #E85A1F;
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
+    .header h1 {
+    color: #E85A1F;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    }
 
-        .header p {
-            color: #666;
-            font-size: 16px;
-        }
+    .header p {
+    color: #666;
+    font-size: 16px;
+    }
 
-        .step-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
+    .step-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    }
 
-        .step-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 24px;
-            padding: 0 4px;
-        }
+    .step-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 0 4px;
+    }
 
-        .step-number {
-            background: #E85A1F;
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            margin-right: 12px;
-        }
+    .step-number {
+    background: #E85A1F;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-right: 12px;
+    }
 
-        .step-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: #333;
-        }
+    .step-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    }
 
-        .grade-list {
-            max-height: 400px;
-            overflow-y: auto;
-            margin-bottom: 24px;
-            border-radius: 12px;
-            background: white;
-            border: 2px solid #f0f0f0;
-        }
+    .grade-list {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 24px;
+    border-radius: 12px;
+    background: white;
+    border: 2px solid #f0f0f0;
+    }
 
-        .grade-item {
-            padding: 16px 20px;
-            border-bottom: 1px solid #f0f0f0;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+    .grade-item {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    }
 
-        .grade-item:last-child {
-            border-bottom: none;
-        }
+    .grade-item:last-child {
+    border-bottom: none;
+    }
 
-        .grade-item:hover {
-            background: #fff5f0;
-        }
+    .grade-item:hover {
+    background: #fff5f0;
+    }
 
-        .grade-item.selected {
-            background: #E85A1F;
-            color: white;
-        }
+    .grade-item.selected {
+    background: #E85A1F;
+    color: white;
+    }
 
-        .grade-item.selected:hover {
-            background: #d14a17;
-        }
+    .grade-item.selected:hover {
+    background: #d14a17;
+    }
 
-        .dropdown-container {
-            margin-bottom: 20px;
-        }
+    .dropdown-container {
+    margin-bottom: 20px;
+    }
 
-        .dropdown {
-            width: 100%;
-            padding: 16px;
-            border: 2px solid #f0f0f0;
-            border-radius: 12px;
-            background: white;
-            font-size: 16px;
-            font-family: inherit;
-            color: #333;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
+    .dropdown {
+    width: 100%;
+    padding: 16px;
+    border: 2px solid #f0f0f0;
+    border-radius: 12px;
+    background: white;
+    font-size: 16px;
+    font-family: inherit;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    }
 
-        .dropdown:focus {
-            outline: none;
-            border-color: #E85A1F;
-        }
+    .dropdown:focus {
+    outline: none;
+    border-color: #E85A1F;
+    }
 
-        .dropdown:disabled {
-            background: #f8f8f8;
-            cursor: not-allowed;
-            color: #999;
-        }
+    .dropdown:disabled {
+    background: #f8f8f8;
+    cursor: not-allowed;
+    color: #999;
+    }
 
-        .quiz-container {
-            margin-bottom: 24px;
-        }
+    .quiz-container {
+    margin-bottom: 24px;
+    }
 
-        .quiz-item {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
-            border: 2px solid #f0f0f0;
-            transition: all 0.2s ease;
-        }
+    .quiz-item {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    border: 2px solid #f0f0f0;
+    transition: all 0.2s ease;
+    }
 
-        .quiz-item.answered {
-            border-color: #E85A1F;
-        }
+    .quiz-item.answered {
+    border-color: #E85A1F;
+    }
 
-        .quiz-question {
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 16px;
-            color: #333;
-        }
+    .quiz-question {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    color: #333;
+    }
 
-        .quiz-options {
-            display: flex;
-            gap: 12px;
-        }
+    .quiz-options {
+    display: flex;
+    gap: 12px;
+    }
 
-        .quiz-option {
-            flex: 1;
-            padding: 12px 16px;
-            border: 2px solid #f0f0f0;
-            border-radius: 8px;
-            background: white;
-            color: #333;
-            cursor: pointer;
-            text-align: center;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
+    .quiz-option {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid #f0f0f0;
+    border-radius: 8px;
+    background: white;
+    color: #333;
+    cursor: pointer;
+    text-align: center;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    }
 
-        .quiz-option:hover {
-            border-color: #E85A1F;
-            background: #fff5f0;
-        }
+    .quiz-option:hover {
+    border-color: #E85A1F;
+    background: #fff5f0;
+    }
 
-        .quiz-option.selected {
-            background: #E85A1F;
-            color: white;
-            border-color: #E85A1F;
-        }
+    .quiz-option.selected {
+    background: #E85A1F;
+    color: white;
+    border-color: #E85A1F;
+    }
 
-        .button-container {
-            margin-top: auto;
-            padding: 20px 0;
-        }
+    .button-container {
+    margin-top: auto;
+    padding: 20px 0;
+    }
 
-        .btn {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: inherit;
-        }
+    .btn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    }
 
-        .btn-primary {
-            background: #E85A1F;
-            color: white;
-        }
+    .btn-primary {
+    background: #E85A1F;
+    color: white;
+    }
 
-        .btn-primary:hover {
-            background: #d14a17;
-        }
+    .btn-primary:hover {
+    background: #d14a17;
+    }
 
-        .btn-primary:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
+    .btn-primary:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    }
 
-        .btn-secondary {
-            background: white;
-            color: #E85A1F;
-            border: 2px solid #E85A1F;
-            margin-bottom: 12px;
-        }
+    .btn-secondary {
+    background: white;
+    color: #E85A1F;
+    border: 2px solid #E85A1F;
+    margin-bottom: 12px;
+    }
 
-        .btn-secondary:hover {
-            background: #fff5f0;
-        }
+    .btn-secondary:hover {
+    background: #fff5f0;
+    }
 
-        .progress-bar {
-            height: 4px;
-            background: #f0f0f0;
-            border-radius: 2px;
-            margin-bottom: 32px;
-            overflow: hidden;
-        }
+    .progress-bar {
+    height: 4px;
+    background: #f0f0f0;
+    border-radius: 2px;
+    margin-bottom: 32px;
+    overflow: hidden;
+    }
 
-        .progress-fill {
-            height: 100%;
-            background: #E85A1F;
-            transition: width 0.3s ease;
-            border-radius: 2px;
-        }
+    .progress-fill {
+    height: 100%;
+    background: #E85A1F;
+    transition: width 0.3s ease;
+    border-radius: 2px;
+    }
 
-        .completion-message {
-            text-align: center;
-            padding: 40px 20px;
-        }
+    .completion-message {
+    text-align: center;
+    padding: 40px 20px;
+    }
 
-        .completion-message h2 {
-            color: #E85A1F;
-            font-size: 24px;
-            margin-bottom: 16px;
-        }
+    .completion-message h2 {
+    color: #E85A1F;
+    font-size: 24px;
+    margin-bottom: 16px;
+    }
 
-        .completion-message p {
-            color: #666;
-            font-size: 16px;
-            margin-bottom: 24px;
-        }
+    .completion-message p {
+    color: #666;
+    font-size: 16px;
+    margin-bottom: 24px;
+    }
 
-        @media (max-width: 480px) {
-            .container {
-                padding: 16px;
-            }
+    @media (max-width: 480px) {
+    .container {
+    padding: 16px;
+    }
 
-            .header {
-                padding-top: 20px;
-                margin-bottom: 32px;
-            }
+    .header {
+    padding-top: 20px;
+    margin-bottom: 32px;
+    }
 
-            .header h1 {
-                font-size: 24px;
-            }
+    .header h1 {
+    font-size: 24px;
+    }
 
-            .step-title {
-                font-size: 18px;
-            }
+    .step-title {
+    font-size: 18px;
+    }
 
-            .grade-item {
-                padding: 14px 16px;
-            }
-        }
+    .grade-item {
+    padding: 14px 16px;
+    }
+    }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState } = React;
+    const { useState } = React;
 
-        const SignupApp = () => {
-            const [currentStep, setCurrentStep] = useState(1);
-            const [selectedGrade, setSelectedGrade] = useState('');
-            const [selectedMajorUnit, setSelectedMajorUnit] = useState('');
-            const [selectedMinorUnit, setSelectedMinorUnit] = useState('');
-            const [weekdayHour, setWeekdayHour] = useState('');
-            const [weekdayMinute, setWeekdayMinute] = useState('');
-            const [weekendHour, setWeekendHour] = useState('');
-            const [weekendMinute, setWeekendMinute] = useState('');
+    const SignupApp = () => {
+      const [currentStep, setCurrentStep] = useState(1);
+      const [selectedGrade, setSelectedGrade] = useState('');
+      const [selectedMajorUnit, setSelectedMajorUnit] = useState('');
+      const [selectedMinorUnit, setSelectedMinorUnit] = useState('');
+      const [weekdayHour, setWeekdayHour] = useState('');
+      const [weekdayMinute, setWeekdayMinute] = useState('');
+      const [weekendHour, setWeekendHour] = useState('');
+      const [weekendMinute, setWeekendMinute] = useState('');
 
-            // EDT 검사용 상태
-            const [forced1, setForced1] = useState('');
-            const [forced2, setForced2] = useState('');
-            const [forced3, setForced3] = useState('');
-            const [likert1, setLikert1] = useState(null);
-            const [likert2, setLikert2] = useState(null);
-            const [likert3, setLikert3] = useState(null);
-            const [resultType, setResultType] = useState(null);
+      // EDT 검사용 상태
+      const [forced1, setForced1] = useState('');
+      const [forced2, setForced2] = useState('');
+      const [forced3, setForced3] = useState('');
+      const [likert1, setLikert1] = useState(null);
+      const [likert2, setLikert2] = useState(null);
+      const [likert3, setLikert3] = useState(null);
+      const [resultType, setResultType] = useState(null);
 
-            const grades = [
-                '1학년 1학기',
-                '1학년 2학기',
-                '2학년 1학기',
-                '2학년 2학기',
-                '3학년 1학기',
-                '3학년 2학기'];
+      const grades = [
+        '1학년 1학기',
+        '1학년 2학기',
+        '2학년 1학기',
+        '2학년 2학기',
+        '3학년 1학기',
+        '3학년 2학기'];
 
-            const curriculum = {
-                '1학년 1학기': {
-                    "소인수분해": [
-                        "소수, 합성수",
-                        "거듭제곱, 밑, 지수",
-                        "소인수분해",
-                        "약수, 배수",
-                        "공약수, 최대공약수",
-                        "공배수, 최소공배수"
-                    ],
-                    "정수와 유리수": [
-                        "양수, 음수",
-                        "정수, 유리수",
-                        "절댓값",
-                        "유리수의 크기 비교",
-                        "정수와 유리수의 사칙연산",
-                        "정수와 유리수의 혼합계산"
-                    ],
-                    "문자와 식": [
-                        "문자, 식의 값 구하기",
-                        "단항식, 다항식",
-                        "일차식, 일차식의 연산",
-                        "등식, 방정식, 항등식, 해",
-                        "등식의 성질",
-                        "일차방정식"
-                    ],
-                    "좌표평면과 그래프": [
-                        "좌표, 순서쌍",
-                        "좌표평면, 사분면",
-                        "점의 좌표",
-                        "그래프의 해석",
-                        "정비례, 반비례",
-                        "정비례, 반비례 그래프"
-                    ]
-                },
-                '1학년 2학기': {
-                    "기본도형": [
-                        "점, 선, 면, 각",
-                        "거리, 맞꼭지각",
-                        "직교, 수선, 평행선",
-                        "직각",
-                        "합동, 삼각형의 합동 조건"
-                    ],
-                    "평면도형": [
-                        "다각형, 정다각형",
-                        "다각형의 성질",
-                        "대각선, 내각, 외각",
-                        "정다각형의 내각과 외각",
-                        "원, 부채꼴",
-                        "호, 현"
-                    ],
-                    "입체도형": [
-                        "다면체, 정다면체",
-                        "정다면체 전개도",
-                        "회전체",
-                        "원기둥, 원뿔, 구의 겉넓이",
-                        "원기둥, 원뿔, 구의 부피"
-                    ],
-                    "통계": [
-                        "줄기와 잎",
-                        "도수분포표",
-                        "히스토그램",
-                        "도수분포다각형",
-                        "상대도수",
-                        "상대도수분포표"
-                    ]
-                },
-                '2학년 1학기': {
-                    '수와 식(유리수와 소수 + 식의 계산)': [
-                        '유리수를 소수로 나타내기',
-                        '유한소수, 무한소수, 순환소수',
-                        '순환소수와 분수',
-                        '지수법칙',
-                        '단항식의 계산',
-                        '다항식의 계산'
-                    ],
-                    '부등식과 방정식': [
-                        '부등식',
-                        '부등식의 성질, 부등식의 성질',
-                        '일차부등식',
-                        '연립일차방정식',
-                        '연립일차방정식의 풀이'
-                    ],
-                    '함수': [
-                        '함수의 개념',
-                        '일차함수',
-                        '일차함수의 그래프, 절편',
-                        '일차함수의 활용',
-                        '연립일차방정식과 일차함수'
-                    ]
-                },
-                '2학년 2학기': {
-                    '도형의 성질': [
-                        '이동변삼각형의 성질, 조건',
-                        '직각삼각형의 합동 조건',
-                        '내심, 외심',
-                        '내심의 성질, 외심의 성질',
-                        '평행사변형의 성질, 조건',
-                        '여러 가지 사각형의 성질, 조건'
-                    ],
-                    '도형의 활용 + 피타고라스 정리': [
-                        '합동의 의미, 특징',
-                        '삼각형의 합동 조건',
-                        '닮은 도형의 성질, 닮음',
-                        '삼각형의 유사(닮음)',
-                        '닮은 도형의 길이, 넓이, 부피 구하기',
-                        '피타고라스 정리'
-                    ],
-                    '확률': [
-                        '경우의 수',
-                        '사건',
-                        '확률의 의미와 성질',
-                        '확률 구하기'
-                    ]
-                },
-                '3학년 1학기': {
-                    '제곱근과 실수': [
-                        '제곱근, 근호(√)',
-                        '제곱근의 크기 비교',
-                        '무리수, 실수',
-                        '실수의 크기 비교',
-                        '근호가 포함된 사칙연산',
-                        '분모의 유리화'
-                    ],
-                    '다항식의 곱셈과 인수분해': [
-                        '다항식의 곱셈, 식의 전개',
-                        '곱셈 공식',
-                        '인수분해'
-                    ],
-                    '이차방정식': [
-                        '이차방정식의 의미',
-                        '이차방정식의 풀이',
-                        '완전제곱식, 근의 공식'
-                    ],
-                    '이차함수': [
-                        '이차함수의 의미',
-                        '이차함수의 그래프',
-                        '완전제곱식이 포함된 이차함수',
-                        '이차식으로 나타낸 이차함수'
-                    ]
-                },
-                '3학년 2학기': {
-                    '삼각비': [
-                        '삼각비의 의미, 삼각비의 종류',
-                        '삼각비의 값 구하기',
-                        '삼각비 표',
-                        '삼각비를 이용해 길이 구하기',
-                        '삼각비를 이용해 넓이 구하기',
-                        '삼각형의 넓이 공식'
-                    ],
-                    '원의 성질': [
-                        '현의 의미, 현의 성질',
-                        '접선의 의미, 접선의 성질',
-                        '원주각, 호의 의미',
-                        '원주각의 성질'
-                    ],
-                    '통계': [
-                        '대표값, 평균, 중앙값, 최빈값',
-                        '산포도의 의미',
-                        '편차, 분산, 표준편차',
-                        '상대표준, 상관관계'
-                    ]
-                }
-            };
+      const curriculum = {
+        '1학년 1학기': {
+          "소인수분해": [
+            "소수, 합성수",
+            "거듭제곱, 밑, 지수",
+            "소인수분해",
+            "약수, 배수",
+            "공약수, 최대공약수",
+            "공배수, 최소공배수"
+          ],
+          "정수와 유리수": [
+            "양수, 음수",
+            "정수, 유리수",
+            "절댓값",
+            "유리수의 크기 비교",
+            "정수와 유리수의 사칙연산",
+            "정수와 유리수의 혼합계산"
+          ],
+          "문자와 식": [
+            "문자, 식의 값 구하기",
+            "단항식, 다항식",
+            "일차식, 일차식의 연산",
+            "등식, 방정식, 항등식, 해",
+            "등식의 성질",
+            "일차방정식"
+          ],
+          "좌표평면과 그래프": [
+            "좌표, 순서쌍",
+            "좌표평면, 사분면",
+            "점의 좌표",
+            "그래프의 해석",
+            "정비례, 반비례",
+            "정비례, 반비례 그래프"
+          ]
+        },
+        '1학년 2학기': {
+          "기본도형": [
+            "점, 선, 면, 각",
+            "거리, 맞꼭지각",
+            "직교, 수선, 평행선",
+            "직각",
+            "합동, 삼각형의 합동 조건"
+          ],
+          "평면도형": [
+            "다각형, 정다각형",
+            "다각형의 성질",
+            "대각선, 내각, 외각",
+            "정다각형의 내각과 외각",
+            "원, 부채꼴",
+            "호, 현"
+          ],
+          "입체도형": [
+            "다면체, 정다면체",
+            "정다면체 전개도",
+            "회전체",
+            "원기둥, 원뿔, 구의 겉넓이",
+            "원기둥, 원뿔, 구의 부피"
+          ],
+          "통계": [
+            "줄기와 잎",
+            "도수분포표",
+            "히스토그램",
+            "도수분포다각형",
+            "상대도수",
+            "상대도수분포표"
+          ]
+        },
+        '2학년 1학기': {
+          '수와 식(유리수와 소수 + 식의 계산)': [
+            '유리수를 소수로 나타내기',
+            '유한소수, 무한소수, 순환소수',
+            '순환소수와 분수',
+            '지수법칙',
+            '단항식의 계산',
+            '다항식의 계산'
+          ],
+          '부등식과 방정식': [
+            '부등식',
+            '부등식의 성질, 부등식의 성질',
+            '일차부등식',
+            '연립일차방정식',
+            '연립일차방정식의 풀이'
+          ],
+          '함수': [
+            '함수의 개념',
+            '일차함수',
+            '일차함수의 그래프, 절편',
+            '일차함수의 활용',
+            '연립일차방정식과 일차함수'
+          ]
+        },
+        '2학년 2학기': {
+          '도형의 성질': [
+            '이동변삼각형의 성질, 조건',
+            '직각삼각형의 합동 조건',
+            '내심, 외심',
+            '내심의 성질, 외심의 성질',
+            '평행사변형의 성질, 조건',
+            '여러 가지 사각형의 성질, 조건'
+          ],
+          '도형의 활용 + 피타고라스 정리': [
+            '합동의 의미, 특징',
+            '삼각형의 합동 조건',
+            '닮은 도형의 성질, 닮음',
+            '삼각형의 유사(닮음)',
+            '닮은 도형의 길이, 넓이, 부피 구하기',
+            '피타고라스 정리'
+          ],
+          '확률': [
+            '경우의 수',
+            '사건',
+            '확률의 의미와 성질',
+            '확률 구하기'
+          ]
+        },
+        '3학년 1학기': {
+          '제곱근과 실수': [
+            '제곱근, 근호(√)',
+            '제곱근의 크기 비교',
+            '무리수, 실수',
+            '실수의 크기 비교',
+            '근호가 포함된 사칙연산',
+            '분모의 유리화'
+          ],
+          '다항식의 곱셈과 인수분해': [
+            '다항식의 곱셈, 식의 전개',
+            '곱셈 공식',
+            '인수분해'
+          ],
+          '이차방정식': [
+            '이차방정식의 의미',
+            '이차방정식의 풀이',
+            '완전제곱식, 근의 공식'
+          ],
+          '이차함수': [
+            '이차함수의 의미',
+            '이차함수의 그래프',
+            '완전제곱식이 포함된 이차함수',
+            '이차식으로 나타낸 이차함수'
+          ]
+        },
+        '3학년 2학기': {
+          '삼각비': [
+            '삼각비의 의미, 삼각비의 종류',
+            '삼각비의 값 구하기',
+            '삼각비 표',
+            '삼각비를 이용해 길이 구하기',
+            '삼각비를 이용해 넓이 구하기',
+            '삼각형의 넓이 공식'
+          ],
+          '원의 성질': [
+            '현의 의미, 현의 성질',
+            '접선의 의미, 접선의 성질',
+            '원주각, 호의 의미',
+            '원주각의 성질'
+          ],
+          '통계': [
+            '대표값, 평균, 중앙값, 최빈값',
+            '산포도의 의미',
+            '편차, 분산, 표준편차',
+            '상대표준, 상관관계'
+          ]
+        }
+      };
 
-            const hourOptions = Array.from({ length: 13 }, (_, i) => i);
-            const minuteOptions = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
+      const hourOptions = Array.from({ length: 13 }, (_, i) => i);
+      const minuteOptions = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
 
-            const getProgress = () => {
-                return (currentStep / 5) * 100;
-            };
+      const getProgress = () => {
+        return (currentStep / 5) * 100;
+      };
 
-            const canProceedToNextStep = () => {
-                switch (currentStep) {
-                    case 1:
-                        return selectedGrade !== '';
-                    case 2:
-                        return selectedMajorUnit !== '' && selectedMinorUnit !== '';
-                    case 3:
-                        return (
-                            weekdayHour !== '' && weekdayMinute !== '' &&
-                            weekendHour !== '' && weekendMinute !== ''
-                        );
-                    case 4:
-                        return forced1 && forced2 && forced3 && likert1 !== null && likert2 !== null && likert3 !== null;
-                    default:
-                        return false;
-                }
-            };
-
-            //  필수 설문에 따라 최종 학습 유형을 계산
-            const calculateType = () => {
-                // Likert 점수(1~4)를 기반으로 각 차원의 선택 값 결정
-                const l1 = likert1;
-                const l2 = likert2;
-                const l3 = likert3;
-
-                const likertChoice1 = (l1 >= 3) ? 'whole' : 'detail';
-                const likertChoice2 = (l2 >= 3) ? 'external' : 'internal';
-                const likertChoice3 = (l3 >= 3) ? 'spontaneous' : 'plan';
-
-                // 충돌 시 Likert 우선
-                const final1 = (forced1 === likertChoice1) ? forced1 : likertChoice1;
-                const final2 = (forced2 === likertChoice2) ? forced2 : likertChoice2;
-                const final3 = (forced3 === likertChoice3) ? forced3 : likertChoice3;
-
-                const key = `${final1}_${final2}_${final3}`;
-                const typeMap = {
-                    'whole_internal_plan': {
-                        name: '플라톤형',
-                        desc: `절대적 참실재인 ‘이데아’를 추구한 플라톤과 같이, 종합적인 이해를 위해 노력하는 학습자입니다. 공부를 통해 스스로 성장하는 것에 관심이 있으며, 냉철한 이성으로 자기관리를 해 나갑니다.`
-                    },
-                    'whole_internal_spontaneous': {
-                        name: '가우디형',
-                        desc: `종합적인 구조를 자신만의 개성으로 표현한 건축가 가우디와 같이, 전체 구조를 이해하고 스스로 공부하는 목적을 찾아가는 학습자입니다. 기분과 상황에 따라 자유롭게 공부하는 것을 선호합니다.`
-                    },
-                    'detail_internal_plan': {
-                        name: '마리퀴리형',
-                        desc: `모든 원소를 빠짐없이 조사하기 위해 철저하게 자기관리를 했던 마리퀴리와 같이, 공부하는 주제에 대한 꼼꼼한 확인, 외부 환경에 굴하지 않고 공부에 집중하려는 태도, 냉정하게 감정을 조절하려는 학습 특성을 가지고 있습니다.`
-                    },
-                    'detail_internal_spontaneous': {
-                        name: '슈베르트형',
-                        desc: `섬세하고 개성적으로 자신의 감성을 표현한 슈베르트와 같이, 공부하는 내용을 자세히 이해하고 스스로 즐기면서 공부하는 학습자입니다. 자신의 마음 변화에 즉각적으로 반응하며, 이를 공부에 반영하려고 노력합니다.`
-                    },
-                    'whole_external_plan': {
-                        name: '루스벨트형',
-                        desc: `많은 사람들에게 미치는 영향을 세심하게 고려하여 미국 경제 정책의 큰 그림을 그려낸 루스벨트 대통령과 같이, 공부하는 내용의 큰 구조에 관심을 두는 학습자입니다. 공부하는 과정에서 다른 사람들과 비교하면서 철저하게 계획을 실천해 나가려고 합니다.`
-                    },
-                    'whole_external_spontaneous': {
-                        name: '스티븐 스필버그형',
-                        desc: `영화의 큰 흐름을 중심으로 관객과 감성적으로 소통하는 스티븐 스필버그와 같이, 공부하는 내용의 큰 흐름을 이해하기 위해 노력합니다. 자신의 감정과 상황을 수시로 살펴보며 다른 사람들과 자신의 실력을 견주며 공부를 합니다.`
-                    },
-                    'detail_external_plan': {
-                        name: '셜록홈즈형',
-                        desc: `사건의 증거들을 세심하게 살피고 의뢰인을 위해 사건을 해결하는 셜록홈즈처럼, 공부하는 내용을 자세하고 명확하게 확인하려고 노력하는 학습자입니다. 다른 사람들을 의식하면서 신중하고 체계적으로 자신을 관리하려는 모습을 보입니다.`
-                    },
-                    'detail_external_spontaneous': {
-                        name: '나이팅게일형',
-                        desc: `종 환자들의 회복을 위한 방안들을 꼼꼼하고 세심하게 고민한 나이팅게일과 같이, 구체적인 정보에 집중하고 다른 사람들을 의식하면서 공부하는 유형입니다. 편안한 마음으로 자신의 기분에 맞춰 공부하는 것을 선호합니다.`
-                    }
-                };
-
-                const typeInfo = typeMap[key];
-                if (typeInfo) {
-                    return typeInfo;
-                }
-                return null;
-            };
-
-            const handleNext = async () => {
-                if (canProceedToNextStep()) {
-                    if (currentStep === 4) {
-                        const typeInfo = calculateType();
-                        setResultType(typeInfo);
-                        // 가입 정보와 함께 학습 유형까지 localStorage에 저장
-                        const quizResult = {
-                            forced: [
-                                forced1 === 'whole',
-                                forced2 === 'external', 
-                                forced3 === 'spontaneous',
-                            ],
-                            likert: [likert1, likert2, likert3]
-                        };
-
-                        const response = await fetch("https://doziapi.duckdns.org/api/me/quiz", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            credentials: "include",
-                            body: JSON.stringify(quizResult)
-                        });
-
-                        const data = await response.json();
-
-                        const signupInfo = {
-                            grade: selectedGrade,
-                            majorUnit: selectedMajorUnit,
-                            minorUnit: selectedMinorUnit,
-                            weekdayHour,
-                            weekdayMinute,
-                            weekendHour,
-                            weekendMinute,
-                            forced1,
-                            forced2,
-                            forced3,
-                            likert1,
-                            likert2,
-                            likert3,
-                            learningType: typeInfo // 계산된 학습 유형
-                        };
-                        localStorage.setItem('signupInfo', JSON.stringify(signupInfo));
-                    }
-                    setCurrentStep(prev => Math.min(prev + 1, 5));
-                }
-            };
-
-            const handlePrevious = () => {
-                setCurrentStep(prev => Math.max(prev - 1, 1));
-            };
-
-            const renderStep1 = () => (
-                <div>
-                    <div className="step-header">
-                        <div className="step-number">1</div>
-                        <div className="step-title">학년을 선택해주세요</div>
-                    </div>
-                    <div className="grade-list">
-                        {grades.map((grade, index) => (
-                            <div
-                                key={index}
-                                className={`grade-item ${selectedGrade === grade ? 'selected' : ''}`}
-                                onClick={() => setSelectedGrade(grade)}
-                            >
-                                <span>{grade}</span>
-                                {selectedGrade === grade && <span>✓</span>}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            );
-
-            const renderStep2 = () => (
-                <div>
-                    <div className="step-header">
-                        <div className="step-number">2</div>
-                        <div className="step-title">학습 단원을 선택해주세요</div>
-                    </div>
-                    <div className="dropdown-container">
-                        <select
-                            className="dropdown"
-                            value={selectedMajorUnit}
-                            onChange={e => { setSelectedMajorUnit(e.target.value); setSelectedMinorUnit(''); }}
-                        >
-                            <option value="">대단원을 선택하세요</option>
-                            {selectedGrade && Object.keys(curriculum[selectedGrade] || {}).map((unit, idx) => (
-                                <option key={idx} value={unit}>{unit}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="dropdown-container">
-                        <select
-                            className="dropdown"
-                            value={selectedMinorUnit}
-                            onChange={e => setSelectedMinorUnit(e.target.value)}
-                            disabled={!selectedMajorUnit}
-                        >
-                            <option value="">소단원을 선택하세요</option>
-                            {selectedMajorUnit && curriculum[selectedGrade][selectedMajorUnit].map((sub, idx) => (
-                                <option key={idx} value={sub}>{sub}</option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-            );
-
-            const renderStep3 = () => (
-                <div>
-                    <div className="step-header">
-                        <div className="step-number">3</div>
-                        <div className="step-title">평일/주말 평균 하루 공부시간을 입력해주세요</div>
-                    </div>
-                    <div style={{ marginBottom: "24px" }}>
-                        <div style={{ marginBottom: "16px" }}>
-                            <label style={{ fontSize: "16px", fontWeight: 500, color: "#333" }}>
-                                <span style={{ color: "#E85A1F" }}>평일</span> 하루 평균 공부시간
-                            </label>
-                            <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
-                                <select
-                                    className="dropdown"
-                                    style={{ width: "100px" }}
-                                    value={weekdayHour}
-                                    onChange={e => setWeekdayHour(e.target.value)}
-                                >
-                                    <option value="">시간</option>
-                                    {hourOptions.map(h => (
-                                        <option key={h} value={h}>{h}시간</option>
-                                    ))}
-                                </select>
-                                <span style={{ alignSelf: "center" }}>시간</span>
-                                <select
-                                    className="dropdown"
-                                    style={{ width: "100px" }}
-                                    value={weekdayMinute}
-                                    onChange={e => setWeekdayMinute(e.target.value)}
-                                >
-                                    <option value="">분</option>
-                                    {minuteOptions.map(m => (
-                                        <option key={m} value={m}>{m}분</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label style={{ fontSize: "16px", fontWeight: 500, color: "#333" }}>
-                                <span style={{ color: "#E85A1F" }}>주말</span> 하루 평균 공부시간
-                            </label>
-                            <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
-                                <select
-                                    className="dropdown"
-                                    style={{ width: "100px" }}
-                                    value={weekendHour}
-                                    onChange={e => setWeekendHour(e.target.value)}
-                                >
-                                    <option value="">시간</option>
-                                    {hourOptions.map(h => (
-                                        <option key={h} value={h}>{h}시간</option>
-                                    ))}
-                                </select>
-                                <span style={{ alignSelf: "center" }}>시간</span>
-                                <select
-                                    className="dropdown"
-                                    style={{ width: "100px" }}
-                                    value={weekendMinute}
-                                    onChange={e => setWeekendMinute(e.target.value)}
-                                >
-                                    <option value="">분</option>
-                                    {minuteOptions.map(m => (
-                                        <option key={m} value={m}>{m}분</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                        <div style={{ fontSize: "14px", color: "#999", marginTop: "8px" }}>
-                            예시: 1시간 30분, 2시간 등
-                        </div>
-                    </div>
-                </div>
-            );
-
-            // STEP 4: EDT 학습 유형 검사
-            const renderStep4 = () => (
-                <div>
-                    <div className="step-header">
-                        <div className="step-number">4</div>
-                        <div className="step-title">EDT 학습유형 검사</div>
-                    </div>
-                    {/* 1. 공부를 하는 과정에서 내가 보다 중요하게 생각하는 것은? */}
-                    <h3 style={{margin: "24px 0 8px 0", color: "#E85A1F", fontSize: "17px"}}>1. 공부를 하는 과정에서 내가 보다 중요하게 생각하는 것은?</h3>
-                    <div className="quiz-container">
-                        {/* 강제선택 문항 */}
-                        <div className={`quiz-item ${forced1 ? 'answered' : ''}`}>
-                            <div className="quiz-options">
-                                <div
-                                    className={`quiz-option ${forced1 === 'whole' ? 'selected' : ''}`}
-                                    onClick={() => setForced1('whole')}
-                                >
-                                    나는 전체 내용을 고민한 후, 큰 개념과 작은 개념을 한꺼번에 공부한다.
-                                </div>
-                                <div
-                                    className={`quiz-option ${forced1 === 'detail' ? 'selected' : ''}`}
-                                    onClick={() => setForced1('detail')}
-                                >
-                                    나는 세부 설명을 중심으로 한 번에 하나씩 내용을 이해하고 공부한다.
-                                </div>
-                            </div>
-                        </div>
-                        <div className={`quiz-item ${forced2 ? 'answered' : ''}`}>
-                            <div className="quiz-options">
-                                <div
-                                    className={`quiz-option ${forced2 === 'external' ? 'selected' : ''}`}
-                                    onClick={() => setForced2('external')}
-                                >
-                                    좋은 성적을 받으면 보상(용돈·칭찬 등)을 받을 수 있어서 공부한다.
-                                </div>
-                                <div
-                                    className={`quiz-option ${forced2 === 'internal' ? 'selected' : ''}`}
-                                    onClick={() => setForced2('internal')}
-                                >
-                                    꿈을 이루기 위해 공부한다.
-                                </div>
-                            </div>
-                        </div>
-                        <div className={`quiz-item ${forced3 ? 'answered' : ''}`}>
-                            <div className="quiz-options">
-                                <div
-                                    className={`quiz-option ${forced3 === 'spontaneous' ? 'selected' : ''}`}
-                                    onClick={() => setForced3('spontaneous')}
-                                >
-                                    공부할 때 하고 싶은 과목에 시간을 많이 소비한다.
-                                </div>
-                                <div
-                                    className={`quiz-option ${forced3 === 'plan' ? 'selected' : ''}`}
-                                    onClick={() => setForced3('plan')}
-                                >
-                                    공부를 할 때 계획표 대로 과목을 나눠 공부하는 편이다.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {/* 2. 평소 공부하는 모습과 가까운 것은? */}
-                    <h3 style={{margin: "32px 0 8px 0", color: "#E85A1F", fontSize: "17px"}}>2. 평소 공부하는 모습과 가까운 것은?</h3>
-                    <div className="quiz-container">
-                        {/* Likert 척도 문항 */}
-                        <div className={`quiz-item ${likert1 !== null ? 'answered' : ''}`}>
-                            <div className="quiz-question">1) 이해한 내용은 나만의 방법으로 다시 정리하면서 학습한다.</div>
-                            <div className="quiz-options">
-                                {[4, 3, 2, 1].map(val => (
-                                    <div
-                                        key={val}
-                                        className={`quiz-option ${likert1 === val ? 'selected' : ''}`}
-                                        onClick={() => setLikert1(val)}
-                                    >
-                                        {val === 4 ? '매우 그렇다' :
-                                            val === 3 ? '그렇다' :
-                                            val === 2 ? '아니다' : '전혀 아니다'}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className={`quiz-item ${likert2 !== null ? 'answered' : ''}`}>
-                            <div className="quiz-question">2) 친구들보다 좋은 성적을 받아 사람들로부터 인정을 받으려고 한다.</div>
-                            <div className="quiz-options">
-                                {[4, 3, 2, 1].map(val => (
-                                    <div
-                                        key={val}
-                                        className={`quiz-option ${likert2 === val ? 'selected' : ''}`}
-                                        onClick={() => setLikert2(val)}
-                                    >
-                                        {val === 4 ? '매우 그렇다' :
-                                            val === 3 ? '그렇다' :
-                                            val === 2 ? '아니다' : '전혀 아니다'}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className={`quiz-item ${likert3 !== null ? 'answered' : ''}`}>
-                            <div className="quiz-question">3) 기분에 따라 공부할 과목을 정한다.</div>
-                            <div className="quiz-options">
-                                {[4, 3, 2, 1].map(val => (
-                                    <div
-                                        key={val}
-                                        className={`quiz-option ${likert3 === val ? 'selected' : ''}`}
-                                        onClick={() => setLikert3(val)}
-                                    >
-                                        {val === 4 ? '매우 그렇다' :
-                                            val === 3 ? '그렇다' :
-                                            val === 2 ? '아니다' : '전혀 아니다'}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-
-            const renderStep5 = () => (
-                <div className="completion-message">
-                    <h2>회원가입이 완료되었습니다!</h2>
-                    <p>선택하신 정보를 바탕으로 맞춤형 학습을 시작해보세요.</p>
-                    <div style={{ marginTop: '24px', padding: '20px', background: 'white', borderRadius: '12px', textAlign: 'left' }}>
-                        <h3 style={{ color: '#E85A1F', marginBottom: '16px' }}>설정 정보</h3>
-                        <p><strong>학년:</strong> {selectedGrade}</p>
-                        <p><strong>대단원:</strong> {selectedMajorUnit}</p>
-                        <p><strong>소단원:</strong> {selectedMinorUnit}</p>
-                        <p>
-                            <strong>평일 공부시간:</strong> {weekdayHour ? `${weekdayHour}시간` : ''}{weekdayMinute ? ` ${weekdayMinute}분` : ''}
-                            <br />
-                            <strong>주말 공부시간:</strong> {weekendHour ? `${weekendHour}시간` : ''}{weekendMinute ? ` ${weekendMinute}분` : ''}
-                        </p>
-                        <p>
-                            <strong>학습유형:</strong> {resultType ? resultType.name : '알 수 없음'}
-                        </p>
-                    </div>
-                    <div className="button-container">
-                        <button
-                            className="btn btn-secondary"
-                            onClick={() => {
-                                window.location.href = "home.html";
-                            }}
-                        >
-                            확인
-                        </button>
-                    </div>
-                </div>
-            );
-
+      const canProceedToNextStep = () => {
+        switch (currentStep) {
+          case 1:
+            return selectedGrade !== '';
+          case 2:
+            return selectedMajorUnit !== '' && selectedMinorUnit !== '';
+          case 3:
             return (
-                <div className="container">
-                    <div className="header">
-                        <h1>학습자 맞춤 설정</h1>
-                        <p>단계별로 정보를 입력해주세요</p>
-                    </div>
-
-                    {currentStep < 5 && (
-                        <div className="progress-bar">
-                            <div className="progress-fill" style={{ width: `${getProgress()}%` }}></div>
-                        </div>
-                    )}
-
-                    <div className="step-container">
-                        {currentStep === 1 && renderStep1()}
-                        {currentStep === 2 && renderStep2()}
-                        {currentStep === 3 && renderStep3()}
-                        {currentStep === 4 && renderStep4()}
-                        {currentStep === 5 && renderStep5()}
-
-                        {currentStep < 5 && (
-                            <div className="button-container">
-                                {currentStep > 1 && (
-                                    <button
-                                        className="btn btn-secondary"
-                                        onClick={handlePrevious}
-                                    >
-                                        이전
-                                    </button>
-                                )}
-                                <button
-                                    className="btn btn-primary"
-                                    onClick={handleNext}
-                                    disabled={!canProceedToNextStep()}
-                                >
-                                    {currentStep === 4 ? '완료' : '다음'}
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </div>
+              weekdayHour !== '' && weekdayMinute !== '' &&
+                weekendHour !== '' && weekendMinute !== ''
             );
+          case 4:
+            return forced1 && forced2 && forced3 && likert1 !== null && likert2 !== null && likert3 !== null;
+          default:
+            return false;
+        }
+      };
+
+      //  필수 설문에 따라 최종 학습 유형을 계산
+      const calculateType = () => {
+        // Likert 점수(1~4)를 기반으로 각 차원의 선택 값 결정
+        const l1 = likert1;
+        const l2 = likert2;
+        const l3 = likert3;
+
+        const likertChoice1 = (l1 >= 3) ? 'whole' : 'detail';
+        const likertChoice2 = (l2 >= 3) ? 'external' : 'internal';
+        const likertChoice3 = (l3 >= 3) ? 'spontaneous' : 'plan';
+
+        // 충돌 시 Likert 우선
+        const final1 = (forced1 === likertChoice1) ? forced1 : likertChoice1;
+        const final2 = (forced2 === likertChoice2) ? forced2 : likertChoice2;
+        const final3 = (forced3 === likertChoice3) ? forced3 : likertChoice3;
+
+        const key = `${final1}_${final2}_${final3}`;
+        const typeMap = {
+          'whole_internal_plan': {
+            name: '플라톤형',
+            desc: `절대적 참실재인 ‘이데아’를 추구한 플라톤과 같이, 종합적인 이해를 위해 노력하는 학습자입니다. 공부를 통해 스스로 성장하는 것에 관심이 있으며, 냉철한 이성으로 자기관리를 해 나갑니다.`
+          },
+          'whole_internal_spontaneous': {
+            name: '가우디형',
+            desc: `종합적인 구조를 자신만의 개성으로 표현한 건축가 가우디와 같이, 전체 구조를 이해하고 스스로 공부하는 목적을 찾아가는 학습자입니다. 기분과 상황에 따라 자유롭게 공부하는 것을 선호합니다.`
+          },
+          'detail_internal_plan': {
+            name: '마리퀴리형',
+            desc: `모든 원소를 빠짐없이 조사하기 위해 철저하게 자기관리를 했던 마리퀴리와 같이, 공부하는 주제에 대한 꼼꼼한 확인, 외부 환경에 굴하지 않고 공부에 집중하려는 태도, 냉정하게 감정을 조절하려는 학습 특성을 가지고 있습니다.`
+          },
+          'detail_internal_spontaneous': {
+            name: '슈베르트형',
+            desc: `섬세하고 개성적으로 자신의 감성을 표현한 슈베르트와 같이, 공부하는 내용을 자세히 이해하고 스스로 즐기면서 공부하는 학습자입니다. 자신의 마음 변화에 즉각적으로 반응하며, 이를 공부에 반영하려고 노력합니다.`
+          },
+          'whole_external_plan': {
+            name: '루스벨트형',
+            desc: `많은 사람들에게 미치는 영향을 세심하게 고려하여 미국 경제 정책의 큰 그림을 그려낸 루스벨트 대통령과 같이, 공부하는 내용의 큰 구조에 관심을 두는 학습자입니다. 공부하는 과정에서 다른 사람들과 비교하면서 철저하게 계획을 실천해 나가려고 합니다.`
+          },
+          'whole_external_spontaneous': {
+            name: '스티븐 스필버그형',
+            desc: `영화의 큰 흐름을 중심으로 관객과 감성적으로 소통하는 스티븐 스필버그와 같이, 공부하는 내용의 큰 흐름을 이해하기 위해 노력합니다. 자신의 감정과 상황을 수시로 살펴보며 다른 사람들과 자신의 실력을 견주며 공부를 합니다.`
+          },
+          'detail_external_plan': {
+            name: '셜록홈즈형',
+            desc: `사건의 증거들을 세심하게 살피고 의뢰인을 위해 사건을 해결하는 셜록홈즈처럼, 공부하는 내용을 자세하고 명확하게 확인하려고 노력하는 학습자입니다. 다른 사람들을 의식하면서 신중하고 체계적으로 자신을 관리하려는 모습을 보입니다.`
+          },
+          'detail_external_spontaneous': {
+            name: '나이팅게일형',
+            desc: `종 환자들의 회복을 위한 방안들을 꼼꼼하고 세심하게 고민한 나이팅게일과 같이, 구체적인 정보에 집중하고 다른 사람들을 의식하면서 공부하는 유형입니다. 편안한 마음으로 자신의 기분에 맞춰 공부하는 것을 선호합니다.`
+          }
         };
 
-        ReactDOM.render(<SignupApp />, document.getElementById('root'));
+        const typeInfo = typeMap[key];
+        if (typeInfo) {
+          return typeInfo;
+        }
+        return null;
+      };
+
+      const handleNext = async () => {
+        if (canProceedToNextStep()) {
+          if (currentStep === 4) {
+            const typeInfo = calculateType();
+            setResultType(typeInfo);
+            // 가입 정보와 함께 학습 유형까지 localStorage에 저장
+            const quizResult = {
+              forced: [
+                forced1 === 'whole',
+                forced2 === 'external', 
+                forced3 === 'spontaneous',
+              ],
+              likert: [likert1, likert2, likert3]
+            };
+
+            const response = await fetch("https://doziapi.duckdns.org/api/me/quiz", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              credentials: "include",
+              body: JSON.stringify(quizResult)
+            });
+
+            const data = await response.json();
+
+            const signupInfo = {
+              grade: selectedGrade,
+              majorUnit: selectedMajorUnit,
+              minorUnit: selectedMinorUnit,
+              weekdayHour,
+              weekdayMinute,
+              weekendHour,
+              weekendMinute,
+              forced1,
+              forced2,
+              forced3,
+              likert1,
+              likert2,
+              likert3,
+              learningType: typeInfo // 계산된 학습 유형
+            };
+            localStorage.setItem('signupInfo', JSON.stringify(signupInfo));
+          }
+          setCurrentStep(prev => Math.min(prev + 1, 5));
+        }
+      };
+
+      const handlePrevious = () => {
+        setCurrentStep(prev => Math.max(prev - 1, 1));
+      };
+
+      const renderStep1 = () => (
+        <div>
+          <div className="step-header">
+            <div className="step-number">1</div>
+            <div className="step-title">학년을 선택해주세요</div>
+          </div>
+          <div className="grade-list">
+            {grades.map((grade, index) => (
+              <div
+                key={index}
+                className={`grade-item ${selectedGrade === grade ? 'selected' : ''}`}
+                onClick={() => setSelectedGrade(grade)}
+              >
+                <span>{grade}</span>
+                {selectedGrade === grade && <span>✓</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+
+      const renderStep2 = () => (
+        <div>
+          <div className="step-header">
+            <div className="step-number">2</div>
+            <div className="step-title">학습 단원을 선택해주세요</div>
+          </div>
+          <div className="dropdown-container">
+            <select
+              className="dropdown"
+              value={selectedMajorUnit}
+              onChange={e => { setSelectedMajorUnit(e.target.value); setSelectedMinorUnit(''); }}
+            >
+              <option value="">대단원을 선택하세요</option>
+              {selectedGrade && Object.keys(curriculum[selectedGrade] || {}).map((unit, idx) => (
+                <option key={idx} value={unit}>{unit}</option>
+              ))}
+            </select>
+          </div>
+          <div className="dropdown-container">
+            <select
+              className="dropdown"
+              value={selectedMinorUnit}
+              onChange={e => setSelectedMinorUnit(e.target.value)}
+              disabled={!selectedMajorUnit}
+            >
+              <option value="">소단원을 선택하세요</option>
+              {selectedMajorUnit && curriculum[selectedGrade][selectedMajorUnit].map((sub, idx) => (
+                <option key={idx} value={sub}>{sub}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      );
+
+      const renderStep3 = () => (
+        <div>
+          <div className="step-header">
+            <div className="step-number">3</div>
+            <div className="step-title">평일/주말 평균 하루 공부시간을 입력해주세요</div>
+          </div>
+          <div style={{ marginBottom: "24px" }}>
+            <div style={{ marginBottom: "16px" }}>
+              <label style={{ fontSize: "16px", fontWeight: 500, color: "#333" }}>
+                <span style={{ color: "#E85A1F" }}>평일</span> 하루 평균 공부시간
+              </label>
+              <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
+                <select
+                  className="dropdown"
+                  style={{ width: "100px" }}
+                  value={weekdayHour}
+                  onChange={e => setWeekdayHour(e.target.value)}
+                >
+                  <option value="">시간</option>
+                  {hourOptions.map(h => (
+                    <option key={h} value={h}>{h}시간</option>
+                  ))}
+                </select>
+                <span style={{ alignSelf: "center" }}>시간</span>
+                <select
+                  className="dropdown"
+                  style={{ width: "100px" }}
+                  value={weekdayMinute}
+                  onChange={e => setWeekdayMinute(e.target.value)}
+                >
+                  <option value="">분</option>
+                  {minuteOptions.map(m => (
+                    <option key={m} value={m}>{m}분</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label style={{ fontSize: "16px", fontWeight: 500, color: "#333" }}>
+                <span style={{ color: "#E85A1F" }}>주말</span> 하루 평균 공부시간
+              </label>
+              <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
+                <select
+                  className="dropdown"
+                  style={{ width: "100px" }}
+                  value={weekendHour}
+                  onChange={e => setWeekendHour(e.target.value)}
+                >
+                  <option value="">시간</option>
+                  {hourOptions.map(h => (
+                    <option key={h} value={h}>{h}시간</option>
+                  ))}
+                </select>
+                <span style={{ alignSelf: "center" }}>시간</span>
+                <select
+                  className="dropdown"
+                  style={{ width: "100px" }}
+                  value={weekendMinute}
+                  onChange={e => setWeekendMinute(e.target.value)}
+                >
+                  <option value="">분</option>
+                  {minuteOptions.map(m => (
+                    <option key={m} value={m}>{m}분</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div style={{ fontSize: "14px", color: "#999", marginTop: "8px" }}>
+              예시: 1시간 30분, 2시간 등
+            </div>
+          </div>
+        </div>
+      );
+
+      // STEP 4: EDT 학습 유형 검사
+      const renderStep4 = () => (
+        <div>
+          <div className="step-header">
+            <div className="step-number">4</div>
+            <div className="step-title">EDT 학습유형 검사</div>
+          </div>
+          {/* 1. 공부를 하는 과정에서 내가 보다 중요하게 생각하는 것은? */}
+          <h3 style={{margin: "24px 0 8px 0", color: "#E85A1F", fontSize: "17px"}}>1. 공부를 하는 과정에서 내가 보다 중요하게 생각하는 것은?</h3>
+          <div className="quiz-container">
+            {/* 강제선택 문항 */}
+            <div className={`quiz-item ${forced1 ? 'answered' : ''}`}>
+              <div className="quiz-options">
+                <div
+                  className={`quiz-option ${forced1 === 'whole' ? 'selected' : ''}`}
+                  onClick={() => setForced1('whole')}
+                >
+                  나는 전체 내용을 고민한 후, 큰 개념과 작은 개념을 한꺼번에 공부한다.
+                </div>
+                <div
+                  className={`quiz-option ${forced1 === 'detail' ? 'selected' : ''}`}
+                  onClick={() => setForced1('detail')}
+                >
+                  나는 세부 설명을 중심으로 한 번에 하나씩 내용을 이해하고 공부한다.
+                </div>
+              </div>
+            </div>
+            <div className={`quiz-item ${forced2 ? 'answered' : ''}`}>
+              <div className="quiz-options">
+                <div
+                  className={`quiz-option ${forced2 === 'external' ? 'selected' : ''}`}
+                  onClick={() => setForced2('external')}
+                >
+                  좋은 성적을 받으면 보상(용돈·칭찬 등)을 받을 수 있어서 공부한다.
+                </div>
+                <div
+                  className={`quiz-option ${forced2 === 'internal' ? 'selected' : ''}`}
+                  onClick={() => setForced2('internal')}
+                >
+                  꿈을 이루기 위해 공부한다.
+                </div>
+              </div>
+            </div>
+            <div className={`quiz-item ${forced3 ? 'answered' : ''}`}>
+              <div className="quiz-options">
+                <div
+                  className={`quiz-option ${forced3 === 'spontaneous' ? 'selected' : ''}`}
+                  onClick={() => setForced3('spontaneous')}
+                >
+                  공부할 때 하고 싶은 과목에 시간을 많이 소비한다.
+                </div>
+                <div
+                  className={`quiz-option ${forced3 === 'plan' ? 'selected' : ''}`}
+                  onClick={() => setForced3('plan')}
+                >
+                  공부를 할 때 계획표 대로 과목을 나눠 공부하는 편이다.
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* 2. 평소 공부하는 모습과 가까운 것은? */}
+          <h3 style={{margin: "32px 0 8px 0", color: "#E85A1F", fontSize: "17px"}}>2. 평소 공부하는 모습과 가까운 것은?</h3>
+          <div className="quiz-container">
+            {/* Likert 척도 문항 */}
+            <div className={`quiz-item ${likert1 !== null ? 'answered' : ''}`}>
+              <div className="quiz-question">1) 이해한 내용은 나만의 방법으로 다시 정리하면서 학습한다.</div>
+              <div className="quiz-options">
+                {[4, 3, 2, 1].map(val => (
+                  <div
+                    key={val}
+                    className={`quiz-option ${likert1 === val ? 'selected' : ''}`}
+                    onClick={() => setLikert1(val)}
+                  >
+                    {val === 4 ? '매우 그렇다' :
+                      val === 3 ? '그렇다' :
+                        val === 2 ? '아니다' : '전혀 아니다'}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className={`quiz-item ${likert2 !== null ? 'answered' : ''}`}>
+              <div className="quiz-question">2) 친구들보다 좋은 성적을 받아 사람들로부터 인정을 받으려고 한다.</div>
+              <div className="quiz-options">
+                {[4, 3, 2, 1].map(val => (
+                  <div
+                    key={val}
+                    className={`quiz-option ${likert2 === val ? 'selected' : ''}`}
+                    onClick={() => setLikert2(val)}
+                  >
+                    {val === 4 ? '매우 그렇다' :
+                      val === 3 ? '그렇다' :
+                        val === 2 ? '아니다' : '전혀 아니다'}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className={`quiz-item ${likert3 !== null ? 'answered' : ''}`}>
+              <div className="quiz-question">3) 기분에 따라 공부할 과목을 정한다.</div>
+              <div className="quiz-options">
+                {[4, 3, 2, 1].map(val => (
+                  <div
+                    key={val}
+                    className={`quiz-option ${likert3 === val ? 'selected' : ''}`}
+                    onClick={() => setLikert3(val)}
+                  >
+                    {val === 4 ? '매우 그렇다' :
+                      val === 3 ? '그렇다' :
+                        val === 2 ? '아니다' : '전혀 아니다'}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+
+      const renderStep5 = () => (
+        <div className="completion-message">
+          <h2>회원가입이 완료되었습니다!</h2>
+          <p>선택하신 정보를 바탕으로 맞춤형 학습을 시작해보세요.</p>
+          <div style={{ marginTop: '24px', padding: '20px', background: 'white', borderRadius: '12px', textAlign: 'left' }}>
+            <h3 style={{ color: '#E85A1F', marginBottom: '16px' }}>설정 정보</h3>
+            <p><strong>학년:</strong> {selectedGrade}</p>
+            <p><strong>대단원:</strong> {selectedMajorUnit}</p>
+            <p><strong>소단원:</strong> {selectedMinorUnit}</p>
+            <p>
+              <strong>평일 공부시간:</strong> {weekdayHour ? `${weekdayHour}시간` : ''}{weekdayMinute ? ` ${weekdayMinute}분` : ''}
+              <br />
+              <strong>주말 공부시간:</strong> {weekendHour ? `${weekendHour}시간` : ''}{weekendMinute ? ` ${weekendMinute}분` : ''}
+            </p>
+            <p>
+              <strong>학습유형:</strong> {resultType ? resultType.name : '알 수 없음'}
+            </p>
+          </div>
+          <div className="button-container">
+            <button
+              className="btn btn-secondary"
+              onClick={() => {
+                window.location.href = "home.html";
+              }}
+            >
+              확인
+            </button>
+          </div>
+        </div>
+      );
+
+      return (
+        <div className="container">
+          <div className="header">
+            <h1>학습자 맞춤 설정</h1>
+            <p>단계별로 정보를 입력해주세요</p>
+          </div>
+
+          {currentStep < 5 && (
+            <div className="progress-bar">
+              <div className="progress-fill" style={{ width: `${getProgress()}%` }}></div>
+            </div>
+          )}
+
+          <div className="step-container">
+            {currentStep === 1 && renderStep1()}
+            {currentStep === 2 && renderStep2()}
+            {currentStep === 3 && renderStep3()}
+            {currentStep === 4 && renderStep4()}
+            {currentStep === 5 && renderStep5()}
+
+            {currentStep < 5 && (
+              <div className="button-container">
+                {currentStep > 1 && (
+                  <button
+                    className="btn btn-secondary"
+                    onClick={handlePrevious}
+                  >
+                    이전
+                  </button>
+                )}
+                <button
+                  className="btn btn-primary"
+                  onClick={handleNext}
+                  disabled={!canProceedToNextStep()}
+                >
+                  {currentStep === 4 ? '완료' : '다음'}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    ReactDOM.render(<SignupApp />, document.getElementById('root'));
     </script>
-</body>
+  </body>
 
 </html>
