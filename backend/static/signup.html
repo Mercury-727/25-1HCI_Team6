@@ -509,7 +509,9 @@
       };
 
       const hourOptions = Array.from({ length: 13 }, (_, i) => i);
-      const hourOptions24 = Array.from({ length: 24 }, (_, i) => i);
+      const wakeHourOptions = [5, 6, 7, 8, 9];
+      const schoolHourOptions = [12, 13, 14, 15, 16];
+      const bedHourOptions = [20, 21, 22, 23];
       const minuteOptions = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
 
       const getProgress = () => {
@@ -743,7 +745,6 @@
                     <option key={h} value={h}>{h}시간</option>
                   ))}
                 </select>
-                <span style={{ alignSelf: "center" }}>시간</span>
                 <select
                   className="dropdown"
                   style={{ width: "100px" }}
@@ -774,7 +775,6 @@
                     <option key={h} value={h}>{h}시간</option>
                   ))}
                 </select>
-                <span style={{ alignSelf: "center" }}>시간</span>
                 <select
                   className="dropdown"
                   style={{ width: "100px" }}
@@ -803,10 +803,9 @@
             <label style={{ fontSize: "16px", fontWeight: 500, color: "#333" }}><span style={{ color: "#E85A1F" }}>기상</span> 시간</label>
             <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
               <select className="dropdown" style={{ width: "100px" }} value={wakeHour} onChange={e => setWakeHour(e.target.value)}>
-                <option value="">시간</option>
-                {hourOptions24.map(h => <option key={h} value={h}>{h}시</option>)}
+                <option value="">시</option>
+                {wakeHourOptions.map(h => <option key={h} value={h}>{h}시</option>)}
               </select>
-              <span style={{ alignSelf: "center" }}>시</span>
               <select className="dropdown" style={{ width: "100px" }} value={wakeMinute} onChange={e => setWakeMinute(e.target.value)}>
                 <option value="">분</option>
                 {minuteOptions.map(m => <option key={m} value={m}>{m}분</option>)}
@@ -819,10 +818,9 @@
             <label style={{ fontSize: "16px", fontWeight: 500, color: "#333" }}><span style={{ color: "#E85A1F" }}>하교</span> 시간</label>
             <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
               <select className="dropdown" style={{ width: "100px" }} value={schoolHour} onChange={e => setSchoolHour(e.target.value)}>
-                <option value="">시간</option>
-                {hourOptions24.map(h => <option key={h} value={h}>{h}시</option>)}
+                <option value="">시</option>
+                {schoolHourOptions.map(h => <option key={h} value={h}>{h}시</option>)}
               </select>
-              <span style={{ alignSelf: "center" }}>시</span>
               <select className="dropdown" style={{ width: "100px" }} value={schoolMinute} onChange={e => setSchoolMinute(e.target.value)}>
                 <option value="">분</option>
                 {minuteOptions.map(m => <option key={m} value={m}>{m}분</option>)}
@@ -835,10 +833,9 @@
             <label style={{ fontSize: "16px", fontWeight: 500, color: "#333" }}><span style={{ color: "#E85A1F" }}>취침</span> 시간</label>
             <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
               <select className="dropdown" style={{ width: "100px" }} value={bedHour} onChange={e => setBedHour(e.target.value)}>
-                <option value="">시간</option>
-                {hourOptions24.map(h => <option key={h} value={h}>{h}시</option>)}
+                <option value="">시</option>
+                {bedHourOptions.map(h => <option key={h} value={h}>{h}시</option>)}
               </select>
-              <span style={{ alignSelf: "center" }}>시</span>
               <select className="dropdown" style={{ width: "100px" }} value={bedMinute} onChange={e => setBedMinute(e.target.value)}>
                 <option value="">분</option>
                 {minuteOptions.map(m => <option key={m} value={m}>{m}분</option>)}
