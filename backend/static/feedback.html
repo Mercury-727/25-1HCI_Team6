@@ -16,36 +16,59 @@
     />
 
     <style>
+    /* Basic Reset */
     * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+        /* Prevent selection, tap highlight on touch devices */
+        user-select: none;
+        -webkit-user-select: none; /* Safari */
+        -ms-user-select: none; /* IE 10+ */
+        -webkit-touch-callout: none; /* Prevent callout menu on iOS */
+        -webkit-tap-highlight-color: transparent; /* Prevent tap highlight */
     }
 
+    /* Body styles for centering and background */
     body {
         font-family: "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
-        background-color: #fdf8f4;
+        background-color: #fdf8f4; /* Light orange background */
+        color: #333; /* Default text color */
+        line-height: 1.6;
         max-width: 390px; /* Target max-width */
         margin: 0 auto;
-        color: #333;
-        line-height: 1.6;
         min-height: 100vh; /* Ensure body fills viewport height */
         display: flex; /* Use flex to push footer down */
         flex-direction: column; /* Arrange children vertically */
+        overflow-y: auto; /* Default scroll behavior */
+        overflow-x: hidden; /* Prevent horizontal scroll */
     }
 
+    /* Class to disable scrolling on body */
+    body.no-scroll {
+        overflow-y: hidden;
+        overscroll-behavior-y: contain; /* Prevent pull-to-refresh etc. */
+    }
+
+    /* Header style */
     .header {
         position: sticky;
         top: 0;
-        left: 0;
-        right: 0;
-        background-color: #fdf8f4;
-        padding: 12px 16px; /* Reduced horizontal padding */
-        border-bottom: 1px solid #e8ddd4;
+        width: 100%; /* Takes full width of the body (390px) */
+        background-color: #fdf8f4; /* Match body background */
+        padding: 12px 16px; /* Padding */
+        border-bottom: 1px solid #e8ddd4; /* Bottom border */
         display: flex;
-        justify-content: space-between;
+        justify-content: space-between; /* Space out logo and buttons */
         align-items: center;
-        z-index: 1000;
+        z-index: 1000; /* Above other content */
+        transition: filter 0.3s ease; /* Smooth blur transition */
+    }
+
+    /* Header blur effect when modal is open */
+    .header.blurred {
+      filter: blur(3px);
+      pointer-events: none; /* Disable clicks */
     }
 
     .logo {
@@ -53,25 +76,20 @@
         align-items: center;
         font-size: 18px;
         font-weight: 700;
-        color: #f96c50;
+        color: #f96c50; /* Orange color */
     }
 
-    .logo i {
-        margin-right: 8px;
-        font-size: 22px; /* Slightly smaller icon */
-    }
-
-    .header-actions {
+    .header-buttons { /* Container for header buttons */
         display: flex;
-        gap: 12px; /* Reduced gap */
+        gap: 8px; /* Gap between buttons */
     }
 
-    .header-btn {
+    .header-btn { /* Individual header button */
         background: none;
         border: none;
         padding: 8px;
         border-radius: 8px;
-        color: #DD6B20;
+        color: #DD6B20; /* Darker orange color */
         cursor: pointer;
         transition: all 0.2s ease;
     }
@@ -80,13 +98,55 @@
         transform: scale(1.05);
     }
 
-    /* 메인 컨테이너 */
+    /* Main container */
     .main-container {
         margin-top: 20px;
         padding: 16px;
         width: 100%;
         flex-grow: 1;
+        /* Added min-height to ensure it takes up space even if content is short */
+        min-height: calc(100vh - 50px - 40px); /* viewport height - header height - some margin/padding */
+        display: flex; /* Use flex to center loading */
+        flex-direction: column; /* Stack children vertically */
     }
+
+    /* Loading Indicator Styles */
+    .loading-container {
+        flex-grow: 1; /* Take available space to center vertically */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center; /* Center vertically */
+        padding: 50px 0; /* Add some padding */
+        color: #f96c50;
+        font-weight: 500;
+    }
+
+    .spinner {
+        width: 40px; /* Spinner size */
+        height: 40px;
+        border: 4px solid #f3f3f3; /* Light grey border */
+        border-top: 4px solid #f96c50; /* Orange border for animation */
+        border-radius: 50%;
+        animation: spin 1s linear infinite; /* Apply spinning animation */
+        margin-bottom: 15px; /* Space between spinner and text */
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+
+    .eta-text {
+        font-size: 14px;
+        color: #666;
+    }
+
 
     /* 페이지 타이틀 */
     .page-title {
@@ -134,11 +194,7 @@
     /* 오늘의 학습 요약 */
     .summary-stats {
         display: grid;
-        /* minmax(200px, 1fr) would likely cause overflow on 390px - padding */
-        /* Let grid handle it naturally, or explicitly set to 1fr on small screens */
-        /* As per previous logic, the media query handles this better,
-           but let's make the base definition reasonable too */
-         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Adjusted minmax */
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Adjusted minmax */
         gap: 16px; /* Reduced gap */
         margin-bottom: 16px; /* Reduced margin */
     }
@@ -277,6 +333,12 @@
         text-decoration: none; /* Ensure buttons used as links look correct */
     }
 
+    .btn-primary {
+        background: #f96c50; /* Primary orange */
+        color: white;
+        border: none; /* No border for primary */
+    }
+
 
     .btn-primary:hover {
         background: #e85a3f;
@@ -325,7 +387,7 @@
 
     /* 모달 스타일 */
     .modal {
-        display: none; /* Controlled by JS */
+        display: flex; /* Use flex for centering */
         position: fixed;
         top: 0;
         left: 0;
@@ -334,20 +396,26 @@
         background: rgba(0, 0, 0, 0.5);
         z-index: 2000;
         animation: fadeIn 0.3s ease;
+        align-items: center; /* Center vertically */
+        justify-content: center; /* Center horizontally */
+        padding: 16px; /* Add padding to prevent content touching edges */
+    }
+
+     /* Hidden state for modal */
+    .modal.hidden {
+        display: none;
     }
 
     .modal-content {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        /* Removed absolute positioning and transform */
         background: white;
         padding: 24px; /* Reduced padding */
         border-radius: 12px; /* Reduced border-radius */
         max-width: 360px; /* Adjusted max-width to fit within body */
-        width: calc(100% - 32px); /* Account for body padding if needed, or just use 90% */
-        width: 90%; /* Ensure it's 90% of viewport width */
-        animation: slideUp 0.3s ease;
+        width: 100%; /* Take full width up to max-width */
+        box-shadow: 0 8px 16px rgba(0,0,0,0.15); /* shadow-lg */
+        box-sizing: border-box; /* Include padding in width */
+        animation: slideUp 0.3s ease; /* Keep slide up animation */
     }
 
     .modal-header {
@@ -379,6 +447,7 @@
         filter: grayscale(1); /* Start with grayscale */
         opacity: 0.6; /* Start with reduced opacity */
         transform: scale(1);
+        display: inline-block; /* Ensure transform works */
     }
 
     #emoji-rating span:hover {
@@ -408,16 +477,18 @@
         overflow: auto; /* Show scrollbar if needed */
         box-sizing: border-box;
         width: 100%; /* Make it responsive */
-        /* max-width: 400px; Removed as body max-width handles this */
-        margin-left: auto;
-        margin-right: auto;
         margin-bottom: 12px;
         border-radius: 8px;
         border: 1px solid #e8ddd4;
         padding: 8px;
         min-height: 60px; /* Increased min-height */
         font-size: 14px; /* Consistent font size */
+        outline: none; /* Remove default outline */
     }
+     #satisfaction-text:focus {
+        border-color: #f96c50; /* Focus border color */
+        box-shadow: 0 0 0 3px rgba(249, 108, 80, 0.2); /* Focus ring */
+     }
 
     /* Animation Keyframes */
     @keyframes fadeIn {
@@ -426,12 +497,11 @@
     }
 
     @keyframes slideUp {
-        from { transform: translate(-50%, -40%); opacity: 0; }
-        to { transform: translate(-50%, -50%); opacity: 1; }
+        /* Adjusted animation for flex centering */
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Removed the redundant @media (max-width: 768px) block
-       as styles are adjusted for 390px directly or handled by flex/grid */
     </style>
 
     <!-- React and Babel CDNs -->
@@ -439,15 +509,22 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script> <!-- Add Moment.js for date formatting -->
+     <script src="https://cdn.jsdelivr.net/npm/moment/locale/ko.js"></script> <!-- Korean locale for Moment.js -->
+
   </head>
-  <body>
+  <body className={loading ? 'no-scroll' : ''}>
     <div id="root">
       <!-- React app will be mounted here -->
     </div>
 
     <script type="text/babel">
-    const { useState, useEffect } = React;
+    const { useState, useEffect, useRef } = React; // Import useRef
     const root = ReactDOM.createRoot(document.getElementById('root'));
+
+    // Set Moment.js locale
+    moment.locale('ko');
+
 
     // Component for the Header
     const Header = () => (
@@ -455,18 +532,18 @@
         <div className="logo">
           My Study
         </div>
-        <div className="header-actions">
+        <div className="header-buttons">
           <button
             onClick={(e) => {e.stopPropagation(); window.location.href = './home.html';}}
             className="header-btn"
           >
-            <i data-lucide="home" className="lucide" style={{ width: 20, height: 20 }} />
+            <i data-lucide="home" className="lucide" style={{ width: 20, height: 20, pointerEvents: 'none' }} />
           </button>
           <button
             onClick={() => window.location.reload() }
             className="header-btn"
           >
-            <i data-lucide="refresh-cw" className="lucide" style={{ width: 20, height: 20 }} />
+            <i data-lucide="refresh-cw" className="lucide" style={{ width: 20, height: 20, pointerEvents: 'none' }} />
           </button>
         </div>
       </header>
@@ -500,11 +577,8 @@
           return;
         }
 
-        const today = new Date();
-        const y = today.getFullYear();
-        const m = String(today.getMonth() + 1).padStart(2, "0");
-        const d = String(today.getDate()).padStart(2, "0");
-        const dateStr = `${y}년${m}월${d}일 계획 생성에 대한 피드백`;
+        // Use Moment.js for consistent date string
+        const dateStr = moment().format('YYYY년MM월DD일 계획 생성에 대한 피드백');
 
         const feedback = {
           date: dateStr,
@@ -571,12 +645,11 @@
                 placeholder="오늘 계획에 대해 한줄평을 남겨주세요!"
                 value={satisfactionText}
                 onChange={(e) => setSatisfactionText(e.target.value)}
-                style={{ display: showInput ? "block" : "none" }} // Control display via style
               ></textarea>
               <button
                 id="satisfaction-submit"
                 className="btn-secondary"
-                style={{ display: showInput ? "inline-block" : "none", align: "center" }} // Control display
+                style={{ display: "inline-block", margin: "0 auto" }} // Center the button
                 onClick={handleSubmit}
               >
                 제출하기
@@ -622,6 +695,16 @@
         }, 2000);
       };
 
+      // Initial style for the button
+      useEffect(() => {
+        setButtonStyle({
+            background: 'linear-gradient(135deg, #FFE5E0, #FFF0ED)',
+            color: '#F96C50',
+            border: '2px solid #F96C50'
+          });
+      }, []);
+
+
       return (
         <div className="encouragement-section">
           <div className="encouragement-text">오늘 하루도 수고했어요! 🎉</div>
@@ -638,13 +721,28 @@
       );
     };
 
+
+    // Component for the Loading Indicator
+    const LoadingIndicator = ({ eta }) => (
+        <div className="loading-container">
+            <div className="spinner"></div>
+            <div className="loading-text">로딩 중...</div>
+            {eta > 0 && <div className="eta-text">예상 완료까지: {eta}초</div>}
+             {eta <= 0 && <div className="eta-text">조금만 기다려주세요</div>}
+        </div>
+    );
+
+
     // Main App Component
     function DailyFeedback() {
       const [feedbackData, setFeedbackData] = useState(null);
       const [loading, setLoading] = useState(true);
       const [userPlans, setUserPlans] = useState([]);
       const [summary, setSummary] = useState(null);
+      const [etaRemaining, setEtaRemaining] = useState(10); // Default ETA 10 seconds
+      const timerRef = useRef(null); // Ref for the interval timer
 
+        // Load user plans and calculate summary on mount
         useEffect(() => {
           const saved = localStorage.getItem("userPlans");
           if (saved) {
@@ -654,85 +752,154 @@
                 setUserPlans(parsed);
 
                 const completedPlans = parsed.filter(p => p.done);
-                const [averageAchievement, totalDuration] = completedPlans
-                    .reduce(
-                        ([avg, weight], plan) => [Math.floor((avg * weight + plan.achievement * plan.duration) / (weight + plan.duration)), weight + plan.duration],
-                        [0, 0]
-                    );
-                const totalHours = Math.floor(totalDuration / 3600);
-                const totalMinutes = Math.floor(totalDuration / 60) % 60;
+                 // Calculate total duration and weighted average achievement only if there are completed plans
+                 if (completedPlans.length > 0) {
+                    const totalDuration = completedPlans.reduce((sum, plan) => sum + (plan.duration || 0), 0);
+                     // Calculate total 'achievement points' (achievement * duration)
+                    const totalAchievementPoints = completedPlans.reduce((sum, plan) => sum + (plan.achievement || 0) * (plan.duration || 0), 0);
 
-                setSummary({
-                    achievement: averageAchievement,
-                    totalHours,
-                    totalMinutes
-                });
+                    const averageAchievement = totalDuration > 0 ? Math.floor(totalAchievementPoints / totalDuration) : 0;
+
+                    const totalHours = Math.floor(totalDuration / 3600);
+                    const totalMinutes = Math.floor(totalDuration / 60) % 60;
+
+                    setSummary({
+                        achievement: averageAchievement,
+                        totalHours,
+                        totalMinutes
+                    });
+                 } else {
+                    // Handle case with no completed plans
+                     setSummary({
+                         achievement: 0,
+                         totalHours: 0,
+                         totalMinutes: 0
+                     });
+                 }
+
               } else {
-                console.warn("\u{26A0} userPlans가 배열이 아닙니다.");
+                console.warn("\u{26A0} userPlans가 배열이 아닙니다. 초기화합니다.");
+                 setUserPlans([]);
+                 setSummary({ achievement: 0, totalHours: 0, totalMinutes: 0 });
               }
             } catch (e) {
               console.error("\u{274C} JSON parse error:", e);
+               setUserPlans([]);
+               setSummary({ achievement: 0, totalHours: 0, totalMinutes: 0 });
             }
           } else {
-            console.warn("\u{2753} localStorage에 userPlans 없음");
+            console.warn("\u{2753} localStorage에 userPlans 없음. 초기화합니다.");
+             setUserPlans([]);
+             setSummary({ achievement: 0, totalHours: 0, totalMinutes: 0 });
           }
-        }, []);
+        }, []); // Empty dependency array means this effect runs once on mount
 
+        // Fetch feedback data and manage loading state
       useEffect(() => {
-        // Fetch main data
+          // Start the timer when loading begins
+           setEtaRemaining(10); // Reset ETA to 10 seconds
+           timerRef.current = setInterval(() => {
+               setEtaRemaining(prevEta => (prevEta > 0 ? prevEta - 1 : 0));
+           }, 1000);
+
+
         fetch("https://doziapi.duckdns.org/api/feedback/daily")
-          .then((response) => response.json())
+          .then((response) => {
+               if (!response.ok) {
+                   throw new Error(`HTTP error! status: ${response.status}`);
+               }
+               return response.json();
+           })
           .then((data) => {
             setFeedbackData(data);
           })
           .catch((err) => {
             console.error("Failed to fetch feedback data:", err);
             // Set empty state or error state if needed
-            setFeedbackData({});
+            setFeedbackData({
+                analysis: "피드백 로딩에 실패했습니다.",
+                suggestion: "잠시 후 다시 시도해주세요.",
+                encouragement: "데이터 로딩에 실패했어요."
+            });
+             // Ensure ETA stops
+            setEtaRemaining(0);
           })
           .finally(() => {
             setLoading(false);
+             // Stop the timer once loading is complete (whether success or error)
+             if (timerRef.current) {
+                 clearInterval(timerRef.current);
+             }
           });
+
+           // Cleanup function for the fetch effect
+           return () => {
+               // Stop the timer if the component unmounts while loading
+               if (timerRef.current) {
+                   clearInterval(timerRef.current);
+               }
+           };
+
       }, []); // Empty dependency array means this effect runs once on mount
 
-      useEffect(() => {
-        if (!loading) {
-          lucide.createIcons();
-        }
-      }, [loading]);
+
+       // Effect to manage the body's no-scroll class based on loading state (and potentially modal state if added later)
+       useEffect(() => {
+           const body = document.body;
+            // Apply no-scroll class while loading
+           if (loading) { // Assuming no modal in this specific feedback page
+               body.classList.add('no-scroll');
+           } else {
+               body.classList.remove('no-scroll');
+           }
+            // Cleanup effect
+            return () => {
+                body.classList.remove('no-scroll'); // Ensure scroll is re-enabled on component unmount
+            };
+       }, [loading]); // Effect depends on loading state
+
+
+       // Effect to initialize Lucide icons after content is rendered
+       useEffect(() => {
+           // Only create icons once loading is false and data is likely rendered
+           if (!loading && feedbackData) {
+               lucide.createIcons();
+           }
+       }, [loading, feedbackData]); // Rerun when loading state or feedbackData changes
+
 
       if (loading) {
         return (
           <>
             <Header />
-            <div className="main-container">
-              <div style={{textAlign: 'center', marginTop: '50px'}}>로딩 중...</div>
-            </div>
+             {/* Render the loading indicator */}
+            <main className="main-container"> {/* Use main tag for semantics */}
+               <LoadingIndicator eta={etaRemaining} />
+            </main>
           </>
-        ); // Or a proper loading spinner
+        );
       }
 
-      const encouragementSubtitle = feedbackData ?
-        feedbackData.encouragement
-        : '데이터 로딩에 실패했어요.';
+      // Use fetched feedbackData or default if fetch failed
+      const analysisText = feedbackData?.analysis || "피드백 로딩에 실패했습니다.";
+      const suggestionText = feedbackData?.suggestion || "잠시 후 다시 시도해주세요.";
+      const encouragementSubtitle = feedbackData?.encouragement || '데이터 로딩에 실패했어요.';
 
-      const todayStr = (new Date()).toLocaleString("ko-KR", {
-        year: "numeric",
-        day: "numeric",
-        month: "numeric",
-        weekday: "long",
-      });
+
+      // Use Moment.js to get today's date in Korean format
+      const todayStr = moment().format("YYYY년 MM월 DD일 dddd");
+
 
       return (
         <>
           <Header />
-          <div className="main-container">
+          <main className="main-container"> {/* Use main tag for semantics */}
             <div className="page-title">
               <h1>오늘의 학습 피드백 📅</h1>
               <p>{todayStr}</p>
             </div>
 
-            <div className="card">
+            <section className="card"> {/* Use section tag for semantics */}
               <h2 className="card-title">
                 <i className="fas fa-chart-line"></i>
                 학습 요약
@@ -753,49 +920,47 @@
                   <div className="stat-label">총 학습 시간</div>
                 </div>
               </div>
-            </div>
+            </section>
 
-            <div className="card">
+            <section className="card"> {/* Use section tag for semantics */}
               <h2 className="card-title">
                 <i className="fas fa-book"></i>
                 학습 기록
               </h2>
 
               <ul className="study-list">
-                {userPlans?.length > 0 ? (
+                {userPlans?.filter(p => p.done).length > 0 ? ( // Check filtered length
                   userPlans.filter(p => p.done).map((item, index) => (
-                    <li key={index} className="study-item">
+                    <li key={item.id || index} className="study-item"> {/* Use item.id if available, fallback to index */}
                       <span className="study-checkbox"><i className="fas fa-check"></i></span>
                       <span className="study-text">{item.title}</span>
                     </li>
                   ))
                 ) : (
-                    <li className="study-item"><span className="study-text">학습 목록이 없습니다.</span></li>
+                    <li className="study-item"><span className="study-text">완료된 학습이 없습니다.</span></li>
                   )}
               </ul>
-            </div>
+            </section>
 
-            <div className="card feedback-card">
+            <section className="card feedback-card"> {/* Use section tag for semantics */}
               <h2 className="card-title">
                 <i className="fas fa-comment-dots"></i>
                 피드백
               </h2>
 
               <div className="feedback-text">
-                {feedbackData ? 
-                  <>
-                    <h3>🔍 학습 분석</h3>{feedbackData.analysis}<h3>💬 제안</h3>{feedbackData.suggestion}
-                  </> : (
-                    "피드백을 불러오지 못했습니다."
-                  )}
+                  <h3>🔍 학습 분석</h3>
+                  <p>{analysisText}</p>
+                  <h3>💬 제안</h3>
+                  <p>{suggestionText}</p>
               </div>
-            </div>
+            </section>
 
             <SatisfactionSection />
 
             <EncouragementSection encouragementText={encouragementSubtitle} />
 
-          </div>
+          </main>
         </>
       );
     };
