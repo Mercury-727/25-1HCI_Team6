@@ -319,6 +319,8 @@
       const [weekendHour, setWeekendHour] = useState('');
       const [weekendMinute, setWeekendMinute] = useState('');
 
+      const [wakeHour, setWakeHour] = useState('');
+      const [wakeMinute, setWakeMinute] = useState('');
       const [schoolHour, setSchoolHour] = useState('');
       const [schoolMinute, setSchoolMinute] = useState('');
       const [bedHour, setBedHour] = useState('');
@@ -597,6 +599,21 @@
           const typeInfo = calculateType();
           setResultType(typeInfo);
           // 가입 정보와 함께 학습 유형까지 localStorage에 저장
+          const wakeTime = parseInt(wakeHour) * 60 + parseInt(wakeMinute);
+          const schoolTime = parseInt(schoolHour) * 60 + parseInt(schoolMinute);
+          const bedTime = parseInt(bedHour) * 60 + parseInt(bedMinute);
+
+          const schoolTimestamp = schoolHour.padStart(2, '0') + ':' + schoolMinute.padStart(2, '0') + ':00'
+          const wakeTimestamp = wakeHour.padStart(2, '0') + ':' + wakeMinute.padStart(2, '0') + ':00'
+
+          const userdata = {
+            weekday_study_time: parseInt(weekdayHour) * 60 + parseInt(weekdayMinute),
+            weekend_study_time: parseInt(weekendHour) * 60 + parseInt(weekendMinute),
+            weekday_requirement: { start: schoolTimestamp, duration_minute: bedTime - schoolTime },
+            weekend_requirement: { start: wakeTimestamp, duration_minute: bedTime - wakeTime },
+            progress: selectedMinorUnit
+          };
+
           const quizResult = {
             forced: [
               forced1 === 'whole',
@@ -606,7 +623,18 @@
             likert: [likert1, likert2, likert3]
           };
 
-          const response = await fetch("https://doziapi.duckdns.org/api/me/quiz", {
+          const me_response = await fetch("https://doziapi.duckdns.org/api/me", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify(userdata)
+          });
+
+          const data = await me_response.json();
+
+          const quiz_response = await fetch("https://doziapi.duckdns.org/api/me/quiz", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -615,14 +643,13 @@
             body: JSON.stringify(quizResult)
           });
 
-          const data = await response.json();
-
           const signupInfo = {
             grade: selectedGrade,
             majorUnit: selectedMajorUnit,
             minorUnit: selectedMinorUnit,
             weekdayHour, weekdayMinute,
             weekendHour, weekendMinute,
+            wakeHour, wakeMinute,
             schoolHour, schoolMinute,
             bedHour, bedMinute,
             forced1, forced2, forced3,
@@ -770,11 +797,26 @@
 
       const renderStep4 = () => (
         <div>
-          <div className="step-header"><div className="step-number">4</div><div className="step-title">등교·취침 시간 설정</div></div>
-
-          {/* 등교 시간 */}
+          <div className="step-header"><div className="step-number">4</div><div className="step-title">생활 패턴 설정</div></div>
+          {/* 기상 시간 */}
           <div style={{ marginBottom: "24px" }}>
-            <label style={{ fontSize: "16px", fontWeight: 500, color: "#333" }}><span style={{ color: "#E85A1F" }}>등교</span> 시간</label>
+            <label style={{ fontSize: "16px", fontWeight: 500, color: "#333" }}><span style={{ color: "#E85A1F" }}>기상</span> 시간</label>
+            <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
+              <select className="dropdown" style={{ width: "100px" }} value={wakeHour} onChange={e => setWakeHour(e.target.value)}>
+                <option value="">시간</option>
+                {hourOptions24.map(h => <option key={h} value={h}>{h}시</option>)}
+              </select>
+              <span style={{ alignSelf: "center" }}>시</span>
+              <select className="dropdown" style={{ width: "100px" }} value={wakeMinute} onChange={e => setWakeMinute(e.target.value)}>
+                <option value="">분</option>
+                {minuteOptions.map(m => <option key={m} value={m}>{m}분</option>)}
+              </select>
+            </div>
+          </div>
+
+          {/* 하교 시간 */}
+          <div style={{ marginBottom: "24px" }}>
+            <label style={{ fontSize: "16px", fontWeight: 500, color: "#333" }}><span style={{ color: "#E85A1F" }}>하교</span> 시간</label>
             <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
               <select className="dropdown" style={{ width: "100px" }} value={schoolHour} onChange={e => setSchoolHour(e.target.value)}>
                 <option value="">시간</option>
@@ -939,7 +981,9 @@
               <strong>주말 공부시간:</strong> {weekendHour ? `${weekendHour}시간` : ''}{weekendMinute ? ` ${weekendMinute}분` : ''}
             </p>
             <p>
-              <strong>등교 시간:</strong> {schoolHour !== '' ? `${schoolHour}시 ${schoolMinute}분` : ''}
+              <strong>기상 시간:</strong> {wakeHour !== '' ? `${wakeHour}시 ${wakeMinute}분` : ''}
+              <br />
+              <strong>하교 시간:</strong> {schoolHour !== '' ? `${schoolHour}시 ${schoolMinute}분` : ''}
               <br />
               <strong>취침 시간:</strong> {bedHour !== '' ? `${bedHour}시 ${bedMinute}분` : ''}</p>
             <p>

@@ -1,6 +1,7 @@
 from typing import Optional
+from datetime import datetime
 
-from model import TaskResult, UserData, QuizResult
+from model import TaskResult, UserData, QuizResult, Plan
 from knowledge_base import KnowledgeBase
 
 PLAN_SYSTEM_PROMPT = """You are a study planner for self-directed learners.
@@ -11,6 +12,7 @@ Your task:
 - Use "TEXTBOOK CONTENTS" and "WORKBOOK CONTENTS" from the KNOWLEDGE BASE to decide the order and scope of study.
 - When assigning workbook problems, specify the exact page ranges.
 - All content and tasks should be in Korean.
+- Consider attention span. Each task's duration should not be too long.
 - Insert break times between tasks(do not include breaks in the schedule).
 """
 
@@ -24,12 +26,10 @@ All content should be in Korean.
 
 ADDITIONAL_INSTRUCTIONS = """
 Additional Instructions:
-- Analyze the user's recent task results—especially completion rate and actual duration—to estimate their current learning level and pace.
-- For both the textbook and workbook, determine the current progress based on the most recently completed tasks (e.g., last studied page).
-- When creating new tasks, always start from where the last task was completed.
-- When scheduling workbook tasks, dynamically adjust the number of pages per task based on recent performance:
-    - If the completion rate for recent workbook tasks is low or the actual duration exceeded the planned time, reduce the number of pages for the next workbook task.
-    - If the completion rate is high and the actual duration was within the planned time, you may slightly increase the number of pages.
+- Analyze the user's current plan.
+- Keep all tasks already marked as "done" unchanged in the schedule.
+- For tasks not yet completed (not marked as "done"), adjust their start time and duration appropriately, considering the overall flow and the user's recent pace and learning preferences.
+- When creating new tasks, always start from where the last relevant task in the current plan was completed.
 - Explicitly state the page ranges for each workbook task, and ensure the workload is appropriate for the user's current ability.
 - Reflect the user's progress and preferences in all scheduling decisions.
 
@@ -47,16 +47,16 @@ def make_knowledge_base(textbook: str, workbook: str) -> str:
 
 
 def make_user_input(userdata: UserData, data_available=False) -> str:
+    is_weekday = datetime.today().weekday() < 5
+
     prompt = f"""Please generate a study plan based on the following constraints:
 
-- Total study time must be ≤ {userdata.active_time}.
-- Each task's duration must be ≤ {userdata.attention_span}.
-- The plan must satisfy: {userdata.requirement.model_dump_json()}.
-- Do not schedule any task during: [{",".join(interval.model_dump_json() for interval in userdata.constraints)}].
+- Total study time must be ≤ {userdata.weekday_study_time if is_weekday else userdata.weekend_study_time}.
+- The plan must satisfy: {userdata.weekday_requirement.model_dump_json() if is_weekday else userdata.weekend_requirement.model_dump_json()}.
     """
 
     if not data_available:
-        prompt += f"- I have studied up to page {userdata.progress} of the textbook.\n"
+        prompt += f"- I'm currently studying chapter {userdata.progress} of the textbook.\n"
 
     return prompt
 
@@ -105,12 +105,27 @@ def make_recent_results(results: list[TaskResult]) -> str:
 
     return "\n".join(recent_results)
 
-def make_planning_considerations(quiz_result: QuizResult, results: list[TaskResult]):
+def make_current_plan(current_plan: Plan) -> str:
+    plans = [
+        "- I have planned these tasks today."
+    ]
+
+    if not current_plan.plan:
+        plans.append("No tasks planned")
+
+    for task in current_plan.plan:
+        plans.append(f"{task.topic} {task.schedule.model_dump_json()}{' done' if task.done else ''}")
+
+    return "\n".join(plans)
+
+
+def make_planning_considerations(quiz_result: QuizResult, current_plan: Plan):
     prompt = [
         "For planning, consider:",
     ]
 
     prompt.append(make_learning_preference(quiz_result))
-    prompt.append(make_recent_results(results))
+    prompt.append(make_current_plan(current_plan))
+    prompt.append("I take 10min to solve a page of workbook")
 
     return "\n".join(prompt)

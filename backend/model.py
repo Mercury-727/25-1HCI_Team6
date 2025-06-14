@@ -1,5 +1,6 @@
 from typing import Optional
 from datetime import time, datetime
+from uuid import UUID
 from pydantic import BaseModel
 
 class TimeBlock(BaseModel):
@@ -7,20 +8,21 @@ class TimeBlock(BaseModel):
     duration_minute: int
 
 class Task(BaseModel):
-    id: int
+    uuid: UUID
     emoji: str
     topic: str
     schedule: TimeBlock
+    done: bool
 
 class Plan(BaseModel):
     plan: list[Task]
 
 class UserData(BaseModel):
-    active_time: int
-    attention_span: int
-    requirement: TimeBlock
-    constraints: list[TimeBlock]
-    progress: int
+    weekday_study_time: int
+    weekend_study_time: int
+    weekday_requirement: TimeBlock
+    weekend_requirement: TimeBlock
+    progress: str
 
 class QuizResult(BaseModel):
     forced: list[bool]

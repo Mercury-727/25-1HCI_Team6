@@ -10,7 +10,7 @@ from prompt import *
 from model import DailyFeedback, UserData, Plan, QuizResult, TaskResult, BookInformation
 from core import DoziFlask
 
-DEBUG = True
+DEBUG = False
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
@@ -31,6 +31,8 @@ def me():
             data = request.get_json()
             userdata = UserData(**data)
             put_db(user_id, "userdata", userdata)
+
+            put_db(user_id, "books", BookInformation(textbook="지학사", workbook="쎈"))
 
             return userdata.model_dump_json()
         except ValidationError as e:
@@ -97,96 +99,104 @@ def ping():
     return "pong"
 
 
-@api_bp.route("/plan")
+@api_bp.route("/plan", methods=["GET", "POST"])
 def plan():
     user_id = get_uuid()
 
-    userdata = get_db(user_id, "userdata")
+    if request.method == "GET":
+        userdata = get_db(user_id, "userdata")
+        if not userdata:
+            return "You must provide user data for planning"
 
-    if not userdata:
-        return "You must provide user data for planning"
+        book_info = get_db(user_id, "books")
+        if not book_info:
+            return "You must provide your book information for planning"
 
-    book_info = get_db(user_id, "books")
+        quiz_result = get_db(user_id, "quiz_result")
+        if not quiz_result:
+            return "You must provide your learning preferences quiz result"
 
-    if not book_info:
-        return "You must provide your book information for planning"
+        current_plan = get_db(user_id, "current_plan", Plan(plan=[]))
 
-    quiz_result = get_db(user_id, "quiz_result", QuizResult(forced=[], likert=[]))
-
-    recent_results: list[TaskResult] = get_db(user_id, "recent_results", [])
-    now = datetime.now()
-    recent_results = list(filter(
-            lambda task: now < task.timestamp + timedelta(days=7),
-            recent_results,
-    ))
-    put_db(user_id, "recent_results", recent_results)
-
-    if DEBUG:
-        return """{
-    "plan": [
-        {
-            "id": 1,
-            "emoji": "📗",
-            "topic": "이차방정식 복습: 핵심 개념 정리(p74-79)",
-            "schedule": {
-                "start": "15:30:00-05:00",
-                "duration_minute": 40
-            }
-        },
-        {
-            "id": 2,
-            "emoji": "📝",
-            "topic": "문제 세트 08: 이차방정식 풀이① - 내신 대비 문제(p120-124)",
-            "schedule": {
-                "start": "16:20:00-05:00",
-                "duration_minute": 37
-            }
-        },
-        {
-            "id": 3,
-            "emoji": "💪",
-            "topic": "문제 세트 09: 이차방정식 풀이② - 자신감 향상(p132-135)",
-            "schedule": {
-                "start": "18:00:00-05:00",
-                "duration_minute": 30
-            }
-        }
-    ]
-}"""
-
-    client = OpenAI()
-
-    response = client.responses.parse(
-        model="o4-mini-2025-04-16",
-        text_format=Plan,
-        input=[
+        if DEBUG:
+            return """{
+        "plan": [
             {
-                "role": "system",
-                "content": PLAN_SYSTEM_PROMPT,
+                "id": 1,
+                "emoji": "📗",
+                "topic": "이차방정식 복습: 핵심 개념 정리(p74-79)",
+                "schedule": {
+                    "start": "15:30:00-05:00",
+                    "duration_minute": 40
+                }
             },
             {
-                "role": "user",
-                "content": make_knowledge_base(book_info.textbook, book_info.workbook),
+                "id": 2,
+                "emoji": "📝",
+                "topic": "문제 세트 08: 이차방정식 풀이① - 내신 대비 문제(p120-124)",
+                "schedule": {
+                    "start": "16:20:00-05:00",
+                    "duration_minute": 37
+                }
             },
             {
-                "role": "user",
-                "content": make_user_input(userdata, data_available=bool(recent_results)),
-            },
-            {
-                "role": "user",
-                "content": make_planning_considerations(quiz_result.answers, recent_results),
-            },
-            {
-                "role": "user",
-                "content": ADDITIONAL_INSTRUCTIONS,
+                "id": 3,
+                "emoji": "💪",
+                "topic": "문제 세트 09: 이차방정식 풀이② - 자신감 향상(p132-135)",
+                "schedule": {
+                    "start": "18:00:00-05:00",
+                    "duration_minute": 30
+                }
             }
         ]
-    )
+    }"""
 
-    if not response.output_parsed:
-        return '''{"plan": []}'''
+        client = OpenAI()
 
-    return response.output_parsed.model_dump_json()
+        response = client.responses.parse(
+            model="o4-mini-2025-04-16",
+            text_format=Plan,
+            input=[
+                {
+                    "role": "system",
+                    "content": PLAN_SYSTEM_PROMPT,
+                },
+                {
+                    "role": "user",
+                    "content": make_knowledge_base(book_info.textbook, book_info.workbook),
+                },
+                {
+                    "role": "user",
+                    "content": make_user_input(userdata, data_available=False),
+                },
+                {
+                    "role": "user",
+                    "content": make_planning_considerations(quiz_result, current_plan),
+                },
+                {
+                    "role": "user",
+                    "content": ADDITIONAL_INSTRUCTIONS,
+                }
+            ]
+        )
+
+        plan_suggestion = response.output_parsed
+
+        if not plan_suggestion:
+            return '''{"plan": []}'''
+
+        return plan_suggestion.model_dump_json()
+
+    elif request.method == "POST":
+        try:
+            data = request.get_json()
+            current_plan = Plan(**data)
+            put_db(user_id, "current_plan", current_plan)
+
+            return current_plan.model_dump_json()
+        except ValidationError as e:
+            return jsonify(e.errors(), 400)
+    return ""
 
 @api_bp.route("/tasks/complete", methods=["GET", "POST"])
 def complete_task():
@@ -197,7 +207,7 @@ def complete_task():
         now = datetime.now()
         recent_results = list(
             filter(
-                lambda task: now < task.timestamp + timedelta(days=7),
+                lambda task: now < task.timestamp.replace(tzinfo=None) + timedelta(days=7),
                 recent_results,
             )
         )
