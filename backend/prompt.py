@@ -107,14 +107,14 @@ def make_recent_results(results: list[TaskResult]) -> str:
 
 def make_current_plan(current_plan: Plan) -> str:
     plans = [
-        "- I have planned these tasks today."
+        "- The user's current plans (uuid, topic, schedule)"
     ]
 
     if not current_plan.plan:
         plans.append("No tasks planned")
 
     for task in current_plan.plan:
-        plans.append(f"{task.topic} {task.schedule.model_dump_json()}{' done' if task.done else ''}")
+        plans.append(f"{task.uuid} {task.topic} {task.schedule.model_dump_json()}{' done' if task.done else ''}")
 
     return "\n".join(plans)
 

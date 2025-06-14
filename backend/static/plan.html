@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ko">
-
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -21,10 +20,10 @@
     box-sizing: border-box;
     /* Prevent selection, tap highlight on touch devices */
     user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    -webkit-touch-callout: none;
-    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10+ */
+    -webkit-touch-callout: none; /* Prevent callout menu on iOS */
+    -webkit-tap-highlight-color: transparent; /* Prevent tap highlight */
     }
 
     /* Body styles for centering and background */
@@ -111,6 +110,7 @@
     transition-property: transform;
     transition-duration: 300ms;
     transition-timing-function: ease; /* Match Tailwind duration-300 transition-transform */
+    flex-shrink: 0; /* Prevent shrinking in flex container */
     }
 
     /* Schedule view position */
@@ -122,9 +122,7 @@
     .ai-view {
     position: absolute; /* Position AI view on top */
     top: 0;
-    /* Instead of translate-x-full, position it to the right */
     left: 100%; /* Start 100% to the right of its container */
-    /* When active, move to translateX(-100%) to slide into view */
     }
 
     /* AI view active state */
@@ -135,7 +133,6 @@
     .schedule-view.shifted {
     transform: translateX(-100%); /* Slide left out of view */
     }
-
 
     /* Time grid background and padding */
     .time-grid {
@@ -283,6 +280,8 @@
     height: 100%; /* Fill parent height */
     background-color: #fff7ed; /* Unified background color (matching time-grid) */
     padding-bottom: 120px; /* Padding for fixed footer */
+    display: flex; /* Use flex for layout */
+    flex-direction: column; /* Stack children vertically */
     }
 
     .ai-header {
@@ -290,6 +289,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px; /* mb-4 */
+    flex-shrink: 0; /* Prevent header from shrinking */
     }
 
     .ai-title {
@@ -309,9 +309,13 @@
     .ai-back-btn:hover { text-decoration: underline; }
 
     .ai-plans-list {
+    flex-grow: 1; /* Allow plan list to take available space */
+    overflow-y: auto; /* Add scroll to the list if it overflows */
     display: flex;
     flex-direction: column;
     gap: 12px; /* space-y-3 */
+    /* Add some padding if needed, considering the scrollbar */
+    padding-right: 8px; /* Add padding for scrollbar visual separation */
     }
 
     .ai-plan-card {
@@ -326,6 +330,12 @@
     gap: 12px; /* gap-3 */
     /* Adjust padding-right to make space for the delete button */
     padding-right: 40px; /* Add space for the button */
+    flex-shrink: 0; /* Prevent cards from shrinking in the flex container */
+    }
+
+    .ai-plan-card.is-done {
+    border-color: #d1fae5; /* green-300 */
+    background-color: #f0fdf4; /* green-50 */
     }
 
     .ai-plan-emoji {
@@ -354,6 +364,7 @@
     right: 8px; /* Position from right */
     background: none;
     border: none;
+    font-size: 12px;
     color: rgba(255, 255, 255, 0.7); /* Slightly transparent white */
     cursor: pointer;
     padding: 4px; /* Clickable area */
@@ -364,16 +375,46 @@
     .ai-plan-delete-btn:hover {
     color: white;
     }
-    .ai-plan-delete-btn .lucide {
-    pointer-events: none; /* Prevent icon blocking click */
-    }
 
-
-    .ai-empty-state {
+    /* AI Empty State / Loading Indicator Container */
+    .ai-center-container {
+    flex-grow: 1; /* Take up space */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Center vertically */
     text-align: center;
     padding: 32px 0; /* py-8 */
     color: #4b5563; /* gray-600 */
     }
+
+
+    /* Loading Indicator Styles */
+    .spinner {
+    width: 40px; /* Spinner size */
+    height: 40px;
+    border: 4px solid #f3f3f3; /* Light grey border */
+    border-top: 4px solid #f96c50; /* Orange border for animation */
+    border-radius: 50%;
+    animation: spin 1s linear infinite; /* Apply spinning animation */
+    margin-bottom: 15px; /* Space between spinner and text */
+    }
+
+    @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+    font-size: 16px;
+    margin-bottom: 5px;
+    }
+
+    .eta-text {
+    font-size: 14px;
+    color: #666;
+    }
+
 
     .ai-generate-btn {
     background-color: #f97316; /* orange-500 */
@@ -601,11 +642,10 @@
     .modal-action-btn.primary:hover {
     background-color: #ea580c; /* hover:bg-orange-600 */
     }
-
     </style>
   </head>
 
-  <body className={`bg-gray-100 ${isDraggingOrResizing ? 'no-scroll' : ''}`}>
+  <body className={`bg-gray-100 ${isDraggingOrResizing || showModal || isAiGenerating ? 'no-scroll' : ''}`}>
     <div id="root"></div>
 
     <script type="text/babel">
@@ -637,6 +677,16 @@
       );
     }
 
+    // Component for the Loading Indicator
+    const LoadingIndicator = ({ eta }) => (
+      <div className="ai-center-container"> {/* Use the flex container for centering */}
+        <div className="spinner"></div>
+        <div className="loading-text">AI 플랜 생성 중...</div>
+        {eta > 0 && <div className="eta-text">예상 완료까지: {eta}초</div>}
+        {eta <= 0 && <div className="eta-text">조금만 기다려주세요</div>}
+      </div>
+    );
+
     function StudyPlannerApp() {
       // =============== 상수 정의 ===============
       const startHour = 8;
@@ -656,7 +706,11 @@
       const [currentView, setCurrentView] = useState('schedule');
       const [userPlans, setUserPlans] = useState([]);
       const [aiPlans, setAiPlans] = useState([]);
-      const [isDraggingOrResizing, setIsDraggingOrResizing] = useState(false); // New state
+      const [isDraggingOrResizing, setIsDraggingOrResizing] = useState(false); // State for drag/resize scroll lock
+      const [isAiGenerating, setIsAiGenerating] = useState(false); // State for AI generation loading
+      const [aiEtaRemaining, setAiEtaRemaining] = useState(0); // State for AI ETA countdown
+      const aiTimerRef = useRef(null); // Ref for AI ETA interval timer
+
 
       // 카드 이동/리사이징용 ref
       const resizeDataRef = useRef(null);
@@ -709,31 +763,27 @@
             console.error("저장된 일정 데이터를 불러오지 못했습니다. 초기화합니다.", e);
             setUserPlans([]); // Reset if data is corrupt
           }
+        } else {
+          // Optional: Initialize with default plans if localStorage is empty
+          // setUserPlans([ /* default plans here */ ]);
         }
-        // If no saved data or data reset, initial state from useState is used.
       }, []); // Run only once on mount
 
       useEffect(() => {
-        // Only save if userPlans has been loaded or changed from its initial state.
-        // A simple check might be to see if the effect has run after initial mount.
-        // Using a ref or checking a flag could be more precise.
-        // For now, saving any time userPlans changes after initial load seems okay.
+        // Save user plans to localStorage whenever they change
         localStorage.setItem("userPlans", JSON.stringify(userPlans));
-        // Re-create lucide icons whenever plans change (because cards might be re-rendered)
-        // Consider debouncing this if performance is an issue with many rapid plan changes
+
         lucide.createIcons();
       }, [userPlans]); // Save whenever userPlans changes
 
-      // Re-create lucide icons initially and when view changes (AI view might have different icons)
       useEffect(() => {
-        lucide.createIcons();
-      }, [currentView]);
-
-
-      useEffect(() => {
+        // Scroll to top when switching to AI view
         if (currentView === 'ai') {
-          // Consider scrolling to the top if AI view is entered
-          // window.scrollTo({ top: 0, behavior: 'smooth' });
+          window.scrollTo({ top: 0, behavior: 'smooth' }); // Optional smooth scroll
+        }
+        // Clear AI plans when switching back from AI view to schedule view
+        if (currentView === 'schedule') {
+          setAiPlans([]);
         }
       }, [currentView]);
 
@@ -749,42 +799,36 @@
         const e2TotalMins = timeToInt(newPlan.end);
 
         if (s2TotalMins >= e2TotalMins) {
+          console.warn("Invalid plan times: start is same as or after end.");
           return true; // Overlap if start is same as or after end (or duration is zero/negative)
         }
-        // Ensure times are within the valid range (startHour to endHour inclusive of start, exclusive of endHour:00 if it exists)
-        // A plan ending at 24:00 is valid if startHour is 8 and endHour is 24.
-        // The range is [startHour*60, endHour*60)
+        // Ensure times are within the valid range (startHour to endHour)
         if (s2TotalMins < startHour * 60 || e2TotalMins > endHour * 60) {
-          console.warn(`Plan time out of range: ${newPlan.start} - ${newPlan.end}`);
+          console.warn(`Plan time out of range: ${newPlan.start} - ${newPlan.end}. Range is ${startHour}:00 - ${endHour}:00`);
           return true; // Treat out of range as overlap for simplicity
         }
 
-
         return plans.some(p => {
           if (editingId && p.id === editingId) return false; // Ignore the plan being edited
-          const [s1h, s1m] = p.start.split(':').map(Number);
-          const [e1h, e1m] = p.end.split(':').map(Number);
-          const s1TotalMins = s1h * 60 + s1m;
-          const e1TotalMins = e1h * 60 + e1m;
+          const s1TotalMins = timeToInt(p.start);
+          const e1TotalMins = timeToInt(p.end);
 
           // Check for overlap: [s1, e1) and [s2, e2) overlap if max(s1, s2) < min(e1, e2)
-          // Example: [10:00, 11:00) and [11:00, 12:00) do NOT overlap.
-          // Example: [10:30, 11:30) and [11:00, 12:00) DO overlap.
           return Math.max(s1TotalMins, s2TotalMins) < Math.min(e1TotalMins, e2TotalMins);
         });
       }
 
       // =============== 플랜 삭제 & 편집 ===============
       const deletePlan = id => {
-        // Prevent deletion if currently dragging/resizing
-        if (isDraggingOrResizing) return;
+        // Prevent deletion if currently dragging/resizing or AI is generating
+        if (isDraggingOrResizing || isAiGenerating) return;
         if (window.confirm("정말로 이 플랜을 삭제하시겠습니까?")) {
           setUserPlans(plans => plans.filter(x => x.id !== id));
         }
       };
       const onEdit = plan => {
-        // Prevent editing if currently dragging/resizing
-        if (isDraggingOrResizing) return;
+        // Prevent editing if currently dragging/resizing or AI is generating
+        if (isDraggingOrResizing || isAiGenerating) return;
         setEditingPlan(plan);
         setNewPlan({
           title: plan.title,
@@ -798,86 +842,137 @@
 
       // =============== AI 제안 생성 ===============
       const generateAiSuggestions = async () => {
-        // Clear previous suggestions
+        if (isAiGenerating) return;
+
+        setIsAiGenerating(true);
         setAiPlans([]);
+        setAiEtaRemaining(30);
+        aiTimerRef.current = setInterval(() => {
+          setAiEtaRemaining(prevEta => (prevEta > 0 ? prevEta - 1 : 0));
+        }, 1000);
+        setCurrentView('ai');
 
-        const currentPlan = userPlans.map(plan => { return {
-          uuid: plan.id,
-          emoji: plan.emoji,
-          topic: plan.title,
-          schedule: {
-            start: plan.start + ':00',
-            duration_minute: timeToInt(plan.end) - timeToInt(plan.start),
-          },
-          done: plan.done
-        }});
+        try {
+          const currentPlanForApi = userPlans.map(plan => { return {
+            uuid: plan.id,
+            emoji: plan.emoji,
+            topic: plan.title,
+            schedule: {
+              start: plan.start + ':00',
+              duration_minute: timeToInt(plan.end) - timeToInt(plan.start),
+            },
+            done: plan.done
+          }});
 
-        const currentPlanResponse = await fetch("https://doziapi.duckdns.org/api/plan", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({ plan: currentPlan })
-        });
-
-        const suggestions = await fetch("https://doziapi.duckdns.org/api/plan")
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
+          const postResponse = await fetch("https://doziapi.duckdns.org/api/plan", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({ plan: currentPlanForApi })
           });
 
-        const suggestionPlans = suggestions.plan.map(suggestion => {
-          const start = suggestion.schedule.start.slice(0, 5);
-          const startTimestamp = timeToInt(start);
-          const endTimestamp = timeToInt(start) + suggestion.schedule["duration_minute"];
-          const endHour = String(Math.floor(endTimestamp / 60)).padStart(2, '0');
-          const endMinute = String(endTimestamp % 60).padStart(2, '0');
-          const end = endHour + ':' + endMinute;
+          if (!postResponse.ok) {
+            const errorBody = await postResponse.text();
+            console.error("API POST failed:", postResponse.status, errorBody);
+            throw new Error(`API POST failed with status: ${postResponse.status}`);
+          }
 
-          return {
-            id: suggestion.uuid,
-            emoji: suggestion.emoji,
-            title: suggestion.topic,
-            memo: '',
-            start, end
-          };
-        });
+          const getResponse = await fetch("https://doziapi.duckdns.org/api/plan");
 
-        setAiPlans(suggestionPlans);
-        setCurrentView('ai'); // Switch to AI view after generation
+          if (!getResponse.ok) {
+            const errorBody = await getResponse.text();
+            console.error("API GET failed:", getResponse.status, errorBody);
+            throw new Error(`API GET failed with status: ${getResponse.status}`);
+          }
+
+          const suggestionsData = await getResponse.json();
+
+          if (!suggestionsData || !Array.isArray(suggestionsData.plan)) {
+            console.error("Invalid API response structure:", suggestionsData);
+            throw new Error("Invalid response format from API.");
+          }
+
+          const suggestionPlans = suggestionsData.plan.map(suggestion => {
+            const start = suggestion.schedule.start.slice(0, 5); // Assuming HH:MM:SS, take HH:MM
+            const startTimestamp = timeToInt(start);
+            const duration = suggestion.schedule.duration_minute;
+            const endTimestamp = startTimestamp + duration;
+
+            // Ensure calculated end time is within the valid range (up to endHour*60)
+            const clampedEndTimestamp = Math.min(endTimestamp, endHour * 60);
+            // Ensure minimum duration of 5 minutes if possible
+            const actualDuration = Math.max(5, clampedEndTimestamp - startTimestamp); // Ensure at least 5 min duration if possible
+            const finalEndTimestamp = startTimestamp + actualDuration;
+
+
+            const endHourStr = String(Math.floor(finalEndTimestamp / 60)).padStart(2, '0');
+            const endMinuteStr = String(finalEndTimestamp % 60).padStart(2, '0');
+            const end = endHourStr + ':' + endMinuteStr;
+
+            return {
+              id: suggestion.uuid,
+              emoji: suggestion.emoji,
+              title: suggestion.topic,
+              memo: '',
+              start: start,
+              end: end,
+            };
+          });
+
+          setAiPlans(suggestionPlans);
+        } catch (error) {
+          console.error("AI plan generation failed:", error);
+          alert("AI 플랜 생성에 실패했습니다: " + error.message);
+          setAiPlans([]); // Clear AI suggestions on error
+          // Stay on schedule view
+          setCurrentView('schedule');
+        } finally {
+          setIsAiGenerating(false); // End loading state
+          // Stop the timer
+          if (aiTimerRef.current) {
+            clearInterval(aiTimerRef.current);
+            aiTimerRef.current = null;
+          }
+          setAiEtaRemaining(0); // Reset ETA
+        }
       };
 
       const applyAiPlans = () => {
-        const potentialNewPlans = aiPlans.map(pl => ({ ...pl, done: false, duration: 0, achievement: 0 }));
-        let newUserPlans = [];
+        // Prevent applying while AI is regenerating
+        if (isAiGenerating) return;
 
-        for (const newPlan of potentialNewPlans) {
-          let found = false;
+        const newUserPlans = [];
+        const userPlansMap = new Map(userPlans.map(plan => [plan.id, plan]));
 
-          // if matching user plan found, it must be marked as done
-          // do not modify tasks marked as done
-          for (const userPlan of userPlans) {
-            if (newPlan.id === userPlan.id) {
-              newUserPlans.push(userPlan);
-              found = true;
-              break;
-            }
+        for (const aiPlan of aiPlans) {
+          const existingUserPlan = userPlansMap.get(aiPlan.id);
+
+          if (existingUserPlan) {
+            newUserPlans.push(existingUserPlan);
+          } else {
+            newUserPlans.push({
+              ...aiPlan,
+              done: false,
+              duration: 0,
+              achievement: 0
+            });
           }
-
-          if (found) continue;
-
-          newUserPlans.push(newPlan);
         }
+
+        newUserPlans.sort((a, b) => {
+          const timeA = timeToInt(a.start);
+          const timeB = timeToInt(b.start);
+          return timeA - timeB;
+        });
 
         setUserPlans(newUserPlans);
         setAiPlans([]); // Clear AI suggestions after applying
         setCurrentView('schedule'); // Switch back to schedule view
       };
 
-      // Delete AI plan suggestion
+      // Delete AI plan suggestion (from the AI list before applying)
       const deleteAiPlan = (id) => {
         setAiPlans(plans => plans.filter(p => p.id !== id));
       };
@@ -901,7 +996,6 @@
             )
           );
         } else {
-          // Assign a new unique ID
           setUserPlans(plans => [...plans, { ...newPlan, id: crypto.randomUUID(), done: false, duration: 0, achievement: 0 }]);
         }
         setEditingPlan(null); // Clear editing state
@@ -933,6 +1027,8 @@
 
 
       const startResizing = (e, planId, edge) => {
+        if (isAiGenerating) return; // Prevent resizing while AI is generating
+
         // Prevent default touch behavior like scrolling/zooming
         if (e.cancelable) e.preventDefault();
         e.stopPropagation(); // Stop propagation to prevent triggering drag
@@ -977,6 +1073,8 @@
 
 
       const startDragging = (e, planId) => {
+        if (isAiGenerating) return; // Prevent dragging while AI is generating
+
         // Prevent default touch behavior like scrolling/zooming
         if (e.cancelable) e.preventDefault();
         e.stopPropagation(); // Stop propagation to prevent triggering resize handles
@@ -1186,7 +1284,8 @@
       // Apply no-scroll class to body based on state
       useEffect(() => {
         const body = document.body;
-        if (isDraggingOrResizing || showModal) { // Also disable scroll when modal is open
+        // Lock scroll if dragging/resizing OR modal is open OR AI is generating
+        if (isDraggingOrResizing || showModal || isAiGenerating) {
           body.classList.add('no-scroll');
         } else {
           body.classList.remove('no-scroll');
@@ -1195,7 +1294,33 @@
         return () => {
           body.classList.remove('no-scroll'); // Ensure scroll is re-enabled on component unmount
         };
-      }, [isDraggingOrResizing, showModal]); // Effect depends on these states
+      }, [isDraggingOrResizing, showModal, isAiGenerating]); // Effect depends on these states
+
+
+      // Effect to manage the AI ETA timer
+      useEffect(() => {
+        if (isAiGenerating) {
+          setAiEtaRemaining(30); // Reset ETA when generation starts
+          aiTimerRef.current = setInterval(() => {
+            setAiEtaRemaining(prevEta => (prevEta > 0 ? prevEta - 1 : 0));
+          }, 1000);
+        } else {
+          // Stop the timer when generation ends
+          if (aiTimerRef.current) {
+            clearInterval(aiTimerRef.current);
+            aiTimerRef.current = null;
+          }
+          setAiEtaRemaining(0); // Reset ETA
+        }
+
+        // Cleanup interval on component unmount or when isAiGenerating changes to false
+        return () => {
+          if (aiTimerRef.current) {
+            clearInterval(aiTimerRef.current);
+            aiTimerRef.current = null;
+          }
+        };
+      }, [isAiGenerating]); // Effect runs when AI generation state changes
 
 
       // =============== 렌더링 ===============
@@ -1257,6 +1382,9 @@
                 // Use onTouchStart to record time and initiate drag detection
                 // Use onTouchEnd to detect double-tap based on time from start
                 const handlePlanTouchStart = (e) => {
+                  // Prevent touch if modal is open or AI is generating
+                  if (showModal || isAiGenerating) return;
+
                   // Check if touch started on a resize handle or button
                   if (e.target.closest('.resize-handle') || e.target.closest('button') || e.target.closest('.lucide')) {
                     return; // Let resize/button handlers take over
@@ -1271,6 +1399,9 @@
 
                 // Mouse down handler for starting drag
                 const handlePlanMouseDown = (e) => {
+                  // Prevent mouse events if modal is open or AI is generating
+                  if (showModal || isAiGenerating) return;
+
                   // Check if mouse down happened on resize handle or icon button, if so, do nothing
                   if (e.target.closest('.resize-handle') || e.target.closest('button') || e.target.closest('.lucide')) {
                     return; // Let resize/button handlers take over
@@ -1295,6 +1426,8 @@
                     onDoubleClick={() => onEdit(plan)} // Keep double click for desktop
                     // onTouchEnd detects double-tap *after* the touch ends
                     onTouchEnd={(e) => {
+                      if (showModal || isAiGenerating) return; // Prevent touch end actions if modal open or AI generating
+
                       // Check if touch ended on a handle/button
                       if (e.target.closest('.resize-handle') || e.target.closest('button') || e.target.closest('.lucide')) {
                         // Let global handleEnd clear drag/resize state if they were active
@@ -1317,9 +1450,11 @@
                       draggable={false} // Explicitly prevent native HTML drag
                       className="resize-handle top" // Using custom class
                       onMouseDown={e => {
+                        if (showModal || isAiGenerating) return; // Prevent resize if modal open or AI generating
                         if (e.cancelable) e.preventDefault(); e.stopPropagation(); startResizing(e, plan.id, 'top');
                       }}
                       onTouchStart={e => {
+                        if (showModal || isAiGenerating) return; // Prevent resize if modal open or AI generating
                         if(e.cancelable) e.preventDefault(); e.stopPropagation(); startResizing(e.touches[0], plan.id, 'top');
                       }}
                     />
@@ -1354,9 +1489,11 @@
                       draggable={false} // Explicitly prevent native HTML drag
                       className="resize-handle bottom" // Using custom class
                       onMouseDown={e => {
+                        if (showModal || isAiGenerating) return; // Prevent resize if modal open or AI generating
                         if (e.cancelable) e.preventDefault(); e.stopPropagation(); startResizing(e, plan.id, 'bottom');
                       }}
                       onTouchStart={e => {
+                        if (showModal || isAiGenerating) return; // Prevent resize if modal open or AI generating
                         if(e.cancelable) e.preventDefault(); e.stopPropagation(); startResizing(e.touches[0], plan.id, 'bottom');
                       }}
                     />
@@ -1374,41 +1511,46 @@
                   <h2 className="ai-title"> {/* Using custom class */}
                     <span>🤖</span> AI 추천 플랜
                   </h2>
-                  <button onClick={() => setCurrentView('schedule')} className="ai-back-btn" type="button"> {/* Using custom class */}
+                  <button onClick={() => setCurrentView('schedule')} className="ai-back-btn" type="button" disabled={isAiGenerating}> {/* Disable button while generating */}
                     ← 돌아가기
                   </button>
                 </div>
-                <div className="ai-plans-list"> {/* Using custom class */}
-                  {aiPlans.length > 0 ? (
-                    aiPlans.map(pl => (
-                      <div key={pl.id} className="ai-plan-card"> {/* Using custom class */}
-                        {/* AI Plan Content */}
-                        <div className="ai-plan-emoji">{pl.emoji}</div> {/* Using custom class */}
-                        <div className="ai-plan-details"> {/* Using custom class */}
-                          <div className="title">{pl.title}</div> {/* Using custom class */}
-                          <div className="time">{pl.start} ~ {pl.end}</div> {/* Using custom class */}
-                        </div>
-                        {/* Delete Button for AI Plan */}
-                        <button
-                          className="ai-plan-delete-btn"
-                          onClick={(e) => { e.stopPropagation(); deleteAiPlan(pl.id); }}
-                          type="button"
-                          aria-label="AI 플랜 삭제"
-                        >
-                          <i data-lucide="x" className="lucide" style={{ width: 18, height: 18, pointerEvents: 'none' }} />
-                        </button>
-                      </div>
-                    ))
-                  ) : (
-                      <div className="ai-empty-state"> {/* Using custom class */}
-                        <p className="mb-4">🤖 AI에게 오늘의 학습 플랜을 추천받아 보세요!</p> {/* Basic margin */}
-                        <button onClick={generateAiSuggestions} className="ai-generate-btn" type="button"> {/* Using custom class */}
-                          AI 플랜 생성하기
-                        </button>
-                      </div>
-                    )}
-                </div>
-                {/* Apply button moved to the fixed footer */}
+
+                {/* Conditional rendering for Loading Indicator or AI Plans List */}
+                {isAiGenerating ? (
+                  <LoadingIndicator eta={aiEtaRemaining} />
+                ) : (
+                    <div className="ai-plans-list"> {/* Using custom class */}
+                      {aiPlans.length > 0 ? (
+                        aiPlans.map(pl => (
+                          <div key={pl.id} className='ai-plan-card'> {/* Using custom class */}
+                            {/* AI Plan Content */}
+                            <div className="ai-plan-emoji">{pl.emoji}</div> {/* Using custom class */}
+                            <div className="ai-plan-details"> {/* Using custom class */}
+                              <div className="title">{pl.title}</div> {/* Using custom class */}
+                              <div className="time">{pl.start} ~ {pl.end}</div> {/* Using custom class */}
+                            </div>
+                            {/* Delete Button for AI Plan */}
+                            <button
+                              className="ai-plan-delete-btn"
+                              onClick={(e) => { e.stopPropagation(); deleteAiPlan(pl.id); }}
+                              type="button"
+                              aria-label="AI 플랜 삭제"
+                            >
+                              🗙
+                            </button>
+                          </div>
+                        ))
+                      ) : (
+                          <div className="ai-center-container"> {/* Use the flex container for centering */}
+                            <p className="mb-4">🤖 AI에게 오늘의 학습 플랜을 추천받아 보세요!</p> {/* Basic margin */}
+                            <button onClick={generateAiSuggestions} className="ai-generate-btn" type="button"> {/* Using custom class */}
+                              AI 플랜 생성하기
+                            </button>
+                          </div>
+                        )}
+                    </div>
+                  )}
               </div>
             </div>
           </div>
@@ -1418,15 +1560,17 @@
           <div className="fixed-bottom-bar">
             <div className="content-wrapper"> {/* Using custom class */}
               {currentView === 'schedule' ? (
+                // Button to switch to AI view and trigger generation
                 <button
                   onClick={() => generateAiSuggestions()} // Trigger generation on button click
                   className="command-btn primary" type="button" /* Using custom classes */
+                  disabled={isAiGenerating} // Disable button while AI is generating
                 >
                   <span style={{ fontSize: '24px' }}>🤖</span> <span>AI 플랜 생성</span> {/* Icon size inline */}
                 </button>
               ) : (
-                  /* AI View Footer: Only show Apply button if plans exist */
-                  aiPlans.length > 0 && (
+                  /* AI View Footer: Only show Apply button if plans exist AND not generating */
+                  !isAiGenerating && aiPlans.length > 0 && (
                     <button
                       onClick={applyAiPlans}
                       className="command-btn primary" type="button" /* Using custom classes */
@@ -1520,6 +1664,7 @@
           )}
 
           {/* ───────── 새 일정 추가 버튼 ───────── */}
+          {/* Fixed button is only shown in schedule view when modal is not open */}
           {!showModal && currentView === 'schedule' && (
             <button
               onClick={() => {
@@ -1530,6 +1675,7 @@
               className="add-plan-button" /* Using custom class */
               type="button"
               aria-label="새 일정 추가"
+              disabled={isAiGenerating} // Disable button while AI is generating
             >
               <i data-lucide="plus" className="lucide" style={{ width: 24, height: 24, color: 'white', pointerEvents: 'none' }} />
             </button>
