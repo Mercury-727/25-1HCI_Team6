@@ -84,13 +84,27 @@
     border-radius: 30px;
     padding: 20px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     }
+
+    .timer-controls-top {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    }
+
     .svg-container {
     position: relative;
     width: 200px;
     height: 200px;
     margin: auto;
     }
+
     .svg-container svg {
     transform: rotate(-90deg);
     }
@@ -107,6 +121,7 @@
     justify-content: center;
     gap: 10px;
     margin-top: 20px;
+    flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
     }
     .btn {
     padding: 10px 16px;
@@ -114,11 +129,35 @@
     border: none;
     font-weight: bold;
     cursor: pointer;
+    flex-grow: 1; /* Allow buttons to grow */
+    min-width: 100px; /* Minimum width */
+    max-width: 150px; /* Maximum width */
+    }
+    .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
     }
     .start { background: #10b981; color: white; }
     .pause { background: #ffa726; color: white; }
     .reset { background: #6b7280; color: white; }
     .stop { background: #ef4444; color: white; }
+
+    .mode-toggle {
+    padding: 6px 12px; /* Smaller padding */
+    font-size: 13px; /* Smaller font size */
+    background: #e0e0e0;
+    color: #333;
+    border-radius: 15px; /* Slightly smaller border-radius */
+    cursor: pointer;
+    font-weight: normal; /* Less bold than main buttons */
+    flex-grow: 0;
+    margin-left: auto;
+    }
+
+    .mode-toggle:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+    }
     </style>
   </head>
   <body>
@@ -164,15 +203,24 @@
       </div>
     );
 
-    const Timer = ({ seconds, isRunning, onToggle, onReset, onStop, targetMinutes }) => {
+    const Timer = ({ seconds, isRunning, onToggle, onReset, onStop, targetMinutes, isCountingUp, onToggleCountingUp, hasStarted }) => {
       const radius = 90;
       const circumference = 2 * Math.PI * radius;
-      const progress = (seconds / (targetMinutes * 60)) * 100;
-      const offset = Math.max(circumference - (progress / 100) * circumference, 0);
+      const progress = Math.min((seconds / (targetMinutes * 60)) * 100, 100);
+      const offset = isCountingUp ?
+        Math.max(circumference - (progress / 100) * circumference, 0) :
+        (progress / 100) * circumference;
+
       const isOver = seconds > targetMinutes * 60;
 
       return (
         <div className="timer">
+        {/* Mode Toggle Button */}
+        <div className="timer-controls-top">
+            <button className="btn mode-toggle" onClick={onToggleCountingUp}>
+                {isCountingUp ? '▼ 카운트다운' : '▲ 카운트업'}
+            </button>
+        </div>
           <div className="svg-container">
             <svg width="200" height="200">
               <defs>
@@ -191,17 +239,24 @@
                 strokeLinecap="round"
               />
             </svg>
-            <div className="timer-text">{formatTime(seconds)}</div>
+            {/* Display time based on counting mode */}
+            <div className="timer-text">
+              {isCountingUp ? formatTime(seconds) : formatTime(Math.max(targetMinutes * 60 - seconds, 0))}
+            </div>
           </div>
-          <p>/ {formatTime(targetMinutes * 60)}</p>
+          {/* Display target time and optional overflow */}
+          <p>목표: {formatTime(targetMinutes * 60)}</p>
           {isOver && <p style={{ color: '#ffa726' }}>초과: +{formatTime(seconds - targetMinutes * 60)}</p>}
 
           <div className="buttons">
+            {/* Start/Pause Button */}
             <button className={"btn " + (isRunning ? "pause" : "start")} onClick={onToggle}>
               {isRunning ? "⏸ 일시정지" : "▶ 시작"}
             </button>
-            <button className="btn stop" onClick={onStop}>✅ 종료</button>
-            <button className="btn reset" onClick={onReset}>🔁 초기화</button>
+             {/* Stop Button - Only shown if timer has been started */}
+            {hasStarted && <button className="btn stop" onClick={onStop}>✅ 종료</button>}
+            {/* Reset Button - Only enabled if timer is running */}
+            <button className="btn reset" onClick={onReset} disabled={!isRunning}>🔁 초기화</button>
           </div>
         </div>
       );
@@ -232,27 +287,43 @@
           p.id === plan.id ? { ...p, done: true, achievement: achievement, duration: seconds } : p
         );
 
-        const response = await fetch("https://doziapi.duckdns.org/api/tasks/complete", {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            topic: plan.title,
-            timestamp: Date.now(),
-            duration_minute: Math.floor(seconds / 60),
-            completion_rate: achievement,
-          }),
-        });
+        try {
+          const response = await fetch("https://doziapi.duckdns.org/api/tasks/complete", {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              topic: plan.title,
+              timestamp: Math.floor(Date.now() / 1000),
+              duration_minute: Math.floor(seconds / 60),
+              completion_rate: achievement,
+            }),
+          });
 
-        const data = await response.json();
+          if (!response.ok) {
+            // Handle API error response
+             const errorText = await response.text();
+             console.error("API Error:", response.status, response.statusText, errorText);
+             alert("API 통신 중 오류가 발생했습니다."); // Inform the user
+          }
 
-        localStorage.setItem("userPlans", JSON.stringify(updatedPlans));
-        // reset currentPlanID
-        localStorage.setItem("currentPlanID", JSON.stringify({}));
-        // jump to home
-        window.location.href = "./home.html";
+          const data = await response.json();
+           console.log("API Success:", data);
+
+
+        } catch (error) {
+           console.error("Network or Fetch Error:", error);
+           alert("요청 중 오류가 발생했습니다."); // Inform the user about fetch errors
+        } finally {
+           // Always save to local storage and navigate, even if API fails
+           localStorage.setItem("userPlans", JSON.stringify(updatedPlans));
+           // reset currentPlanID
+           localStorage.setItem("currentPlanID", JSON.stringify({})); // Reset the current plan ID
+           // jump to home
+           window.location.href = "./home.html";
+        }
       };
 
 
@@ -261,7 +332,7 @@
           <h3>🌟 오늘의 학습 완료!</h3>
           <p>{plan.emoji} {plan.title}</p>
           <p>⏱ 총 학습 시간: {formatTime(seconds)}</p>
-          <p>{getEmoji(achievement)} 목표 달성률: {getText(achievement)}</p>
+          <p>{getEmoji(achievement)} 목표 달성률: {getText(achievement)} ({achievement}%)</p>
           <button className="btn start" onClick={submitFeedback}>확인</button>
         </div>
       );
@@ -270,25 +341,30 @@
     function App() {
       const [seconds, setSeconds] = useState(0);
       const [isRunning, setIsRunning] = useState(false);
+      const [hasStarted, setHasStarted] = useState(false);
       const [phase, setPhase] = useState('timer'); // 'timer', 'confirm', 'achievement', 'feedback'
       const [achievement, setAchievement] = useState(50);
+      const [isCountingUp, setIsCountingUp] = useState(true);
 
+      // Retrieve plan details
       const planID = localStorage.getItem("currentPlanID");
       const plans = JSON.parse(localStorage.getItem("userPlans")) || [];
       const plan = plans.find(p => p.id === planID) || {
         emoji: "🎯",
         title: "목표 없음",
-        memo: "",
-        start: "08:00",
-        end: "09:00",
-        id: 0,
+        memo: "선택된 학습 계획이 없습니다. 홈 화면에서 학습을 시작해주세요.",
+        start: "00:00",
+        end: "00:00",
+        id: null,
         done: false
       };
       const [sh, sm] = plan.start.split(':').map(Number);
       const [eh, em] = plan.end.split(':').map(Number);
-      const targetMinutes = (eh * 60 + em) - (sh * 60 + sm);
+      const targetMinutes = (eh * 60 + em) - (sh * 60 + sm); // Calculate target duration in minutes
+
       const timerRef = useRef(null);
 
+      // Timer interval effect
       useEffect(() => {
         if (isRunning) {
           timerRef.current = setInterval(() => setSeconds(prev => prev + 60), 1000);
@@ -298,43 +374,82 @@
         return () => clearInterval(timerRef.current);
       }, [isRunning]);
 
+      // Lucide icon initialization
       useEffect(() => {
         lucide.createIcons();
       }, []);
 
-      const resetAll = () => {
-        setSeconds(0);
-        setIsRunning(false);
-        setAchievement(50);
-        setPhase('timer');
+       useEffect(() => {
+          if (plan.id !== null) { // Only save if a valid plan is selected
+            const updatedPlans = plans.map(p =>
+              p.id === plan.id ? { ...p, duration: seconds } : p
+            );
+            localStorage.setItem("userPlans", JSON.stringify(updatedPlans));
+          }
+       }, [seconds, plan.id]);
+
+
+      // Toggle timer start/pause
+      const handleToggleTimer = () => {
+        if (!isRunning) {
+          setHasStarted(true); // Mark as started when the start button is pressed
+        }
+        setIsRunning(!isRunning);
       };
+
+      // Reset timer
+      const handleResetTimer = () => {
+        setIsRunning(false);
+        setSeconds(0);
+        setHasStarted(false); // Reset started state
+      };
+
+      // Stop timer and move to confirmation phase
+      const handleStopTimer = () => {
+        setIsRunning(false);
+        setPhase('confirm');
+      };
+
+      // Toggle counting mode
+      const handleToggleCountingUp = () => {
+          setIsCountingUp(prev => !prev);
+      };
+
 
       return (<>
         <Header />
         <div className="container">
           <GoalCard plan={plan}/>
+          {/* Render Timer or subsequent phases based on 'phase' state */}
           {phase === 'timer' && (
             <Timer
               seconds={seconds}
               isRunning={isRunning}
-              onToggle={() => setIsRunning(!isRunning)}
-              onReset={() => { setSeconds(0); setIsRunning(false); }}
-              onStop={() => { setIsRunning(false); setPhase('confirm'); }}
+              onToggle={handleToggleTimer}
+              onReset={handleResetTimer}
+              onStop={handleStopTimer}
               targetMinutes={targetMinutes}
+              isCountingUp={isCountingUp}
+              onToggleCountingUp={handleToggleCountingUp} // Pass toggle handler
+              hasStarted={hasStarted} // Pass started state
             />
           )}
+          {/* Confirmation phase */}
           {phase === 'confirm' && (
             <div className="timer">
               <h3>정말로 학습을 종료하시겠어요?</h3>
+              <p>⏱ 현재 학습 시간: {formatTime(seconds)}</p>
               <div className="buttons">
-                <button className="btn stop" onClick={() => setPhase('achievement')}>YES</button>
-                <button className="btn reset" onClick={() => setPhase('timer')}>NO</button>
+                <button className="btn reset" onClick={() => setPhase('timer')}>❌ 계속할래요</button>
+                <button className="btn stop" onClick={() => setPhase('achievement')}>✅ 종료할게요</button>
               </div>
             </div>
           )}
+          {/* Achievement input phase */}
           {phase === 'achievement' && (
             <AchievementInput onSubmit={(val) => { setAchievement(val); setPhase('feedback'); }} />
           )}
+          {/* Feedback summary phase */}
           {phase === 'feedback' && (
             <FeedbackCard plan={plan} seconds={seconds} achievement={achievement} />
           )}
