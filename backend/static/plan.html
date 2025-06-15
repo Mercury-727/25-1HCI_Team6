@@ -1029,10 +1029,6 @@
       const startResizing = (e, planId, edge) => {
         if (isAiGenerating) return; // Prevent resizing while AI is generating
 
-        // Prevent default touch behavior like scrolling/zooming
-        if (e.cancelable) e.preventDefault();
-        e.stopPropagation(); // Stop propagation to prevent triggering drag
-
         dragDataRef.current = null; // Ensure drag is not active
 
         const plan = userPlans.find(p => p.id === planId);
@@ -1074,10 +1070,6 @@
 
       const startDragging = (e, planId) => {
         if (isAiGenerating) return; // Prevent dragging while AI is generating
-
-        // Prevent default touch behavior like scrolling/zooming
-        if (e.cancelable) e.preventDefault();
-        e.stopPropagation(); // Stop propagation to prevent triggering resize handles
 
         resizeDataRef.current = null; // Ensure resize is not active
 
@@ -1122,10 +1114,6 @@
         if (!dragDataRef.current && !resizeDataRef.current) {
           return;
         }
-
-        // Prevent default scroll behavior if dragging or resizing is active
-        if (e.cancelable) e.preventDefault();
-        e.stopPropagation();
 
         const coords = getCoordsAndScroll(e);
         if (!coords) return;
@@ -1178,7 +1166,7 @@
             }
             return plans; // No change needed
           });
-          // return; // Stop processing if resizing - Handled by the initial if check
+          return;
         }
 
         // --- 이동 중일 때 ---
@@ -1211,7 +1199,7 @@
             }
             return plans; // No change needed
           });
-          // return; // Stop processing if dragging - Handled by the initial if check
+          return;
         }
       };
 
@@ -1455,7 +1443,9 @@
                       }}
                       onTouchStart={e => {
                         if (showModal || isAiGenerating) return; // Prevent resize if modal open or AI generating
-                        if(e.cancelable) e.preventDefault(); e.stopPropagation(); startResizing(e.touches[0], plan.id, 'top');
+                        if(e.cancelable) e.preventDefault();
+                        e.stopPropagation();
+                        startResizing(e, plan.id, 'top');
                       }}
                     />
 
@@ -1494,7 +1484,9 @@
                       }}
                       onTouchStart={e => {
                         if (showModal || isAiGenerating) return; // Prevent resize if modal open or AI generating
-                        if(e.cancelable) e.preventDefault(); e.stopPropagation(); startResizing(e.touches[0], plan.id, 'bottom');
+                        if(e.cancelable) e.preventDefault();
+                        e.stopPropagation();
+                        startResizing(e, plan.id, 'bottom');
                       }}
                     />
                   </div>
