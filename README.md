@@ -19,16 +19,17 @@
 ---
 
 ## 사용된 기술 스택
-- **프론트엔드**: React 17/18, Tailwind CSS, Lucide Icons
-- **빌드**: Babel, webpack (CRA)
-- **배포**: Netlify / GitHub Pages
+- **프론트엔드**: React 17/18, Lucide Icons
+- **백엔드**: Flask, gunicorn, OpenAI API
+- **빌드**: Babel (CDN based)
+- **배포**: Docker compose
 
 ---
 
 ## 평가 및 검증
 ### 🔍 평가 대상과 방법
 - **참여자**: 페르소나 대표 사용자 4명
-- **테스트 기법**: 관찰(Think-Aloud), 사후 설문, 데브리핑
+- **테스트 기법**: 관찰(Think-Aloud), 사후 설문, 디브리핑
 - **테스트 시나리오**:
   1. 일정 추가 후 AI 플랜 적용
   2. 타이머로 목표 시간 측정 및 달성률 입력
@@ -44,7 +45,16 @@
 
 
 ## 설치 및 실행 방법
-1. 저장소 클론:
    ```bash
    git clone https://github.com/your-org/hci-team6.git
    cd hci-team6
+
+   # setup nginx/conf.d/default.d appropriately
+   # ensure certificate is installed under certbot
+   # modify html files' API endpoint to your origin
+   cat $OPENAI_API_KEY > .openai-api-key
+
+   docker compose up
+
+   # open your origin in web browser
+   ```
