@@ -367,7 +367,7 @@
       // Timer interval effect
       useEffect(() => {
         if (isRunning) {
-          timerRef.current = setInterval(() => setSeconds(prev => prev + 60), 1000);
+          timerRef.current = setInterval(() => setSeconds(prev => prev + 1), 1000);
         } else {
           clearInterval(timerRef.current);
         }
