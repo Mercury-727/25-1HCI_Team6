@@ -191,6 +191,91 @@
     background-color: #f0fdf4; /* green-50 */
     }
 
+    .plan-card.is-short .plan-header {
+      padding-top: 2px;
+      padding-botttom: 2px;
+    }
+
+  .plan-card.is-short .plan-memo {
+    display: none; /* Hide memo when card is short */
+  }
+
+
+  /* Styles for cards shorter than 20 minutes (approx 56px height) */
+  .plan-card.is-compact .plan-header {
+    padding-top: 0;
+    padding-bottom: 0;
+    gap: 4px; /* Reduce gap-2 (8px) */
+  }
+
+  .plan-card.is-compact .plan-title-text {
+    font-size: 12px; /* Reduce title font from 14px */
+    /* Ensure text doesn't wrap tightly */
+    line-height: 1.2;
+  }
+
+  .plan-card.is-compact .plan-actions {
+    gap: 2px; /* Reduce gap-1 (4px) */
+  }
+
+  .plan-card.is-compact .plan-action-btn {
+    padding: 2px; /* Reduce p-1 (4px) */
+  }
+  .plan-card.is-compact .lucide {
+      width: 12px !important; /* Smaller icons */
+      height: 12px !important;
+  }
+
+
+  .plan-card.is-compact .plan-content {
+    padding-top: 0;    /* Remove top padding */
+    padding-bottom: 2px; /* Reduce pb-2 (8px) */
+  }
+
+  .plan-card.is-compact .plan-times {
+    font-size: 10px; /* Reduce time font from 12px */
+    margin-top: 0; /* Remove margin-top */
+  }
+
+  /* Styles for cards shorter than 15 minutes (approx 42px height) */
+  /* At this height, we likely need to hide more elements */
+  .plan-card.is-very-compact {
+    display: flex;
+    justify-content: space-evenly;
+  }
+
+  .plan-card.is-very-compact .plan-header {
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  .plan-card.is-very-compact .plan-title {
+      gap: 0;
+    align-items: center;
+  }
+
+
+  .plan-card.is-very-compact .plan-emoji {
+    display: none; /* Hide emoji */
+  }
+
+  .plan-card.is-very-compact .plan-title-text {
+    font-size: 10px; /* Same as compact time font size */
+    white-space: nowrap; /* Prevent text wrapping */
+    overflow: hidden; /* Hide overflowing text */
+    text-overflow: ellipsis; /* Add ellipsis */
+    flex-grow: 1; /* Allow text to take available space */
+    max-width: 240px;
+    min-width: 0; /* Needed for ellipsis in flex item */
+  }
+
+  .plan-card.is-very-compact .plan-content {
+    display: none; /* Hide the entire content block (time/memo) */
+  }
+
     .plan-header {
     display: flex;
     align-items: center;
@@ -1115,16 +1200,16 @@
           return;
         }
 
+        if (e.cancelable && (e.type === 'mousemove' || e.type === 'touchmove')) {
+          e.preventDefault();
+        }
+
         const coords = getCoordsAndScroll(e);
         if (!coords) return;
 
         // Calculate delta Y relative to initial *page* position, accounting for scroll
-        const initialClientY = resizeDataRef.current?.initialClientY || dragDataRef.current?.initialClientY;
-        const initialScrollY = resizeDataRef.current?.initialScrollY || dragDataRef.current?.initialScrollY;
-
-        // Only proceed if initial coords were captured (should always be if refs are set)
-        if (initialClientY === undefined || initialScrollY === undefined) return;
-
+        const initialClientY = resizeDataRef.current ? resizeDataRef.current.initialClientY : dragDataRef.current.initialClientY;
+        const initialScrollY = resizeDataRef.current ? resizeDataRef.current.initialScrollY : dragDataRef.current.initialScrollY;
 
         const deltaY = (coords.clientY + coords.scrollY) - (initialClientY + initialScrollY);
         const deltaSlots5 = Math.round(deltaY / slotHeight5);
@@ -1366,6 +1451,9 @@
                 const topPx = startIdx5 * slotHeight5;
                 const heightPx = Math.max(spanSlots5 * slotHeight5, slotHeight5); // Ensure min height of 5 mins
 
+                const isShort = heightPx <= 84;
+                const isCompact = heightPx <= 56;
+                const isVeryCompact = heightPx <= 42;
 
                 // Use onTouchStart to record time and initiate drag detection
                 // Use onTouchEnd to detect double-tap based on time from start
@@ -1403,7 +1491,7 @@
                 return (
                   <div
                     key={plan.id}
-                    className={`plan-card ${plan.done ? 'is-done' : ''}`} /* Using custom classes */
+                    className={`plan-card ${plan.done ? 'is-done' : ''} ${isShort ? 'is-short' : ''} ${isCompact ? 'is-compact' : ''} ${isVeryCompact ? 'is-very-compact' : ''}`} /* Using custom classes */
                     style={{
                       top: `${topPx}px`,
                       height: `${heightPx}px`,
